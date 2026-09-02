@@ -1,0 +1,275 @@
+"""
+extract_latents_aspect.py — aspect-padded MedVAE latents for the frontier.
+
+Produces, for each (config, split), one self-contained .npz:
+    latents_{config}_{split}.npz  with
+        latents   (N, Cz, H, W) float32   # H,W = 96 (4x) or 48 (8x)
+        uuids     (N,)                     # image_uuid per row
+        cobb      (N, 3) float32           # 3 Cobb angles
+        landmarks (N, 136) float32         # normalised, ordering A (68 xs|68 ys)
+
+Same aspect-padded preprocessing as the 96x96 Cobb baseline
+(load_2d_finetune_aspect) so BOTH tasks read the SAME representation at each
+compression level — that is what makes train_frontier.py's task comparison
+controlled. Idempotent: an existing .npz is skipped unless --force.
+
+THE ONE RISKY THING — landmark<->image alignment:
+landmarks.csv has no ID column, so row order must be mapped to image_uuids.
+For test you already verified this with landmark_row_lookup_test_fixed.csv.
+For TRAINING (481 rows feeding both train and val) the mapping must be
+established and CHECKED. This script resolves the mapping in this order:
+    1. an explicit --train-lookup / --test-lookup CSV  (col: image_uuid, in row order)
+    2. a filenames.csv sitting next to landmarks.csv   (BoostNet canonical order)
+    3. fall back to the boostnet.csv order for that split  (LOUD warning)
+ALWAYS run --verify first: it overlays the parsed 68 landmarks on a few images
+per split and prints which mapping source was used. If the dots don't sit on
+the vertebra corners (training especially), fix the lookup before the full run.
+
+Usage (verify alignment FIRST — no encoding, fast):
+    python extract_latents_aspect.py --verify \\
+        --csv ./medvae/data/boostnet_with_angles.csv \\
+        --img-dir ./medvae/data/boostnet \\
+        --landmarks-dir ~/MedVAE/data/boostnet_labeldata/labels \\
+        --test-lookup ./landmark_row_lookup_test_fixed.csv \\
+        --out-dir ./latents_aspect
+
+Then full extraction (drop --verify):
+    python extract_latents_aspect.py \\
+        --csv ./medvae/data/boostnet_with_angles.csv \\
+        --img-dir ./medvae/data/boostnet \\
+        --landmarks-dir ~/MedVAE/data/boostnet_labeldata/labels \\
+        --test-lookup ./landmark_row_lookup_test_fixed.csv \\
+        --out-dir ./latents_aspect
+"""
+
+import argparse
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import torch
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+
+from medvae import MVAE
+from medvae.utils.loaders import load_2d_finetune_aspect
+
+CONFIGS = ["medvae_4_1_2d", "medvae_8_1_2d"]
+CONFIG_LABELS = {"medvae_4_3_2d": "4_3", "medvae_4_1_2d": "4_1",
+                 "medvae_8_4_2d": "8_4", "medvae_8_1_2d": "8_1"}
+N_LANDMARKS = 68
+# training/landmarks.csv covers BOTH the train and val splits.
+SPLIT_TO_LMK_SUBDIR = {"train": "training", "val": "training", "test": "test"}
+LANDMARK_COLOR = "#B85042"
+
+
+# ---------------------------------------------------------------------------
+# MedVAE
+# ---------------------------------------------------------------------------
+def transform_image(path):
+    # identical preprocessing to the Cobb 96x96 baseline / the endplate script
+    return load_2d_finetune_aspect(str(path), merge_channels=True).unsqueeze(0)
+
+
+@torch.no_grad()
+def encode_latent(mvae, x):
+    """Deterministic latent (posterior mode/mean). Robust to MedVAE's encode
+    returning a tensor, a tuple, or a distribution object."""
+    out = mvae.model.encode(x)
+    if isinstance(out, (tuple, list)):
+        out = out[0]
+    if torch.is_tensor(out):
+        z = out
+    elif hasattr(out, "mode"):
+        z = out.mode()
+    elif hasattr(out, "mean"):
+        z = out.mean
+    elif hasattr(out, "sample"):
+        z = out.sample()
+    else:
+        raise RuntimeError(f"Unrecognised encode() return: {type(out)}")
+    return z.squeeze(0).float().cpu()   # (Cz, H, W)
+
+
+def match_in_channels(x, n_in):
+    """Replicate a 1-channel image to the n_in channels a checkpoint expects.
+    The 3c/4c MedVAE models take a 3-channel input; the 1c models take 1."""
+    if x.shape[1] == n_in:
+        return x
+    if x.shape[1] == 1:
+        return x.repeat(1, n_in, 1, 1)
+    raise ValueError(f"cannot match input {x.shape[1]}ch -> {n_in}ch")
+
+
+@torch.no_grad()
+def probe_in_channels(mvae, x1, device):
+    """Find how many input channels this checkpoint's encoder wants (1, 3, or 4)."""
+    for c in (1, 3, 4):
+        try:
+            encode_latent(mvae, match_in_channels(x1, c).to(device))
+            return c
+        except Exception:
+            continue
+    raise RuntimeError("could not determine encoder input channels")
+
+
+# ---------------------------------------------------------------------------
+# Landmarks
+# ---------------------------------------------------------------------------
+def parse_landmark_row(vals):
+    xs = np.asarray(vals[:N_LANDMARKS], dtype=float)
+    ys = np.asarray(vals[N_LANDMARKS:], dtype=float)
+    return np.concatenate([xs, ys])   # (136,) ordering A preserved
+
+
+def build_uuid_to_row(split, df_split, landmarks_dir, lookups):
+    """Return {image_uuid: landmark_row_index} for this split, plus a source
+    string. Honours an explicit lookup's `landmark_row` column when present
+    (robust to file ordering); otherwise falls back to positional order."""
+    subdir = SPLIT_TO_LMK_SUBDIR[split]
+    lk = lookups.get("train" if subdir == "training" else "test")
+    if lk is not None:
+        ucol = "image_uuid" if "image_uuid" in lk.columns else lk.columns[0]
+        if "landmark_row" in lk.columns:
+            m = {str(u): int(r) for u, r in zip(lk[ucol], lk["landmark_row"])}
+        else:
+            m = {str(u): i for i, u in enumerate(lk[ucol].astype(str))}
+        return m, f"explicit lookup ({subdir}, {len(m)} rows)"
+    fnames = Path(landmarks_dir) / subdir / "filenames.csv"
+    if fnames.exists():
+        f = pd.read_csv(fnames, header=None)[0].astype(str)
+        m = {Path(s).stem: i for i, s in enumerate(f)}
+        return m, f"filenames.csv ({subdir}) — RAW stems, NOT canonicalised"
+    return ({str(u): i for i, u in enumerate(df_split["image_uuid"].astype(str))},
+            f"!! FALLBACK boostnet.csv order ({split}) — VERIFY THIS !!")
+
+
+def load_landmarks_for_split(split, landmarks_dir):
+    subdir = SPLIT_TO_LMK_SUBDIR[split]
+    arr = pd.read_csv(Path(landmarks_dir) / subdir / "landmarks.csv",
+                      header=None).values
+    return np.stack([parse_landmark_row(r) for r in arr])   # (R,136)
+
+
+# ---------------------------------------------------------------------------
+# Verify: overlay landmarks on a few images per split
+# ---------------------------------------------------------------------------
+def content_bbox(t, thresh=-0.8):
+    m = (t > thresh).squeeze()
+    rows = m.any(dim=1).nonzero(as_tuple=True)[0]
+    cols = m.any(dim=0).nonzero(as_tuple=True)[0]
+    if len(rows) == 0 or len(cols) == 0:
+        return 0, t.shape[-2], 0, t.shape[-1]
+    return rows[0].item(), rows[-1].item() + 1, cols[0].item(), cols[-1].item() + 1
+
+
+def verify(args, df, lookups):
+    out = Path(args.out_dir); out.mkdir(parents=True, exist_ok=True)
+    fig, axes = plt.subplots(1, 3, figsize=(12, 6))
+    for ax, split in zip(axes, ("train", "val", "test")):
+        sub = df[df["split"] == split].reset_index(drop=True)
+        if len(sub) == 0:
+            ax.set_title(f"{split}: empty"); ax.axis("off"); continue
+        uuid_to_row, src = build_uuid_to_row(split, sub, args.landmarks_dir, lookups)
+        lmk = load_landmarks_for_split(split, args.landmarks_dir)
+        target = sub.iloc[len(sub) // 2]["image_uuid"]
+        if str(target) not in uuid_to_row:
+            ax.set_title(f"{split}: '{target}' not in mapping\n{src}")
+            ax.axis("off"); print(f"[{split}] {src}: target uuid missing!"); continue
+        row = lmk[uuid_to_row[str(target)]]
+        x = transform_image(Path(args.img_dir) / f"{target}.jpg")
+        r0, r1, c0, c1 = content_bbox(x)
+        img = x.squeeze().numpy()
+        xs = c0 + row[:N_LANDMARKS] * (c1 - c0)
+        ys = r0 + row[N_LANDMARKS:] * (r1 - r0)
+        ax.imshow(img, cmap="gray")
+        ax.scatter(xs, ys, s=14, c=LANDMARK_COLOR, edgecolors="white", linewidths=0.4)
+        ax.set_title(f"{split}: {target}\n{src}", fontsize=8)
+        ax.axis("off")
+        print(f"[{split}] source = {src}")
+    fig.suptitle("Landmark alignment check — dots must sit on vertebra corners")
+    fig.tight_layout()
+    p = out / "landmark_alignment_check.png"
+    fig.savefig(p, dpi=130, bbox_inches="tight")
+    print(f"\nSaved {p} — open it before the full run.")
+
+
+# ---------------------------------------------------------------------------
+# Full extraction
+# ---------------------------------------------------------------------------
+def extract(args, df, lookups):
+    out = Path(args.out_dir); out.mkdir(parents=True, exist_ok=True)
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    cobb_cols = [c for c in ("pt", "mt", "tl_l") if c in df.columns] or \
+                [c for c in df.columns if c.lower().startswith(("angle", "cobb"))][:3]
+    if len(cobb_cols) != 3:
+        raise SystemExit(f"Could not identify 3 Cobb-angle columns; got {cobb_cols}. "
+                         f"Pass the right --csv or edit cobb_cols.")
+    print(f"Cobb columns: {cobb_cols}")
+
+    for config in args.configs:
+        mvae = MVAE(model_name=config, modality="xray").to(device).eval()
+        # 1c vs 3c/4c checkpoints expect different input channel counts
+        probe_x = transform_image(Path(args.img_dir) / f"{df.iloc[0]['image_uuid']}.jpg")
+        n_in = probe_in_channels(mvae, probe_x, device)
+        print(f"[{CONFIG_LABELS[config]}] encoder expects {n_in}-channel input")
+        for split in ("train", "val", "test"):
+            dst = out / f"latents_{config}_{split}.npz"
+            if dst.exists() and not args.force:
+                print(f"skip (exists): {dst.name}"); continue
+            sub = df[df["split"] == split].reset_index(drop=True)
+            if len(sub) == 0:
+                print(f"no {split} rows, skip"); continue
+
+            uuid_to_row, src = build_uuid_to_row(split, sub, args.landmarks_dir, lookups)
+            lmk_all = load_landmarks_for_split(split, args.landmarks_dir)
+            print(f"[{CONFIG_LABELS[config]} {split}] landmark source: {src}")
+
+            lat_list, uuids, cobb, lmk = [], [], [], []
+            for _, r in sub.iterrows():
+                u = str(r["image_uuid"])
+                if u not in uuid_to_row:
+                    print(f"  WARN no landmark row for {u}, skipping"); continue
+                x = match_in_channels(transform_image(Path(args.img_dir) / f"{u}.jpg"), n_in).to(device)
+                lat_list.append(encode_latent(mvae, x).numpy())
+                uuids.append(u)
+                cobb.append(r[cobb_cols].to_numpy(dtype=np.float32))
+                lmk.append(lmk_all[uuid_to_row[u]].astype(np.float32))
+
+            latents = np.stack(lat_list).astype(np.float32)
+            np.savez_compressed(dst, latents=latents, uuids=np.array(uuids),
+                                cobb=np.stack(cobb), landmarks=np.stack(lmk))
+            print(f"  wrote {dst.name}  latents={latents.shape}  n={len(uuids)}")
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--csv", type=Path, required=True,
+                    help="boostnet csv with image_uuid, split, and 3 Cobb-angle cols")
+    ap.add_argument("--img-dir", type=Path, required=True)
+    ap.add_argument("--landmarks-dir", type=Path, required=True,
+                    help="dir containing training/landmarks.csv and test/landmarks.csv")
+    ap.add_argument("--out-dir", type=Path, required=True)
+    ap.add_argument("--train-lookup", type=Path)
+    ap.add_argument("--test-lookup", type=Path)
+    ap.add_argument("--configs", nargs="+", default=CONFIGS)
+    ap.add_argument("--verify", action="store_true")
+    ap.add_argument("--force", action="store_true")
+    args = ap.parse_args()
+
+    df = pd.read_csv(args.csv)
+    lookups = {}
+    if args.train_lookup:
+        lookups["train"] = pd.read_csv(args.train_lookup)
+    if args.test_lookup:
+        lookups["test"] = pd.read_csv(args.test_lookup)
+
+    if args.verify:
+        verify(args, df, lookups)
+    else:
+        extract(args, df, lookups)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

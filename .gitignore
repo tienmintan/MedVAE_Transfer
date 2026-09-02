@@ -1,0 +1,25 @@
+# ---- upstream MedVAE package and its data/weights: 176 GB ----
+medvae/
+
+# ---- model checkpoints: 2.9 GB across 284 files ----
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+diffusion_ckpt*/
+lightning_logs/
+wandb/
+
+# ---- latent caches: 12.6 GB, all regenerable ----
+latents*/
+*.npz
+
+# ---- outputs: keep csv, drop everything heavy ----
+outputs/**/*.npz
+outputs/**/*.pt
+
+# ---- housekeeping ----
+.Trash-1000/
+.ipynb_checkpoints/
+__pycache__/
+.DS_Store
