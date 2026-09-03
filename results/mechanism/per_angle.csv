@@ -1,0 +1,4 @@
+stored_column,measured_identity,err_4x,err_8x,delta,rel_pct,p_paired
+PT,major curve (usually main thoracic),8.150,8.158,0.008,0.1,0.982
+MT,proximal thoracic,7.479,8.386,0.908,12.1,0.000985
+TL,thoracolumbar,7.641,7.632,-0.009,-0.1,0.975
