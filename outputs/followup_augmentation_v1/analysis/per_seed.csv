@@ -1,0 +1,13 @@
+cohort,variant,task,seed,mean_error,isotropic_percent
+clean,projected_mean,cobb,0,8.051756482532557,
+clean,projected_mean,cobb,1,8.14561306743417,
+clean,projected_mean,cobb,2,7.6920254130770145,
+clean,projected_mean,landmark,0,0.04505551835373299,3.643103602065601
+clean,projected_mean,landmark,1,0.045014371390202604,3.6902258587800745
+clean,projected_mean,landmark,2,0.042662129677308605,3.538896621284037
+augmented,projected_mean,cobb,0,7.106206985772587,
+augmented,projected_mean,cobb,1,7.229817027808168,
+augmented,projected_mean,cobb,2,6.995966351862686,
+augmented,projected_mean,landmark,0,0.04076182355122569,3.472762793883792
+augmented,projected_mean,landmark,1,0.03924099377712377,3.3666015868705994
+augmented,projected_mean,landmark,2,0.039421124806821375,3.466445651209302

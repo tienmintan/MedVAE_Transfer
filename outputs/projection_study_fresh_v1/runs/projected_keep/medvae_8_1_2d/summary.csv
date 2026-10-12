@@ -1,0 +1,3 @@
+variant,config,task,error_mean,error_lo,error_hi,seed_sd,n,n_seeds,channels,fp32_kib,compression_ratio
+projected_keep,medvae_8_1_2d,cobb,8.045989473583177,7.273740227363305,8.849430273217148,0.1792580557217737,128,10,1,9.0,64.0
+projected_keep,medvae_8_1_2d,landmark,0.04003721922344994,0.03591822608595976,0.04478076019549917,0.0008435781258331594,128,10,1,9.0,64.0

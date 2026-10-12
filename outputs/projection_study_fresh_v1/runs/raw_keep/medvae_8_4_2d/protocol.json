@@ -1,0 +1,56 @@
+{
+  "fingerprint": "2c06862077dc9567045736d7f62fb1d1291e3991092be1ad809e4b98c5215f3e",
+  "variant": "raw_keep",
+  "config": "medvae_8_4_2d",
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "training": {
+    "epochs": 200,
+    "batch_size": 32,
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "patience": 25
+  },
+  "input_sha256": {
+    "train": "efa074b953ee9a42654b19ae395c997f62b849d7c7cb11d99250a426dca63cd6",
+    "val": "afb3a2b1cc5ec3236ceadbb5396453753c70d9fbe7ab1a352ff7f087081733a9",
+    "test": "1a55e62e99472127b9105659d44275b8bdb54ad0289b4f784273e67c76897223"
+  },
+  "trainer_sha256": "221c04e67ab526fdc2bfc75d2eeb7d6ff31c01ff2e89d32c930782d84dadf108",
+  "runner_sha256": "2baf206c83456645a8af78c8439dde6dce6faaa55128e48cf784a340e68f3604",
+  "common_sha256": "59dc4cb593bcd01611a59e9f3214e4f378d93cca7455568da6a98ffedc032190",
+  "manifest_sha256": "f4ea33f85176fce66b493b5def89b21a3248e77093f0a646f646f0da6bd3e0d8",
+  "environment": {
+    "torch": "2.14.0+cu130",
+    "numpy": "1.26.4",
+    "device": "cuda",
+    "cuda": "13.0",
+    "cudnn": 92400,
+    "gpu": "NVIDIA A10",
+    "precision": {
+      "api": "fp32_precision",
+      "values": {
+        "global": "ieee",
+        "cuda_matmul": "ieee",
+        "cudnn": "ieee",
+        "cudnn_conv": "ieee",
+        "cudnn_rnn": "ieee"
+      },
+      "cudnn_benchmark": false,
+      "cudnn_deterministic": false
+    },
+    "required_precision_mode": "ieee"
+  },
+  "prediction_rule": "average predictions across seeds, then compute per-image error",
+  "save_models": true
+}

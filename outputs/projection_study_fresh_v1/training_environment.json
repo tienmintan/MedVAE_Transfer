@@ -1,0 +1,21 @@
+{
+  "torch": "2.14.0+cu130",
+  "numpy": "1.26.4",
+  "device": "cuda",
+  "cuda": "13.0",
+  "cudnn": 92400,
+  "gpu": "NVIDIA A10",
+  "precision": {
+    "api": "fp32_precision",
+    "values": {
+      "global": "ieee",
+      "cuda_matmul": "ieee",
+      "cudnn": "ieee",
+      "cudnn_conv": "ieee",
+      "cudnn_rnn": "ieee"
+    },
+    "cudnn_benchmark": false,
+    "cudnn_deterministic": false
+  },
+  "required_precision_mode": "ieee"
+}

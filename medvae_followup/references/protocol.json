@@ -1,0 +1,50 @@
+{
+  "training_definitions": {
+    "LatentBackbone": "7be3087c941245bc2a4004ed15872983eaace4e4ea6995ae27ce51294cbc5345",
+    "TaskModel": "a3eebfe646924299ae606c17ad332903e8cd4b9ec8dc259ce86d9effe01d606a",
+    "LatentDataset": "481ede0f6e07ef44c689be84cf72d37e617cfda859c3ebaa70dfdd29592ccd55",
+    "targets_for": "47a36b93cba22dc90ba51d7187dab3cf0d626adfd6d8e8ee007738693b46f085",
+    "train_one": "b1931119eace2f027d84a216e9042951cb943cdec1b4c68a8fc8e4f56f950acc",
+    "predict": "c417e6255da3964b7e514a729c091dad14c614c4f18eb381a40a13e305c3ba4e",
+    "per_image_error": "13012b9cc7b8d0b5c933532a1c2981beb26d415185e4d2c4a13a2c0179b6560d",
+    "cobb_per_image_error": "850ae1364a6c3ecf4073ea07c5065cbadcbb3e092c4fc0ee21ac36bfd1627469",
+    "landmark_per_image_error": "3ab829bd624e731639430e91c674b30a75022f133a2da6971ea507db9c5645ad",
+    "args_preload_limit_bytes": "2392333a58ebd0301c38e720003ef85b2fc15d95e5dcc43a8597a567b7b3d225"
+  },
+  "geometry_definitions": {
+    "to_vertebrae": "a56248edba6a2148deb5c0cb7313380765e2c2ea65f2c8b0d7129bc95580b1e0",
+    "endplate_angles": "98e1f2dfbc0a5cfc6d292d5ff3420e5d650d5cd6f4cef2de5b4915a8c84ae2ad",
+    "three_cobb": "62ba1ceb7940db179844aa618a97b31a9cd3758569687119ebf7264350d1d6e8",
+    "apex_pair": "fd81dfe15b21b5060ac00ef001b4b0a901cfa76b3b283c1a1daaef9347247a3e",
+    "best_assignment": "4486982852174afa897e82600ba261b0a414faf7b459ffc94b0a5b7c87f0f885",
+    "discover_geometry": "4d6dbba048c97a7f727caf5ee2f858f108910838dfc22c81fc8c6c70f969ead8"
+  },
+  "files_sha256": {
+    "raw_frontier_summary.csv": "2b06bae739765c681d701a19e710f3f094c390de6f42e8bcdbb5cf8488d60a05",
+    "projected_frontier_per_image.csv": "54bfc8eb089e08e1cedbfbda9dde6b2c6c74a24dcb573ab439af3bea5beca05e",
+    "cobb_from_landmarks.py": "12f8ae09f2f2f39f593d4cb987c071a534cd862c648511b4d240c46d786f7091",
+    "train_frontier.py": "221c04e67ab526fdc2bfc75d2eeb7d6ff31c01ff2e89d32c930782d84dadf108",
+    "projected_frontier_summary.csv": "7de4e3cf0458eb02ad75af0c0f35b965ef0fde5b6d33cdc8bb9de9efdd3c7517",
+    "raw_frontier_per_image.csv": "4e0b22f502f952b39e23cbb8caea5d5469b7d5c2f7a7bfc3feb064eaa32843e3"
+  },
+  "training": {
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "epochs": 200,
+    "batch_size": 32,
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "patience": 25
+  },
+  "reference_origin": "Raw: supplied project CSV/code dump, outputs/frontier. Projected: uploaded frontier results. Ensemble seeds and settings are documented in the supplied execution history; CSVs alone do not encode training provenance."
+}

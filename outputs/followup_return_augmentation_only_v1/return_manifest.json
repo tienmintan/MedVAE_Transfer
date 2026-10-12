@@ -1,0 +1,2387 @@
+{
+  "files": [
+    {
+      "archive_path": "studies/followup_augmentation_v1/analysis/analysis_complete.json",
+      "bytes": 2732,
+      "sha256": "697cb16a4f11ed02a9277132722c2b1be653ccb3e587640dd1de4f689690ef71"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/analysis/comparisons.csv",
+      "bytes": 919,
+      "sha256": "ca6acd6047f53d9efdfa80eeb366ce80baffeef0daebbd5df3b8e38d2d9a8790"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/analysis/ensemble_augmented_projected_mean_cobb.npz",
+      "bytes": 3978,
+      "sha256": "603b196e10f1201f8e04de7b212b2f95a27089feac930574ae1e07d6966cb240"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/analysis/ensemble_augmented_projected_mean_landmark.npz",
+      "bytes": 120764,
+      "sha256": "34793c3e2e5cdade52db744dc62300c5d1d83f0b0bbe49db23d9062a8976f53e"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/analysis/ensemble_clean_projected_mean_cobb.npz",
+      "bytes": 3974,
+      "sha256": "26be393854fe556f248e42d58c5a4f00b457802c1fdf42a2f18becd0bbb8b3a8"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/analysis/ensemble_clean_projected_mean_landmark.npz",
+      "bytes": 120794,
+      "sha256": "e2112cccbc0f1620d4ec3254d74d2aabd4086e94e88fad2fb6c3ab949f74b698"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/analysis/paired_differences.csv",
+      "bytes": 32320,
+      "sha256": "74b1aff16026dd16a44c4e013660da28a2756b82e82eedda3db9979f0daa12f4"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/analysis/per_image.csv",
+      "bytes": 65337,
+      "sha256": "760f5b58d2b6a31b9b6d4e2f2dccc1a1ce6d96182694f453a8950189e6b94abf"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/analysis/per_seed.csv",
+      "bytes": 798,
+      "sha256": "6787ce05f6473e49c1b0b5f4f89f775a3b8fa70e0eba800dba5fe2e6d4fd2cb3"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/analysis/summary.csv",
+      "bytes": 977,
+      "sha256": "d802d83f8e03f16b580cd93182f1874a48a4a3c17a92811f2dbb9596b919b705"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/attempts.json",
+      "bytes": 899,
+      "sha256": "c372bc09ceafc381091313e1e15a10e98a7063f42a8983c26e32763185ec7c70"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-02-Jan-2017-162_A_AP.json",
+      "bytes": 1091,
+      "sha256": "644932ccf49fbd8463e1b441192941fe0dd3dfc702290ef74d02eafcec50f822"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-02-Jan-2017-162_B_AP.json",
+      "bytes": 1092,
+      "sha256": "4052ec2d417fb020550dea1c33aa9918c73ab3b0811002cab4a886d4f5a5dae6"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-03-Jan-2017-163_A_AP.json",
+      "bytes": 1091,
+      "sha256": "ec7b84edeb4148796fa9f54abd8fceb06532a41ab0de0a7b5ad28f0838ea1acd"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-03-Jan-2017-163_B_AP.json",
+      "bytes": 1090,
+      "sha256": "646fe676bbda2af5762c37fdb86c31ec392511170dd49aa2cb91e23c3b92a7fc"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-03-Jan-2017-165_A_AP.json",
+      "bytes": 1091,
+      "sha256": "f727154b8690351717c5a22e2f8c583ea093b2d980792599c67def225adaa5c3"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-04-Jan-2017-165_B_AP.json",
+      "bytes": 1091,
+      "sha256": "db7846860091dd5146a4db657028383672487617d44de17b2cf7bb40750e0c61"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-05-Jan-2017-167_A_AP.json",
+      "bytes": 1092,
+      "sha256": "e38473c90262d32769eb87da7dec5fd8e8af52b97091bd52286651ad51046e6d"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-05-Jan-2017-167_B_AP.json",
+      "bytes": 1092,
+      "sha256": "9a3be0379669218022e4dcd4a4817f04756c208cf65ca3f754782973c906453f"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-05-Jan-2017-169_A_AP.json",
+      "bytes": 1091,
+      "sha256": "c92d1ec9bac7b850062046feeb94dbb2c3d2aefa9b513528dbefcf1fbe1f698b"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-05-Jan-2017-170_A_AP.json",
+      "bytes": 1090,
+      "sha256": "a2dca28d2ef6689b6ea1537190140530fedd25671bfc9e7d547087178bf2f80d"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-05-Jan-2017-171_A_AP.json",
+      "bytes": 1090,
+      "sha256": "0615b318fabe20c2876cad2b85ec8c986b0db1029bf54511ff1eb99b72337508"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-05-Jan-2017-172_A_AP.json",
+      "bytes": 1089,
+      "sha256": "929732eb523c3c1b3f6a93e069921e6545abf80c4c1d9f147d3ce5c5823beeae"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-05-Jan-2017-172_B_AP.json",
+      "bytes": 1091,
+      "sha256": "01bbc75348270d975be88a82bde11507fa45f265ff8d72b518861e026ad63338"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-05-Jan-2017-173_A_AP.json",
+      "bytes": 1089,
+      "sha256": "e90d4ee2ba7e960a82a8d0a4002c03ed448f7829e2cf027529fcbc8b92e13dfb"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-05-Jan-2017-174_A_AP.json",
+      "bytes": 1090,
+      "sha256": "e2fc3e29df0873d4abec301ba2715db875718240870c0570114227a399076667"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-05-Jan-2017-175_A_AP.json",
+      "bytes": 1091,
+      "sha256": "9f485916d97db6c941d114988da3aa1ec39e42456409545af955c52b1e446d08"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-05-Jan-2017-176_A_AP.json",
+      "bytes": 1087,
+      "sha256": "e40a2cf46d7dd65385f50ca5022483265e44f8bf8cd13c06782ab3a48114abb3"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-06-Jan-2017-176_B_AP.json",
+      "bytes": 1092,
+      "sha256": "517656fc46a98f88e1fc4acf939097621c375665158f1c0587c7da3d67e63153"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-06-Jan-2017-177_A_AP.json",
+      "bytes": 1092,
+      "sha256": "a28821b6de375009d8068a03af72d61521a652c176450a1d41b104f83d00e309"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-06-Jan-2017-177_C_AP.json",
+      "bytes": 1092,
+      "sha256": "cd533619d6c14da0e35d6e950e52caba3669d86becb973bcb880748e5a0e5b28"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-06-Jan-2017-178_A_AP.json",
+      "bytes": 1092,
+      "sha256": "6ac2bc8cdf57b45ff29c0dd83faacdce655cf9a4ef150168184b81ed1604c1ed"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-06-Jan-2017-178_B_AP.json",
+      "bytes": 1090,
+      "sha256": "e6339da4b4f5514d7c683b072a96b4ec8c2515877ec5bd75ba2e8e3c20132253"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-06-Jan-2017-179_A_AP.json",
+      "bytes": 1092,
+      "sha256": "0f493f8ce21e2f6717ab22c0edcee1d09f3da2b895678dcb9713ac413b2724f1"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-06-Jan-2017-180_A_AP.json",
+      "bytes": 1086,
+      "sha256": "17cc88f18e1cc61865c6805a3990814106c757353503b9e95e353ff5ba9f15d5"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-06-Jan-2017-181_A_AP.json",
+      "bytes": 1090,
+      "sha256": "f05ebfae0906441690621fbd31c1bcd337eaaac2aaace93e1b8417a61e805c51"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-06-Jan-2017-182_A_AP.json",
+      "bytes": 1092,
+      "sha256": "642dcffb96878eb90c286f1d84ab8d3aeb13dab944083bae2e49dba2e3c634b0"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-06-Jan-2017-182_B_AP.json",
+      "bytes": 1091,
+      "sha256": "a7dbd8c3dbc6b4782fc68658841e1c8fc3503e57acbc8c342d0ce6cfaa3df7cc"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-06-Jan-2017-182_C_AP.json",
+      "bytes": 1091,
+      "sha256": "d3802c8ba0b5dc4654f3c40652f66e41b2367b3b8779c598c542def395509911"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-06-Jan-2017-184_A_AP.json",
+      "bytes": 1091,
+      "sha256": "61e1ffe21304412b6e98c077c572afff59fd3a2d09a0775238e30fee662c362b"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-06-Jan-2017-187_A_AP.json",
+      "bytes": 1090,
+      "sha256": "988b7e479800cd24922d25eff252d6ff70deeb26fd30bb712c1be77b696567ec"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-06-Jan-2017-188_B_AP.json",
+      "bytes": 1093,
+      "sha256": "358eef9c83bc240c33edc32c0a98a2cdeffd482e6c3ef6bf876bb281ba7eaab7"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-06-Jan-2017-189_A_AP.json",
+      "bytes": 1089,
+      "sha256": "6538eac8e8b5b16aaba4e53dc60be1a549b75732d25766ecaf142615973206a4"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-06-Jan-2017-190_A_AP.json",
+      "bytes": 1091,
+      "sha256": "e19d673f8ee4d859618f30b87d95cc28b7bc57a4f3169eeec3f0a54bbef43b00"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-06-Jan-2017-191_A_AP.json",
+      "bytes": 1090,
+      "sha256": "58c847a45786ef101601c7ca7a0a75098a8b2c3e452de2f6437be4aae2ddacf7"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-192_B_AP.json",
+      "bytes": 1091,
+      "sha256": "d13085eb68e69a396fdb5a4f67acdd0453d945877688d754373e7362e27e05df"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-193_A_AP.json",
+      "bytes": 1091,
+      "sha256": "b282c9bcc521e5c02abbf81a960883621672311a4f81716f79ce480090a6d446"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-194_A_AP.json",
+      "bytes": 1092,
+      "sha256": "a90132e8a9f1628218a2e5208c6d0f8b5a2c20c469739364bf364156ffccddd2"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-194_C_AP.json",
+      "bytes": 1091,
+      "sha256": "c755c3b80074c14985b75d57c6c534780ed0fe64dc57fb64c4632161cd364d49"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-194_D_AP.json",
+      "bytes": 1092,
+      "sha256": "8e67afb3b691b976ff24e848bf09bed79091bff3d64ac2ab4870f5d8a5a38cc8"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-195_A_AP.json",
+      "bytes": 1090,
+      "sha256": "c764aa1581ea3a276e162fbb6a1d50cfadae54bb2ad5db23c1d701e22ca73ccc"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-196_B_AP.json",
+      "bytes": 1090,
+      "sha256": "e0c5ef0e6939ea00399c14f47ecdf6ea6f49de804d6458f5f12c0de5b71d2ecb"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-196_C_AP.json",
+      "bytes": 1091,
+      "sha256": "9fcd473bb4768fa640f6329f8b9e9b1182ab75cfaa09fb964f9e18211765bb7c"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-196_D_AP.json",
+      "bytes": 1091,
+      "sha256": "edfd8630311d79bf8b29165abca0cb0176eb2f12b57256af630e24c246e95bc8"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-196_E_AP.json",
+      "bytes": 1089,
+      "sha256": "e9371090199bef345b38b5c90d472a3a16e39427c92ee6c66c448c633895b3f5"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-197_B_AP.json",
+      "bytes": 1090,
+      "sha256": "1e073a03ac01c1d533ee79561a10f491d7e11102112f9f66ddd4b5535b18607a"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-197_C_AP.json",
+      "bytes": 1093,
+      "sha256": "15da366f538e841078e5c2a01b5caeb18f2eefe8207952c9de984497ff16575a"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-197_E_AP.json",
+      "bytes": 1092,
+      "sha256": "50d0d72ac9455105761bb7338015c06f0aa8ccbb13f231e8cf5823f96f17aa6f"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-199_A_AP.json",
+      "bytes": 1091,
+      "sha256": "d3b20a98bdf5c367968b0db74c03d2a99820c39466d814bebb09c59f7e7f942c"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-199_B_AP.json",
+      "bytes": 1091,
+      "sha256": "e3ba9b399ebf20412cd1ea4106605bece239f875f19bd3ef453e8b0230636b48"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-199_C_AP.json",
+      "bytes": 1092,
+      "sha256": "11845c4be26268348be847a907208637d003301c3c5476737355065daa547959"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-200_A_AP.json",
+      "bytes": 1091,
+      "sha256": "8909ce9f3bfdaa250167739591001010d0c5770167f13b2d847c06752341a0c3"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-202_A_AP.json",
+      "bytes": 1091,
+      "sha256": "d994546e8fa0c25e3e72d8e02278860f1eac44b17da56343b4189721cffdb70c"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-202_B_AP.json",
+      "bytes": 1091,
+      "sha256": "8f6e9be368b1797fcac78ed8cacfbfcec151d10a834d2207bf06d42df6bdd4bc"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-202_C_AP.json",
+      "bytes": 1091,
+      "sha256": "90f3f4adcec88cca4b7a1e48bfe635e00a16b117bebe6ce7c10c4f4cef36102e"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-204_A_AP.json",
+      "bytes": 1089,
+      "sha256": "e190edc8993a78d96807c9097834758bde7e1470091445874bfaba14133bb176"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-205_A_AP.json",
+      "bytes": 1091,
+      "sha256": "fa268de8f590bbf85a42bd4e4a08bbc231ccd1b81c013658f33b161a85d1baa4"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-205_B_AP.json",
+      "bytes": 1090,
+      "sha256": "76fd8f493bf8fdc75290279bbfa5dae8417bc24fd9cf8fa2453425ff450d8c46"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-205_C_AP.json",
+      "bytes": 1090,
+      "sha256": "855777959a9e78765b0335ea7e119dd0f1bf6cd522d41cf0d8cbc2e3df6ebcf3"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-205_D_AP.json",
+      "bytes": 1090,
+      "sha256": "e23f45092bda8d6486b38ecd8287b6919042beecc6a572f9e264be5378d2f08b"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-205_E_AP.json",
+      "bytes": 1091,
+      "sha256": "6d92c176c45764aed8277c7180cc286e645e8cdd2fa767867a3a8d4651f91e55"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-206_A_AP.json",
+      "bytes": 1090,
+      "sha256": "7d86d75b5d0f55c5321c5d1da59f8a9322c2afe498dc1234e75c3d0df7067224"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-206_B_AP.json",
+      "bytes": 1092,
+      "sha256": "ce19853f5daea7f173ca3d49861f269db07ce84e1156c2e9772fb130c7b4aaec"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-207_A_AP.json",
+      "bytes": 1092,
+      "sha256": "e155ed0dafa4aa1ab91637f5e3b8a19565442375fd631b4952ca553c09e06cdf"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-207_B_AP.json",
+      "bytes": 1091,
+      "sha256": "6cdb6208e6a4fbbdfdab0ff28c90234a2a12d622fc3dcffd81e42eda2d25fe7b"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-208_B_AP.json",
+      "bytes": 1090,
+      "sha256": "6c801aaeb1a0988db3dc2cc820bf15100a582be681a7720281fe057470a4fa26"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-210_A_AP.json",
+      "bytes": 1090,
+      "sha256": "23efd943ae9a41314c9dc13ddd423a06bcfc2a65b8ef28f61117cdf68f368d58"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-211_B_AP.json",
+      "bytes": 1090,
+      "sha256": "18e90f57aaeb821b35da7f1400b27454496b955c42742164f6d86a3d7141d2af"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-212_A_AP.json",
+      "bytes": 1090,
+      "sha256": "d4fce1f051dbab6ea93ae1d0230fd38500ce6c995c45a263b01856d228af1b0e"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-212_B_AP.json",
+      "bytes": 1092,
+      "sha256": "4d39ee7d6129248b94fba8544ae3ae8a16d1bc2baebac0a1fcb8ed709b343535"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-212_C_AP.json",
+      "bytes": 1091,
+      "sha256": "7718ad29c9069743c93118f0a9c75c703813f34df9d1171f4b9525160d9c0644"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-214_A_AP.json",
+      "bytes": 1090,
+      "sha256": "c7864c7fd2032dc1e5e0f555bc7e2ad9e4d130d8aedfd6501e4e94249289574c"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-214_C_AP.json",
+      "bytes": 1089,
+      "sha256": "d375ee28424a859cbdd07784d92305d248905f3270ce21e3afa1b86c3db23435"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-215_B_AP.json",
+      "bytes": 1091,
+      "sha256": "5f85e1c84f99e9d566644d3c859a7743f36db5b863c595cd67bb2f9b6b5b00f4"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-215_C_AP.json",
+      "bytes": 1091,
+      "sha256": "17b174a3a2322136653767f75267c8531e777e0b737d0f609456465f68d6e58a"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-215_D_AP.json",
+      "bytes": 1090,
+      "sha256": "95010a3d7126c6a9b519dcc25361e7842b08140c31f9c713b163555fe86c805c"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-215_E_AP.json",
+      "bytes": 1090,
+      "sha256": "aef6bc4596a20005ac78ec67c6ffa115c9a5656186bd72a131b6b055e4a9bd51"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-215_G_AP.json",
+      "bytes": 1090,
+      "sha256": "caa154d1d2acb1502c6a83c1245a6e1d254c34d706262df0ccdbdcab9999b428"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-216_A_AP.json",
+      "bytes": 1091,
+      "sha256": "13a6d7be064e5d12fc2c088911b7c054a57c5db35ad39721b0f061040c1c2df5"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-218_C_AP.json",
+      "bytes": 1089,
+      "sha256": "0b12f1862ffdfc32a3cc1721409bbab6c6699d590eea5261a5ef3f62f12aa5b0"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-219_A_AP.json",
+      "bytes": 1091,
+      "sha256": "08e462b431aa47f868fb86ef3200480e47dda6282d108e4fc2d76d670068fb5e"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-09-Jan-2017-219_C_AP.json",
+      "bytes": 1091,
+      "sha256": "9bbe8b589610b7baf3c0e1ca39462f806cb0b7b60df97d85419057de4d194786"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-221_A_AP.json",
+      "bytes": 1092,
+      "sha256": "5bf45b098ce3b21405c501f3929caa18129dfb413854726a05a24607d3970b27"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-221_C_AP.json",
+      "bytes": 1092,
+      "sha256": "7f537e120252dec2b190b26ab48e8368ef7e2b7999874d472bc46f089340f23c"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-222_A_AP.json",
+      "bytes": 1091,
+      "sha256": "460917c2d518b652a5656608ce236ac1be6ac43a41ef7263c9d4f2da9ab05b39"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-222_B_AP.json",
+      "bytes": 1091,
+      "sha256": "3bad5f3e7bf6235ef39bcdf4a13d66cf64b81244bd225d2bce6d02b17d12d26d"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-227_A_AP.json",
+      "bytes": 1091,
+      "sha256": "8af3172ea6fbcc4f76a8c39444074aa759398dd5e6399a57fcdf8704614ba697"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-227_B_AP.json",
+      "bytes": 1092,
+      "sha256": "40be4b04c5f9ca948adb373cc623d65ad57f70d7063d73ddcf85bcf811e03acf"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-227_C_AP.json",
+      "bytes": 1090,
+      "sha256": "0cfd1629ee712b9ed13bf15308c5cdeb95466ae6c390893eace2bfc1bdc56206"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-227_D_AP.json",
+      "bytes": 1092,
+      "sha256": "95d8ab0d632b6a9c0fed38e87d1c6777183a29312a012936ea09395d637cbcb4"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-227_E_AP.json",
+      "bytes": 1092,
+      "sha256": "c0c8daab07b711927b08cc50c99daf8c734fde6fbfb852f42be2fb9508e7b65e"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-228_A_AP.json",
+      "bytes": 1089,
+      "sha256": "0da02eaf64cdb3c4e112abbe6df5b82ab5b291cc8168d153965bed6d214c084e"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-228_B_AP.json",
+      "bytes": 1090,
+      "sha256": "cead2fc277b7f42135afc7bfc6ac708d97d35b02a020eb9e0cdb34e7dc2f08a2"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-228_C_AP.json",
+      "bytes": 1092,
+      "sha256": "9617d8ca092955de9b8973211c34203f4fb14765537b948be45a1908e54bab36"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-230_A_AP.json",
+      "bytes": 1091,
+      "sha256": "1eaa1625d58ebe8c022a44509fd7cbad333864d9f83a627a08bede98c4afdbda"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-230_B_AP.json",
+      "bytes": 1090,
+      "sha256": "0e8aad1275bd7314058eee3c80d39bb90d4842126c1bfac2ca3746294c5823d7"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-231_A_AP.json",
+      "bytes": 1090,
+      "sha256": "8c175a11fcf099269bf99bf5851a05651019d3f76945b56c06aba06e2d48f712"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-231_B_AP.json",
+      "bytes": 1091,
+      "sha256": "ed43dab3067b14eb1b6b4c0fbdf5614e68b5df3d2e8fd5f4d0c244a4e7fee478"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-232_A_AP.json",
+      "bytes": 1092,
+      "sha256": "c2c21ace27f6f784452c8770e20cc1e625fa7803c02d9817d829c004e447fbec"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-232_B_AP.json",
+      "bytes": 1091,
+      "sha256": "5d19662c74eb13db759a5046a53f63fe4ab07f991f57f67836ef4369782bf743"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-233_A_AP.json",
+      "bytes": 1091,
+      "sha256": "b8d34e63aa6ecd493dce2736871cd1007f5057e1e87ae44a0d5bc1b69c7ec727"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-234_A_AP.json",
+      "bytes": 1093,
+      "sha256": "ea1f722f574350195dbf6d69b4a62ee354f68731a0a8c734fc11a33f721e291b"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-234_B_AP.json",
+      "bytes": 1092,
+      "sha256": "650175e5c0442d9b4102a216ce69b558be1c4fc45189e119024d3bc703f1c67a"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-235_D_AP.json",
+      "bytes": 1089,
+      "sha256": "fd50e5d2905c0b73ae10c8752d7c8c7e2900b3b807dcde554b53ffe73a46dc36"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-237_A_AP.json",
+      "bytes": 1090,
+      "sha256": "aeef7a964ccd1cfefee9df7ecbbe648459fcb2c24deb1276b4515cf3f6618885"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-237_B_AP.json",
+      "bytes": 1090,
+      "sha256": "cac0d07e1e6c155d4450db0c160686481f0aa0c395007055e34e4a090caa32db"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-237_C_AP.json",
+      "bytes": 1090,
+      "sha256": "67efd8d6e544c4d6c9e76cbfa815ae7b46588439fafc08e223899e0bd43fbdfd"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-237_D_AP.json",
+      "bytes": 1091,
+      "sha256": "e91e6b9ba7e6ca4e299c5ca972082c3c34cd5f4433bdc12aafef7a8b56f94c32"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-237_E_AP.json",
+      "bytes": 1090,
+      "sha256": "7396c3cf1108f161ec5c10005a9825e4b6708f5bca2fa8836ae1833634c8ea8f"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-237_F_AP.json",
+      "bytes": 1091,
+      "sha256": "c4d408a26012755c8b180505e6eb9ceadbced6a1305aa84e32460596e4eff922"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-238_A_AP.json",
+      "bytes": 1091,
+      "sha256": "112e09a528da862ae66205c99385444c9d09dc0c2cd917c8ab1ecb76976aeea8"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-238_C_AP.json",
+      "bytes": 1091,
+      "sha256": "a134be29282703e9640bbf47f8a5fe41b609b99076a9f0884ec4e5afb6922242"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-238_D_AP.json",
+      "bytes": 1092,
+      "sha256": "310a27fa68c1fa2609633f07050d97ae6b49ca23cd3f90f13b8c2958d3cc4855"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-239_A_AP.json",
+      "bytes": 1091,
+      "sha256": "d759ca3f42e1d33026b47a9b41f827e5165c12de98667ffd60e08bdb84ae5509"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-239_B_AP.json",
+      "bytes": 1092,
+      "sha256": "2868ccd70761058f6a8252b6bc0871f126d1476c4ff42855413d1cfba7d25b66"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-239_C_AP.json",
+      "bytes": 1090,
+      "sha256": "c75bf640e0fd5f464321e0190ea120d9e2e48929818565c5304713fbee5e0159"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-239_D_AP.json",
+      "bytes": 1091,
+      "sha256": "b50aba6295aeefc87874cb2837da631cedd49b2cdbdde02c612897161269acf5"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-240_A_AP.json",
+      "bytes": 1090,
+      "sha256": "d52bd5d19e338ac07e8225d7f01b1abf3df88098b66a475a45a092d712829e42"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-240_B_AP.json",
+      "bytes": 1090,
+      "sha256": "e4bd267f74247c403969937988fd415635e23959a807bc3dffb8432d140ab500"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-241_A_AP.json",
+      "bytes": 1092,
+      "sha256": "362c2e6be8d3489fff42108e204adf3c0d890a14f30587538c7df1a8c2e09c72"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-241_B_AP.json",
+      "bytes": 1090,
+      "sha256": "f0bef09357911e8969796749ac04b18e55c3993ef2baf62d19a27cf803dbeb70"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-241_C_AP.json",
+      "bytes": 1091,
+      "sha256": "50388cdcd00db5c0f43bf0599e322a6b20f9c1006c8cd8a624e5631bedf0166e"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-243_A_AP.json",
+      "bytes": 1090,
+      "sha256": "facb390e0288021faba2c0d24abd693163a6c6a476d0c2e4513e51528df3f177"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-244_B_AP.json",
+      "bytes": 1091,
+      "sha256": "404d4d5de0cad24c6d9dbd0836cbe792368258106dc94fc971e16477cc1c05dc"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-246_A_AP.json",
+      "bytes": 1090,
+      "sha256": "3b8ff1f95869171009dcfb2d57f198c9bcb13e98ad4ffc36f6068bc94af07aa4"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-247_A_AP.json",
+      "bytes": 1092,
+      "sha256": "4fed9d8a619bff9595d7dc9a524c0c776dc9df6aef6e62e8f35b4876d6dc6421"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-248_A_AP.json",
+      "bytes": 1091,
+      "sha256": "16b154b387fd8f1041698d3e52d9f3a6e14aac56eabb80b8ad5290c9760ac532"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-248_B_AP.json",
+      "bytes": 1088,
+      "sha256": "41632b061e96cd4fee8790d9b03c9e5a6c6344c8864634dd6c3924630385ef78"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-248_C_AP.json",
+      "bytes": 1092,
+      "sha256": "55ae90ce0a71d21284759106af83889c8c3cf6e274b893f78f1f73a2d766ce49"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-249_A_AP.json",
+      "bytes": 1091,
+      "sha256": "40478aab7b524a9c3e76f13ac80c5775e5052ce914b3613f3da19a12da3930b1"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-249_B_AP.json",
+      "bytes": 1090,
+      "sha256": "7a66df48aff7d656e8d47c12c684af858eadfa6547abe6ea3b257dcc3aaa5171"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-251_A_AP.json",
+      "bytes": 1091,
+      "sha256": "b2e7975a7b4b13afbcf7169cbbf45c566660823b69a989018fa6085ff4117449"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-252_A_AP.json",
+      "bytes": 1089,
+      "sha256": "749336e0d7fcec0fc82f1f13d41326d932394229528edee84417d8304d0d34d5"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-252_B_AP.json",
+      "bytes": 1091,
+      "sha256": "289428321265d47904befefd4de95f7cd79338b4565f0fbd5d431e2f7918c935"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-253_A_AP.json",
+      "bytes": 1090,
+      "sha256": "159e95d355cd394aa69e831769b94db47740168fded055941ab56fe661cf502d"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-253_B_AP.json",
+      "bytes": 1090,
+      "sha256": "3a031b4d08b503a6be86d06cb7925f13dfd95c43182fed8e940aa1281f3d7b3c"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-254_C_AP.json",
+      "bytes": 1091,
+      "sha256": "4e7f3894f266ee3066f076e4f08cb44d7f2bdf42a275167424014eed2c8af351"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-10-Jan-2017-254_D_AP.json",
+      "bytes": 1092,
+      "sha256": "bf8eff5fb3deae315f0fa76c5f495fcabd54a06ad1d75e3c5b78e066f1220342"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-11-Jan-2017-254_E_AP.json",
+      "bytes": 1092,
+      "sha256": "bfa23e3f92bc38d1070d3eafed21aed5b7e63f7b6afdde75604a7533f6c9d135"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-11-Jan-2017-254_F_AP.json",
+      "bytes": 1092,
+      "sha256": "b62898da3450b312ec3994e38c49d31a087031d5c3120cb5df6ca35937ba7d4d"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-11-Jan-2017-254_G_AP.json",
+      "bytes": 1091,
+      "sha256": "51135074ea5edfc08e7eb1d366e028998d8301f93b76eedfb0835556c0c562b3"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-11-Jan-2017-254_H_AP.json",
+      "bytes": 1090,
+      "sha256": "32447a0872cf63417cd5338a10d55e4c4be5021f66de9c689817b7edf52a8382"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-11-Jan-2017-254_J_AP.json",
+      "bytes": 1090,
+      "sha256": "e3362f0bd28853badee7fc730068fe78cbf92b189eb7653f2dd3b47008c8683b"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-11-Jan-2017-254_K_AP.json",
+      "bytes": 1091,
+      "sha256": "80abf7c968f3aa946498985a9a2ce20e4da6538aa4dbe7046e835e3eff7115f0"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-11-Jan-2017-254_L_AP.json",
+      "bytes": 1091,
+      "sha256": "dfc047ad26e0c7850b5e56d8faa8b6a88be26e3d3a8d2bb7b8b62be4bb5588ee"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-11-Jan-2017-254_M_AP.json",
+      "bytes": 1088,
+      "sha256": "7ffbb006f72d61a198a7ef666318dab353c3d0750241b01e45c4dc37570cdcc6"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-11-Jan-2017-254_O_AP.json",
+      "bytes": 1090,
+      "sha256": "2b412a183b901ebf7e8ea939ea23f0a14f3120a68acdec6b8339817f83061065"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-11-Jan-2017-254_P_AP.json",
+      "bytes": 1092,
+      "sha256": "16620264972f3962b675beeff306d1e29275a0d54dec8a6ee9fbe1d26abe699d"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-11-Jan-2017-255_A_AP.json",
+      "bytes": 1091,
+      "sha256": "5d755f22f375604adc6ab8732d9fb4e58261dfa8b6ea1079881558fefedc035d"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-11-Jan-2017-255_D_AP.json",
+      "bytes": 1091,
+      "sha256": "c6059455316f6cf663e1df90389c42eed7aa66e6cac6d5b7a572e2dd6fba21a5"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-12-Jan-2017-256_A_AP.json",
+      "bytes": 1090,
+      "sha256": "bfe0e4e35f92811ff2c6ce56f41f6ee35d59500991c62d4f7475209fd9ff49d7"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-12-Jan-2017-258_A_AP.json",
+      "bytes": 1090,
+      "sha256": "bd169a7e2d4404c5de042f2e99a91f9ab6b0c65218983076b3fe060bdf6c9e12"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-12-Jan-2017-258_B_AP.json",
+      "bytes": 1092,
+      "sha256": "1d968adb62a4e17c41b31ec7847decc30e18705cd58230c07256ff6583d9dd60"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-12-Jan-2017-259_A_AP.json",
+      "bytes": 1093,
+      "sha256": "b07d896e3f329a4cff9e001b635c2b185f2029efe7df3e17692afd93c26d903b"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-12-Jan-2017-259_B_AP.json",
+      "bytes": 1091,
+      "sha256": "6167ee1b1c71f21ed70619c8f54a8618d31b91f5d2111d52cadd42bbb876c63d"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-12-Jan-2017-259_C_AP.json",
+      "bytes": 1092,
+      "sha256": "162e164e2b356431fa4f89569fab10a787f41f55a003fddc9661cde85006a2b7"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-12-Jan-2017-261_A_AP.json",
+      "bytes": 1091,
+      "sha256": "4cbc0a9c802ee2e9c77804ff4b467cc8cebdcf024699931f30719241347fe62d"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-12-Jan-2017-262_A_AP.json",
+      "bytes": 1090,
+      "sha256": "b63d2790690b9821ff832166946a60229ac2bb05b1266a43825ec93835873169"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-12-Jan-2017-262_B_AP.json",
+      "bytes": 1090,
+      "sha256": "4ba2ecebe79c3fbbfeb9878330829b055088f6954dd1a84a06374710d056869b"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-12-Jan-2017-262_C_AP.json",
+      "bytes": 1092,
+      "sha256": "c1d533ad7f146cbe875a6c949f242ce18a3237d6bdb26129f968b7a7467ff55b"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-12-Jan-2017-262_E_AP.json",
+      "bytes": 1090,
+      "sha256": "992fa5e81947f9218f7e116d6b16ed0d37728733e9ae5a6e46036ce4d6bed09a"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-12-Jan-2017-263_A_AP.json",
+      "bytes": 1092,
+      "sha256": "929fbe1adbc53c7849038ffc005fa2d123da0996f36a0d02c893d2aa66217c4b"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-12-Jan-2017-264_A_AP.json",
+      "bytes": 1093,
+      "sha256": "b590ca2c5da76824cfe578483763bd16e4f44d2c921c49b5f9e8485477506ae2"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-12-Jan-2017-266_A_AP.json",
+      "bytes": 1091,
+      "sha256": "383eab6b958701ce102feeb0aca8bab61043e869c863aa56a11c3e465ac63b51"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-12-Jan-2017-267_B_AP.json",
+      "bytes": 1090,
+      "sha256": "43ec9bd68f6dd5c9be8affe426fca9ebbd44bc07ed40bee8f495acd5dc2e4194"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-12-Jan-2017-268_A_AP.json",
+      "bytes": 1091,
+      "sha256": "9c04038b7eeaf960e74c4cd294b5a017bcf28bb1892b79dd21eeb40da71deaa3"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-12-Jan-2017-269_A_AP.json",
+      "bytes": 1091,
+      "sha256": "a2a9e898e2b0d52b9d4d6018f7fa3c792d16d97efe6eff988ad80d66730fbe37"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-12-Jan-2017-269_B_AP.json",
+      "bytes": 1091,
+      "sha256": "2a96c27709a4a4e50df4a5e06f93d0cf8056e048bf5dfe3782b913ccd7c4be93"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-12-Jan-2017-269_C_AP.json",
+      "bytes": 1092,
+      "sha256": "0ed140809d070a2d7853614a739ec45bbcf6924449a41c3845780d6a1c3c4aeb"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-12-Jan-2017-271_B_AP.json",
+      "bytes": 1090,
+      "sha256": "be1bd86cad5f457213864226b3485db7a2e3d38f80c16161a8025b63999ce217"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-12-Jan-2017-271_C_AP.json",
+      "bytes": 1092,
+      "sha256": "94bb1a795ac5b3d56d996164898e2d490bb9626b5db7e894e19d46e459ecc234"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-13-Jan-2017-273_B_AP.json",
+      "bytes": 1091,
+      "sha256": "d4a6157702a5448efdf5e108742a58392b55507d37199a4ebcc740ecb150cf0d"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-16-Jan-2017-274_A_AP.json",
+      "bytes": 1093,
+      "sha256": "b91c4d01d5bc5f25a77740fff2d860a0b83507e381de23bdcab52103f5bca743"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-19-Jan-2017-274_B_AP.json",
+      "bytes": 1092,
+      "sha256": "8699465e84168524e944d7f4dcd764ea6b48aa4a7c0057f014c4ae22d5052184"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-19-Jan-2017-275_A_AP.json",
+      "bytes": 1092,
+      "sha256": "923cee90941be79cd1a8aac90e5c5e35739e0596d887fe95ae31b8df4afcf9d9"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-19-Jan-2017-275_B_AP.json",
+      "bytes": 1091,
+      "sha256": "c88651a0f3de589c0b97c07ef294c28fc64c42b3d0f364f2cbe55d976c317731"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jan-2017-275_D_AP.json",
+      "bytes": 1091,
+      "sha256": "2c6749e46db554f414f0a5f9f12638d509fffeacdb89c4e3dc1f015d3c8883a4"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jan-2017-275_E_AP.json",
+      "bytes": 1092,
+      "sha256": "771d0e223d1c2e4f31a2c7266bff5ed8a154dc72a4fda8f9f80fd42b404bb538"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jan-2017-275_F_AP.json",
+      "bytes": 1091,
+      "sha256": "42caa641f08bd3cda04affaaa3f65e0f888573fa31efbf2c6ff02421639f8ba2"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jan-2017-275_G_AP.json",
+      "bytes": 1091,
+      "sha256": "35a828da5b48c2aa41d1f2903de26c5afa7d07c64a9f63c0975279da349097ad"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jan-2017-275_H_AP.json",
+      "bytes": 1091,
+      "sha256": "ce52d61bf2741586f218f1357334e1263765fe267d1bb566e2b3b3ca4ff920e7"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-10_A_AP.json",
+      "bytes": 1090,
+      "sha256": "44d5b4f5ccedf1b2552e3e545691b19d9c3759c7cc28b452db47700c4e8d346a"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-10_B_AP.json",
+      "bytes": 1090,
+      "sha256": "476811ddd0224ad07f710f369c8d44d61b08d34ce5db4bbcd554b3ca3a2d122f"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-12_A_AP.json",
+      "bytes": 1090,
+      "sha256": "fc7a1986c0a0a0827992c94cc35a661474da84f092ca9fd4ae7b0e75e025fc56"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-13_A_AP.json",
+      "bytes": 1090,
+      "sha256": "4501a5d38f5c623c3bf9317164e3265d1d09de6385bdff18e1079468355a201f"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-14_A_AP.json",
+      "bytes": 1090,
+      "sha256": "5c9ad89d0fd681feb274133c34f49dcf5fdb342972f172efce1e1d7624159950"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-16_A_AP.json",
+      "bytes": 1090,
+      "sha256": "0c1f2a533cb92aaac6cacbe1a67e94a12be4eb0ebbc7b677c293119c9c5fe2f7"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-16_B_AP.json",
+      "bytes": 1090,
+      "sha256": "c47f924536a70aa2e8184a4032e3a424db39112cec1156728f3c0a4415b8da32"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-18_A_AP.json",
+      "bytes": 1089,
+      "sha256": "e5879ef05f6eb085c9fb979dac6cfd12ee6f005df59008edd9d4cb1532089f6c"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-19_A_AP.json",
+      "bytes": 1091,
+      "sha256": "92ca591438a270eba84b5926294adc126a6b774800d096eb1bd0dd243a6bf4a3"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-19_B_AP.json",
+      "bytes": 1092,
+      "sha256": "761a9d49bebb34ca9d35ad09115167ba8d84eb6f5bb5d3dfbe736d39fd5a05d2"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-1_A_AP.json",
+      "bytes": 1089,
+      "sha256": "842f59f9450e3c39ee30c459fd00802788ee086b667d59c7a37c6692c5e9ac6f"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-20_B_AP.json",
+      "bytes": 1090,
+      "sha256": "aa5e92606fe9466574abb5151989752f1dc845efdcd7acd9964d01aa705c1584"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-20_C_AP.json",
+      "bytes": 1088,
+      "sha256": "2a624c23b68b09aa778b9d0278aa2dae3bdeb9bf8b9d009e067cb2436eb6d83b"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-20_D_AP.json",
+      "bytes": 1089,
+      "sha256": "6b277c2e2d78704feee8fd821a24adcde368ef149edcb93997a314937c161ffe"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-2_B_AP.json",
+      "bytes": 1087,
+      "sha256": "fe6b4623cd6d47947c25856e467106b17e484ae4d4dd860edb910265a3814c7b"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-3_A_AP.json",
+      "bytes": 1089,
+      "sha256": "d3586f6b2add0c3660fc86c29089943f504d44366c0d8619c31b55836791a431"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-3_B_AP.json",
+      "bytes": 1087,
+      "sha256": "bb8c9f7841614d86244518f91b3a2499944f46459f50e8f16e47476c6b9d09f6"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-4_B_AP.json",
+      "bytes": 1089,
+      "sha256": "59abc8c23a936d307704ebda8a40e5c96984850f153ed109e3faf44db2d9adec"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-5_A_AP.json",
+      "bytes": 1089,
+      "sha256": "b2c6438e61ae888816c4fa9f203d8b9aa4116ceca243cbb401816b3d98a5c84b"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-7_A_AP.json",
+      "bytes": 1088,
+      "sha256": "24f99304922589aec0a46c0f4bd3b9f9c33b913482c88728112c1482f5c92c9d"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-8_A_AP.json",
+      "bytes": 1090,
+      "sha256": "f1759c9c60b9af5d078e2f9e75a81df85630b7711574beb90797215de504469f"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-8_B_AP.json",
+      "bytes": 1089,
+      "sha256": "35e42dae5cb8f5c05fa6a3646846aaaf07f423f0715c3207caf837cb377ab2da"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-9_A_AP.json",
+      "bytes": 1089,
+      "sha256": "978cb6458fb8f9e9fff8704ffd381ba402edf79a5fc730e6e5548df048aabdd1"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-coronal1.json",
+      "bytes": 1092,
+      "sha256": "5e93093e0f88aa8d7232460a231fe4d12ba9eb15f86185657ca564b5f6c22877"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-coronal10.json",
+      "bytes": 1091,
+      "sha256": "cac5a0bbf5a77e5a82a0b8187064ec74b1ccb90fa6d79d585daa1f00987ca155"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-coronal11.json",
+      "bytes": 1093,
+      "sha256": "dbed030fce832cb84a755c2eec7cacc829e53af7d5532e279ee125e6f769a599"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-coronal12.json",
+      "bytes": 1091,
+      "sha256": "87537c219a75107792211629ce7456fe9adc9eb397004651939f31166349d9f8"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-coronal13.json",
+      "bytes": 1091,
+      "sha256": "f3182c7ec506d6d64026301ee8422127c7f332e9dc981aeb841146944b5f394f"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-coronal14.json",
+      "bytes": 1091,
+      "sha256": "36405155f085beac090b3b97330a52a857b61e4c35516b295add9ac715344b7c"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-coronal15.json",
+      "bytes": 1092,
+      "sha256": "7d445f4cc0cc2e10832973680113fdc5e4c86e2aab612193a96d09aa308d3dfd"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-coronal16.json",
+      "bytes": 1088,
+      "sha256": "fd6723722b15e2191783603a9a925f7c5639257249f5a08c149fb3b129333db0"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-coronal17.json",
+      "bytes": 1091,
+      "sha256": "b86d8817a24df20fa5d8cbe266431f55d55d03673c69da466136bf154c1b7d30"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-coronal3.json",
+      "bytes": 1091,
+      "sha256": "c9b94e6c0c76b14648ce8eed3e5c868f2bdbe402cf83a9aa516add62a319aa81"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-coronal4.json",
+      "bytes": 1091,
+      "sha256": "929c3aefbfa70afce51db6ac06f4e87df85f27aec6bdd264b9309fa89aa95fec"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-coronal5.json",
+      "bytes": 1092,
+      "sha256": "92981e97cb6853962bb88b27e6e7c01b379254dc7e942ac0b728b794af44256f"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-coronal7.json",
+      "bytes": 1090,
+      "sha256": "60ec18386445744518e15ad7fbece4c4380f3e37ce4bc606ebed43f3e8b20806"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-20-Jul-2016-coronal9.json",
+      "bytes": 1090,
+      "sha256": "4f6827a4ff6b4d2001ffb1313f8a4cc0b0887c869724de1417813e57c2f11d31"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Jul-2016-15_E_AP.json",
+      "bytes": 1089,
+      "sha256": "66d8c28452d289327e3996ed8172fb0c92265e706ac447a69be7d7d329e1e163"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Jul-2016-17_A_AP.json",
+      "bytes": 1091,
+      "sha256": "ccf8343b212fbb2d88889fd49c3bd72a8c7f095d062b03d7ac643c03e742ca44"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Jul-2016-20_A_AP.json",
+      "bytes": 1091,
+      "sha256": "58ef69561066238c6afa79e63f104277055f3b70d0d8d0fc4f8e5cb541457a38"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Jul-2016-20_E_AP.json",
+      "bytes": 1088,
+      "sha256": "3b323f95c36ede046667529bec1b63f934f21fab29af75f0a4d3c70e22be73e8"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Jul-2016-20_F_AP.json",
+      "bytes": 1090,
+      "sha256": "399d3bf29c0a292da8f8f441cb4fe76990fa6bfc20404995cc366502e3a9feff"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Jul-2016-21_A_AP.json",
+      "bytes": 1090,
+      "sha256": "810e1440de5b504074ec6170224f69839a55af1b8208b39bded86b5e3a242314"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Jul-2016-22_A_AP.json",
+      "bytes": 1085,
+      "sha256": "7c30eec1fed117f79b710d2db1ae7958a6ac06da25455ed14d6a23e57449770b"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Jul-2016-23_A_AP.json",
+      "bytes": 1089,
+      "sha256": "c33d5b84a625b4c7085b69cf26e8644f3525db7f63d887172614bca137fe1764"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Jul-2016-23_B_AP.json",
+      "bytes": 1089,
+      "sha256": "0a6636ecae680e7860af6571d787c4b869ff4b2cd417c0f6088b7539be5a29b3"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Jul-2016-24_A_AP.json",
+      "bytes": 1089,
+      "sha256": "38eeafc76b804f81cbb56af0718157fd1461f2a6cd92b274523c686f319ab926"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Jul-2016-24_B_AP.json",
+      "bytes": 1089,
+      "sha256": "0e6aa7b0e486375223524dcdb097f5102cb22b69ed53b563e02c36ec1616afbc"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Jul-2016-25_A_AP.json",
+      "bytes": 1090,
+      "sha256": "fd5632f5d0ddadb9bf7d4b77362131c409e9714218f572c721d9eaf52b875bde"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Jul-2016-26_A_AP.json",
+      "bytes": 1088,
+      "sha256": "dd91db28ed3a74cd28a59c1b73501aa20f407569f04e51148d89970ce7e585b6"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Jul-2016-26_B_AP.json",
+      "bytes": 1089,
+      "sha256": "2d31ab80dff9a4e42257a7935c7109752a8c83af453798899373cad7d0f34ea1"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Jul-2016-27_A_AP.json",
+      "bytes": 1088,
+      "sha256": "4c71c0a73c7772f133af7145fa5ed76d63d33c06dd25bae6405208317739df8b"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Jul-2016-28_A_AP.json",
+      "bytes": 1089,
+      "sha256": "bdfcdfc5e8e38a99b417a9fd0cacb4f24e10f01cf9dbfe3f8ef2e9e93b29dc04"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Nov-2016-131_A_AP.json",
+      "bytes": 1089,
+      "sha256": "575cfa0a912c71b375f8551223098449199552ad9ea3f1cb13e71a9b5e4be7c4"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Nov-2016-131_B_AP.json",
+      "bytes": 1089,
+      "sha256": "bfaa82512c8f24e6cc68c27c247e6810a5c258b90b82ba1297f8bad1e4dd4bb5"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Nov-2016-132_A_AP.json",
+      "bytes": 1090,
+      "sha256": "05e584346b5e91f51bbad333ba3b76411df9b05dbb351c035c6d6c17cc94ba0f"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Nov-2016-132_B_AP.json",
+      "bytes": 1091,
+      "sha256": "97643598542118ed46e6e34ad51a07498c581f5dc2da2056c15dc22630465bba"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Nov-2016-132_D_AP.json",
+      "bytes": 1089,
+      "sha256": "2b5a479c543fd4bbdc27014a9e332ab3e0f85093ad4c3796659f727d23da602d"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Nov-2016-133_A_AP.json",
+      "bytes": 1089,
+      "sha256": "08ab1e2bfcbb17e8435954bf13b40edf2c5101b7c2468052bd6f7c821c09e417"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Nov-2016-133_B_AP.json",
+      "bytes": 1091,
+      "sha256": "ea5dece5a47a0f2bfd608dcedb49a45d1a7353c175e6b389cbdef302d5b50fa6"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Nov-2016-134_A_AP.json",
+      "bytes": 1091,
+      "sha256": "f41fad575510ab1ee04aa0989b85d1e63601b534bb768be312b491d616fd243a"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Nov-2016-134_B_AP.json",
+      "bytes": 1090,
+      "sha256": "ca663d2f4caaf120d3f73272af159a09927b84df78daf131f651761d5bdd4e7a"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Nov-2016-134_C_AP.json",
+      "bytes": 1089,
+      "sha256": "a9f96c4f6300e6816ea1e96ef004d75e5c2bccb668467532c855b5a18b009de3"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Nov-2016-135_A_AP.json",
+      "bytes": 1089,
+      "sha256": "6fe7415a5c21dc293a256ee49e691de19acc7eac7fbd3966aed3de13394da7ef"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Nov-2016-136_A_AP.json",
+      "bytes": 1091,
+      "sha256": "a2a1ccc75e470d7edc7797a8a51c5474aa34de919f2416b2ca33ad509f463152"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Nov-2016-136_B_AP.json",
+      "bytes": 1090,
+      "sha256": "0a93536b1c3906777d6807bb0d1112e338467c442372fecefd066641ddc97a61"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Nov-2016-137_A_AP.json",
+      "bytes": 1090,
+      "sha256": "6f8a36f92c1243cc20dc766ba968ec83654f45fd060f287323a61d93d03e50ab"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Nov-2016-137_B_AP.json",
+      "bytes": 1091,
+      "sha256": "1efdca0b3acf3112240eb513d9d13114229ba123ef65c8a8eee3e34b3ef60342"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Nov-2016-137_C_AP.json",
+      "bytes": 1092,
+      "sha256": "4f136a3fa960a7171fd6cacb8119a126b71d253c17b601698295b57cfbdbc1fc"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Nov-2016-138_A_AP.json",
+      "bytes": 1090,
+      "sha256": "45bf77bee867ffc8e39faca0be9d3741ee8d3bc0cd031c66eca138ef68613a4c"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Nov-2016-138_B_AP.json",
+      "bytes": 1089,
+      "sha256": "cf82364295676eab5aa5cfa19c7b1f81038fab3793167d11a988df88b66deaf7"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Nov-2016-138_D_AP.json",
+      "bytes": 1092,
+      "sha256": "e62bbfb49f6aead6ec92000bcc93f23f6d5e936344bf37c3255142199507df2f"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Nov-2016-138_D_AP2.json",
+      "bytes": 1088,
+      "sha256": "e9199eb1199b03dc4e57f8d8b8c69efdf44852592a0885796f0132309153cebc"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Nov-2016-139_A_AP.json",
+      "bytes": 1089,
+      "sha256": "4845f0a28202d635ef75eb76eb94d2f4c60a0acd0947119d4bf426390d81af96"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Nov-2016-139_C_AP.json",
+      "bytes": 1090,
+      "sha256": "1e113f75851103f799d4fbf4d1a0e3453dd2a601b0a94a478edb252589c5c7be"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Nov-2016-140_B_AP.json",
+      "bytes": 1091,
+      "sha256": "7d8a147b7c7f16a52720162ac37325a3a229904d1d253211e5aa638048367d03"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-21-Nov-2016-140_C_AP.json",
+      "bytes": 1091,
+      "sha256": "dab0a919514bfc4c09000ed67144b711b9abeb29f15f4fcd1716c9e309e6c50f"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-22-Nov-2016-141_B_AP.json",
+      "bytes": 1090,
+      "sha256": "0c8b35b2cf190203ea3100f3a6b10f97900a2dece774bc8e9f38a5528e349cda"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-22-Nov-2016-141_D_AP.json",
+      "bytes": 1091,
+      "sha256": "4445cf237ee616ceec9e9cd8d4d2d61a19d769e07904337d5dd617dcee4ba2df"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-22-Nov-2016-141_E_AP.json",
+      "bytes": 1089,
+      "sha256": "cb40b53df70f3ba1bcbbae37aff819921fa992aa525849169b0745f0f028b47d"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-22-Nov-2016-141_F_AP.json",
+      "bytes": 1091,
+      "sha256": "5d4fc3c3a1746456202a6421511eabdfe1e5716e117d37a230170967684171df"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-22-Nov-2016-142_A_AP.json",
+      "bytes": 1088,
+      "sha256": "71f345e293c9029031ad5daa9c8deb570dba8bdc001635db6998ef92c64daaaf"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-22-Nov-2016-142_A_AP_2.json",
+      "bytes": 1092,
+      "sha256": "b3278524d1bc6de8244d7154e6b12dbace7771224fff2b0ca7bc2ae6f14967a3"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-22-Nov-2016-143_A_AP.json",
+      "bytes": 1090,
+      "sha256": "72acf302aad847cca06fca6d8c2d9beb70702373be63381baad7b4949c8e80ac"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-22-Nov-2016-144_A_AP.json",
+      "bytes": 1091,
+      "sha256": "a6e1b03da4fab5e1b14f2023745e0ef0df43375a0552dee8eb7235838b619b31"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-22-Nov-2016-145_A_AP.json",
+      "bytes": 1091,
+      "sha256": "6dd74b094d53fa43c027df5a4a13f7e11b2449a6b3fbeb8ba89ba1bb6328520a"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-22-Nov-2016-146_A_AP.json",
+      "bytes": 1091,
+      "sha256": "7a164b8b5e6a181bb93ee3b3b5053e3d4596d3e39942cb562257ec61f28bcaf2"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-22-Nov-2016-147_A_AP.json",
+      "bytes": 1090,
+      "sha256": "6ea54509edfb0085737fc55ff6e3c849a6f0f820dce16085f8093d3106779ec3"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-22-Nov-2016-148_A_AP.json",
+      "bytes": 1091,
+      "sha256": "b94a831b0b62d6affd4bb5944beea8a4983f68e7fc57cc79275122de356796c5"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-22-Nov-2016-149_A_AP.json",
+      "bytes": 1090,
+      "sha256": "79e793d8faed5ae7396a6b9bc027acd24c59ab160294f4f35289a400d43e6ed5"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-22-Nov-2016-149_B_AP.json",
+      "bytes": 1092,
+      "sha256": "d94fcb42c2204c984ded21e24c85cfcec58c8c33bddd0ec5a90decd2cacb564d"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-22-Nov-2016-149_C_AP.json",
+      "bytes": 1090,
+      "sha256": "1938519198ed03b056d0a0d546ac22a7bbd724691884537620dfc3fbdb5c2518"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-22-Nov-2016-150_A_AP.json",
+      "bytes": 1091,
+      "sha256": "9b4b6d56e9f65c0bd0b402f3ccceaef48277768d4aacfe234e9ed922a551eb7f"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-22-Nov-2016-151_A_AP.json",
+      "bytes": 1091,
+      "sha256": "10cf28acb0454cfd27e5cec6f429cd381f65a6609655a6be3586c5f44584a4b6"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-22-Nov-2016-152_A_AP.json",
+      "bytes": 1091,
+      "sha256": "bf007f8d9a195ebc23eae907668f32f71a5d58a71154693f4ac1159260c4fc7e"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-22-Nov-2016-153_A_AP.json",
+      "bytes": 1091,
+      "sha256": "5052e50eea0a6331ea7aaaf51d9e37d26c6ab77c662bdba98f28db1734095076"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-22-Nov-2016-153_B_AP.json",
+      "bytes": 1091,
+      "sha256": "1504ff4713b5ae3ec6b8c2ff1df66b40fc16dbe2290573e3553598a327f0245d"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-22-Nov-2016-153_C_AP.json",
+      "bytes": 1089,
+      "sha256": "d4f9d15a44ae0dec4fe9dbfe7047f8e53d0d5f8e416cfda3df1c8489b92dd328"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-22-Nov-2016-154_A_AP.json",
+      "bytes": 1090,
+      "sha256": "66ca5738a33d2daf3ad326dcadebc6e427293ffc2f3ee91a7e8f09be02f6e24b"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-22-Nov-2016-154_B_AP.json",
+      "bytes": 1090,
+      "sha256": "53cffd6b3f2227217e8aa3d03b80057ff3e85f64532e7e1a61d9c963d6c3a3bb"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-22-Nov-2016-155_A_AP.json",
+      "bytes": 1091,
+      "sha256": "ae830c22f7fe8207bb15074b974fdf35b0ed83658e1f27922008cd26a821f7cc"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-22-Nov-2016-156_A_AP.json",
+      "bytes": 1091,
+      "sha256": "a0138074cf2b2dba0df536f07b58c31db5de8dcb30ff6e0c66667f0a3cf90411"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-23-Jan-2017-276_A_AP.json",
+      "bytes": 1089,
+      "sha256": "04a552ec32b2f4d33e71a6ff6802af68ca2444757bd9bca3ea9e6cad47540061"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-24-Jul-2016-28_B_AP.json",
+      "bytes": 1088,
+      "sha256": "b81b3858e9a551eefdc8046170880fa59e62b691f0c3169c4326b3b72f24030a"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-24-Jul-2016-29_A_AP.json",
+      "bytes": 1089,
+      "sha256": "937b24ddb5aa95c1e8818a583a70abfaa4ea70759c9a7dd021eb1b96e4e7886b"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-24-Jul-2016-30_A_AP.json",
+      "bytes": 1091,
+      "sha256": "2f276072d9fb3addc3543ad0693eac4b1add6867197ac319f8950fe60863ff91"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-24-Jul-2016-31_A_AP.json",
+      "bytes": 1088,
+      "sha256": "9d5fdcc75877403af89ef651b77c632dd7bb24dc7f5ed4557dcfa4dd32c9c423"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-24-Jul-2016-32_B_AP.json",
+      "bytes": 1090,
+      "sha256": "5bce60289b1b39f2b75b00158476d7570aacb324d01ad6d2b9aa4b41705878f3"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-24-Jul-2016-33_A_AP.json",
+      "bytes": 1088,
+      "sha256": "7691d9009384bc43e07c6f8133902fba8f9833351bcc82edcb8347755c8ae5a4"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-24-Jul-2016-34_A_AP.json",
+      "bytes": 1090,
+      "sha256": "5bd4ca5f6cef23e5332d1e9a0a064bd6e3f068b742341cfd55d1ffca189b26a1"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-24-Jul-2016-35_A_AP.json",
+      "bytes": 1090,
+      "sha256": "1c54432f429fe2dc625d4056c732e98182cd0fe3fea8bd6de7b6dcff587e028f"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-24-Jul-2016-35_B_AP.json",
+      "bytes": 1091,
+      "sha256": "eb75b0ea78cb20055346334081fac5e98e0cd90c0c4b2ac7ffbe06049c7cb302"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-24-Jul-2016-35_C_AP.json",
+      "bytes": 1088,
+      "sha256": "ec1a2c1878dcabc2f6f405844bbdf83578b308f460dfdd6a29ab2a17f62c9b8c"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-24-Jul-2016-35_D_AP.json",
+      "bytes": 1090,
+      "sha256": "9f4930c8badb69a97ed5b9d972ac772a4bec3ab716e3ff22adf12dece88f2797"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-24-Jul-2016-35_E_AP.json",
+      "bytes": 1089,
+      "sha256": "9f4e5b2eee367072aac0f2ec8925d0d65976822db07ad106928f6b4e71d43587"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-24-Jul-2016-36_A_AP.json",
+      "bytes": 1090,
+      "sha256": "d9e2672cbd01435c3f3bc8a4e0b62566b0673cb7cbbaacebdafefac1f6a59e1e"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-24-Jul-2016-37_A_AP.json",
+      "bytes": 1090,
+      "sha256": "8cd242c2f360092ab1b8f7556de918e0f3883c6f937a0836257ff656d48b077c"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-24-Jul-2016-37_B_AP.json",
+      "bytes": 1088,
+      "sha256": "37d8e5d96e8e40b62060db692ea79297e8186a3e8b27761f8de91292297b1d12"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-24-Jul-2016-37_C_AP.json",
+      "bytes": 1089,
+      "sha256": "a6496eef1695cbab603f971164a9d2d971c73afc8ceed073cd8709a995b5af4f"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-24-Jul-2016-38_A_AP.json",
+      "bytes": 1090,
+      "sha256": "97871ecf24e16fbaeceef9cda0d1430f49845c920dc6d6e0c6ddf8bd124edf06"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-24-Jul-2016-38_B_AP.json",
+      "bytes": 1088,
+      "sha256": "1770aed59fd69762955fbc2d7fc04293da458101b2ae9ad7c7f114022773494b"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-24-Jul-2016-38_C_AP.json",
+      "bytes": 1088,
+      "sha256": "1100be73f1276d65f868c0863947de59e310647895848a739563db20b3431baf"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-24-Jul-2016-39_A_AP.json",
+      "bytes": 1089,
+      "sha256": "4a7900d8ae53d4412dfbad31ed023b630238e34c99d5bc326eab45103a019be0"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-24-Jul-2016-39_B_AP.json",
+      "bytes": 1088,
+      "sha256": "d0f1179ba0c45d2dbbb15d1719357aed85d6c8df8a69391adc50b6a08a64eb93"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-24-Jul-2016-40_A_AP.json",
+      "bytes": 1090,
+      "sha256": "ecd0ecf4b6d10e450e88e1dfbb4869274af29d5f38bf0cffe2782190efa77b1e"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jan-2017-279_B_AP.json",
+      "bytes": 1092,
+      "sha256": "c97156f9f46ad53849983bd1f507d28965c46c9c5e61879777208681e06b5ae1"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jan-2017-279_C_AP.json",
+      "bytes": 1091,
+      "sha256": "0714952f660641174d1049b808e83a32961f6519ca018d2340737aa9a3353609"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jan-2017-280_A_AP.json",
+      "bytes": 1090,
+      "sha256": "a6075acc84745754fd7b2a95407e02de7747de317265fd66b0471b18843c203b"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jan-2017-281_A_AP.json",
+      "bytes": 1091,
+      "sha256": "219c4025f0efc883c4a6494e377d58e096d6034775853f3de8fae8086d742095"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jan-2017-281_B_AP.json",
+      "bytes": 1091,
+      "sha256": "5274780ff8a898a8507e6117ad7b8103a59340ece707ab545a5bed41eb2e3174"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jan-2017-281_C_AP.json",
+      "bytes": 1090,
+      "sha256": "9833164708c108bb387244e5d937d75b17d245b4a188030fb19c91d6f07fa425"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jan-2017-281_D_AP.json",
+      "bytes": 1090,
+      "sha256": "c8a1d81e5b5e52e11f6b57a20a92387f50784109523ba8e0b51c06b03ac04621"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-15_C_AP.json",
+      "bytes": 1089,
+      "sha256": "b6daaaa247e4bf5e59aa92bc27d235d3c0496010e999bcc9cefc8e65d9594b9e"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-41_A_AP.json",
+      "bytes": 1088,
+      "sha256": "9d285fab3daf702a660367604288835b161a0a8a5c8e335dc8d07e87bb39d3f8"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-41_B_AP.json",
+      "bytes": 1090,
+      "sha256": "b0d3db59a554abd678a207140b82bfcd39c84ceed84f0563f79fa1150443309a"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-44_B_AP.json",
+      "bytes": 1091,
+      "sha256": "38a718223fca6e336e25c901053dfed8a78d348f637b5cec4b76b4db88482139"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-45_A_AP.json",
+      "bytes": 1088,
+      "sha256": "8f91e641e4245bbcc42f7cf2942338ab1a0209e15248d20e6dc3364c7ad8d142"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-45_B_AP.json",
+      "bytes": 1089,
+      "sha256": "3e7f2988d8a9c467078a7e99d3707858cbc335c83dfd75d9943676592ea68d0b"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-45_C_AP.json",
+      "bytes": 1089,
+      "sha256": "057af83dc7710b595208b167d3dd1bb3b7073deb1aef39b1eb53adaf28410167"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-46_A_AP.json",
+      "bytes": 1090,
+      "sha256": "3af719614cb2bc68f801d5c285d6dfa7a9a1ccbc50f9cab1fce0700d5e2b7c73"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-46_B_AP.json",
+      "bytes": 1090,
+      "sha256": "2a10163ea3dbbf3583da9d51f327197b76527f92efe473b6ab7c99f62f3b688f"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-46_C_AP.json",
+      "bytes": 1087,
+      "sha256": "cd1a79aeae8bc780269434ef76a2d4bef86d7276d1627d0540bd1ba5f82d9b52"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-46_D_AP.json",
+      "bytes": 1089,
+      "sha256": "5ab1788233ff7bc586923fb09c696264b0fdba068c575b4ea1350931ae8ca57b"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-47_A_AP.json",
+      "bytes": 1091,
+      "sha256": "f27557a92b04ab0f38ae8126494a7213f66c80edb692c057c85ae67bb7cfcf3b"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-48_A_AP.json",
+      "bytes": 1090,
+      "sha256": "e52f6093c92557187cd4dc8f6cf03725423c2cf9b890cc161897eb03949ed878"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-49_A_AP.json",
+      "bytes": 1090,
+      "sha256": "abdbc512d7d792c16a8c60a024cc50a82ada49af8ca527cd8f661bf4609d0411"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-50_A_AP.json",
+      "bytes": 1090,
+      "sha256": "abf79e2fe8ad2618ea1918f99a6901057a94ec35eeef540bed6d5863a6e89b32"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-50_B_AP.json",
+      "bytes": 1091,
+      "sha256": "bc5a08b0967d36c7fe6acaa016a0adbb718ef6d26d40443609f41227d695894e"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-51_A_AP.json",
+      "bytes": 1089,
+      "sha256": "0d441ddd226eda9c1c4f6e7043cba50701feae3b8cbca2304cba6dca5afc525b"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-51_B_AP.json",
+      "bytes": 1088,
+      "sha256": "a307681a835bafa49998cc1b3d6100288797be2af1bf8f098edeabfb0f536937"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-52_B_AP.json",
+      "bytes": 1089,
+      "sha256": "5ccf9b95f23bc57577ed09b5618a5af71246c7843478a9385c56ad643ae36bc4"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-52_C_AP.json",
+      "bytes": 1089,
+      "sha256": "59526c64c72389ace4c9eabec9ad70d538fb0d01f238998facb7605e85a7941d"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-53_A_AP.json",
+      "bytes": 1089,
+      "sha256": "59440e208f53a75f353fd0688851865edd96590c788f672a682e1f1c3fe7da12"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-53_B_AP.json",
+      "bytes": 1088,
+      "sha256": "23a318b191f2d31117bffcc2d9683fa1c3da03da828e9cac0e9b6a5494d0fbb9"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-55_A_AP.json",
+      "bytes": 1089,
+      "sha256": "38806feabf0d7143ca295a3ad2704164a7460ffaf8612d454b85f821574bbb83"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-55_B_AP.json",
+      "bytes": 1089,
+      "sha256": "1fcb586fcf1a6f599f501680361f48549c254662d60da8966a5fad7af4e180f4"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-56_A_AP.json",
+      "bytes": 1090,
+      "sha256": "b7812b7134603aad9b5256ff1de5b3b7ad53e70e42843795f776f51ff00f9556"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-56_B_AP.json",
+      "bytes": 1091,
+      "sha256": "9b01c8b1844eef369b1731f4b2461bcac49bf4276c4f33e74cde4b81a8d3daff"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-56_C_AP.json",
+      "bytes": 1089,
+      "sha256": "a82b0d5835f4b137d4a60871fbb27fa6bf0266fb0830cec5631ced41c0b545f1"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-56_D_AP.json",
+      "bytes": 1090,
+      "sha256": "4850e26acb1ad9ec0cb14b64f5f762d037691137a2ab0a93f5782969aa48cfa9"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-57_A_AP.json",
+      "bytes": 1088,
+      "sha256": "4f983e7cf2e1323d0e5ec51ebd04dab1a6ae1bd38f4a86ff7d7c3e9e8d3593e3"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-57_B_AP.json",
+      "bytes": 1091,
+      "sha256": "4dd16f20b8866567663279354cd1d13ad6d43e43d49bf8756132bd6c34e9f425"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-57_C_AP.json",
+      "bytes": 1090,
+      "sha256": "328a8f03196e8275db91d30080bdf5cf5163c0b3ea58239904e5655dec6fca2e"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-58_A_AP.json",
+      "bytes": 1090,
+      "sha256": "7b0ed43ee39f530eb3d44b379eec10012843df9e793d1dad1b013eea9eabed24"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-58_B_AP.json",
+      "bytes": 1090,
+      "sha256": "3170b2abbf9a61f4dcd0d4edce350e4e47e11b2fd5fdb8736fbe842a04070b8f"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-59_A_AP.json",
+      "bytes": 1090,
+      "sha256": "4449aafe5802b13d88ae0523204cdf8d6e123bf6239c0737c7b1f6817fa42aee"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-59_B_AP.json",
+      "bytes": 1089,
+      "sha256": "00b6c32e45ce59703fb89f5d5833b3f2e1767f5bdb384396be82fa5cadb58770"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-60_A_AP.json",
+      "bytes": 1090,
+      "sha256": "4acac25899930d97ede4b494644af580da3878b070a8030d1c55de64872463a0"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-60_B_AP.json",
+      "bytes": 1088,
+      "sha256": "01ba582dc8301ad93d7f23dfec4e6f5144a71ef498124b9c46e791720f9a93be"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-60_D_AP.json",
+      "bytes": 1092,
+      "sha256": "41920e09108b5f68c819881881f44ea2d6a511e99b936ca3a651a8dc4095b0b2"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-61_A_AP.json",
+      "bytes": 1090,
+      "sha256": "a444dbcc548d742c5686a3c30da72cef8dec02b24f031751c7440e8960dff6b9"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-62_A_AP.json",
+      "bytes": 1090,
+      "sha256": "110f693108ce56e909579903d14bf11cd16590ed441d5dbe1481795a0ad5f4f4"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-62_C_AP.json",
+      "bytes": 1090,
+      "sha256": "84b342b2bc3951bd3b6583f7ee25b359eb1262625a8be6f2619602c389bd15b4"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-63_A_AP.json",
+      "bytes": 1091,
+      "sha256": "8f5ac5da58c51f2dc3d0944a5db585187e9ffa267bc15560148dc3e99a5656a4"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-63_B_AP.json",
+      "bytes": 1090,
+      "sha256": "73c4e2022c04905ec1bbcbbc8fc8731956bf4c2c1c7d0dbd597f1f9532a45bee"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-63_C_AP.json",
+      "bytes": 1090,
+      "sha256": "93d75430b1634025c662f4ebc8e5d7bed22e2f6d43d7c431fa931e23a2cc0577"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-64_A_AP.json",
+      "bytes": 1090,
+      "sha256": "b09fa0e63579dceb86f22d36493cf43f23aea23bf88b07031bc942fbc7b1ddf5"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-65_A_AP.json",
+      "bytes": 1089,
+      "sha256": "3d7a5902b08d88c818f83b55163316fbb889a8ac65e9415bde286756555f363f"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-25-Jul-2016-66_A_AP.json",
+      "bytes": 1089,
+      "sha256": "16c008219369457084408df21b55b454086f4be204b1e7b9b266a9b29c4fcbf4"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-66_B_AP.json",
+      "bytes": 1089,
+      "sha256": "e61cc2659fdb10ad7021fe56df69fe43f9be6e476c20bcc61328c12898ff8fed"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-67_A_AP.json",
+      "bytes": 1089,
+      "sha256": "6043b2f262a2e01a92a5668fdb051be32a642b8db6da8d5cd8583786a0d26681"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-68_A_AP.json",
+      "bytes": 1089,
+      "sha256": "a339c7cb6213fef1bcd9e53a98fe4bb5ce85d2ff6644345665dbeaa93996c846"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-69_A_AP.json",
+      "bytes": 1089,
+      "sha256": "e901dc9a4f36d37a1e6636a24882b3b80e18c77a92ae60f82c8ddc4a351af720"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-70_A_AP.json",
+      "bytes": 1089,
+      "sha256": "eda1328e4b7c19915d20c92899d605abaa0ace4e2b684d908e0182e9ab5b130d"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-70_B_AP.json",
+      "bytes": 1088,
+      "sha256": "3f62328b7e948c7431499d620616d3e3e3db834b4624fdc817727834dbcea7a4"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-70_C_AP.json",
+      "bytes": 1089,
+      "sha256": "fd35fc623020b234a56763fe5b29e61f83e4e908694ba5f1291303232396b7ec"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-71_A_AP.json",
+      "bytes": 1089,
+      "sha256": "852fbe20d49a732e1823582f05a43d703b4a80898c957cd0fc345ee0b9e0a4fd"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-72_A_AP.json",
+      "bytes": 1090,
+      "sha256": "d9adcc3a51a0a262f6404a4b68b594f393584b7d6227fd2f9cc21c048df1acfe"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-72_B_AP.json",
+      "bytes": 1090,
+      "sha256": "469bafb9632893fa9a293e4c3347e4af01927f544813cf0d454f3a07bce89fb6"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-74_A_AP.json",
+      "bytes": 1090,
+      "sha256": "6c587202919de0da377f2c1ded4489bb4d6b2eac4f619caa3b99261cf41c4dd7"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-75_A_AP.json",
+      "bytes": 1092,
+      "sha256": "30f1cb442cd0e0ec4a63a983c21dda357a042e3a3a4aae61666a3d224ed16778"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-75_B_AP.json",
+      "bytes": 1088,
+      "sha256": "341074cdec2e198d9ec861085058c77a4aedaca5bface2c21fb136db78dff71e"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-76_A_AP.json",
+      "bytes": 1088,
+      "sha256": "d25dc90b6698cc933cd63bb4582d69b2b577649732fbdbe9a205ed3df3ceea84"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-76_B_AP.json",
+      "bytes": 1088,
+      "sha256": "665f8c716f2578941c0d6c1a009a2a9c678c8a14bd76fb15c8f4f4c85f16b10c"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-76_C_AP.json",
+      "bytes": 1087,
+      "sha256": "0a9cec5508c05b9bec3077b2b3ef09bbfa7930eb184a0e9ad48fa2760675558c"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-77_A_AP.json",
+      "bytes": 1089,
+      "sha256": "2e76e519d34a7f55333081b5f2a5e991089119d0ea137b45bee5c7b1c7d33b37"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-77_B_AP.json",
+      "bytes": 1089,
+      "sha256": "577b9ce072b77e49524c65c86dede4f63878dce7c14896f4922b50f2548bf88d"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-77_C_AP.json",
+      "bytes": 1088,
+      "sha256": "5763b347e796ccde47c73e306b36007e4f7ece84059e7d37322bb404abafbe65"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-77_D_AP.json",
+      "bytes": 1089,
+      "sha256": "18c56f0a2c1ddc9d339aeba33d7f53cfc38fdf6aba8ccf67966227f8f77b278a"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-78_B_AP.json",
+      "bytes": 1091,
+      "sha256": "93c27b35d7ce23474169d4d31aa83479cd49c2b0813cec217cab4877ad1ade9d"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-79_A_AP.json",
+      "bytes": 1087,
+      "sha256": "d565128c17ea93ec9c1c58b7cff4e01fc62b6a486eba5a3e43a8a21bb734625d"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-79_B_AP.json",
+      "bytes": 1089,
+      "sha256": "8593607ae8d8e15bd184060539251f9ab5ccb41f0f7359f74ea743c9623ca824"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-79_C_AP.json",
+      "bytes": 1090,
+      "sha256": "9aa3cba1962debc659ed5e99ca0baa6fea5e767a5551939f62409def9263fe67"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-80_A_AP.json",
+      "bytes": 1089,
+      "sha256": "dfe6b434eaa23def7fe56d44eb00624fb4051e2eb7b0a5f735685f7319ddfafb"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-81_A_AP.json",
+      "bytes": 1090,
+      "sha256": "a9fcdae46b71f3ae9158a496cfd5aa157758e6f3fe9d30a0b86b35ab3bc50ff9"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-82_A_AP.json",
+      "bytes": 1089,
+      "sha256": "d702b754854c034fa81138a5d6c4e830579fd602fce709578b666407426cb0f3"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-85_A_AP.json",
+      "bytes": 1089,
+      "sha256": "c01c4dfdc3041bc9423f8f6b8779f450e180cf3909914e8ae412bf6d1c657475"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-86_A_AP.json",
+      "bytes": 1090,
+      "sha256": "e07fcd9961237c8f51ec254012bc9c645e5979f5c42117648c976e28862f4d12"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-88_B_AP.json",
+      "bytes": 1089,
+      "sha256": "2cb03509395d201478e5334515b9f00d103c79558de39f6adbd34446f92e4879"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-89_A_AP.json",
+      "bytes": 1091,
+      "sha256": "f3cfe949d215ba90409a45e2f76ba0fc9943a91448cbf4b013412229537c8521"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-89_B_AP.json",
+      "bytes": 1090,
+      "sha256": "d875bad306a2b28b7053bed79d31b7b617e63bf4b9eb14e3b38dd95c443a72e2"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-89_C_AP.json",
+      "bytes": 1090,
+      "sha256": "b8e052002f400d6994a7d42bfe4db19280bb14ad48d792d1a40fbd80488b7c9c"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-89_D_AP.json",
+      "bytes": 1091,
+      "sha256": "f6026e7ac6af890eb79a513e0f64be94b2515f83f7ea7c5d80ab59e8e071ce9b"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-90_A_AP.json",
+      "bytes": 1088,
+      "sha256": "1cd3c412344a8a4676b59cc510dcd0baa3fdd04137192e425e8625b58a1baaf5"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-90_B_AP.json",
+      "bytes": 1090,
+      "sha256": "9836b01dc37addc92bd9ea884cdc12bf19587639b1b8dda76d7e3a1293a6c668"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-91_A_AP.json",
+      "bytes": 1090,
+      "sha256": "565a872bb07e04fc46f085f4b20bfb033c05b579bff0f64e00cfa1dc190b0cab"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-26-Jul-2016-91_B_AP.json",
+      "bytes": 1090,
+      "sha256": "2d916d7f995ea411c88eb4c097f2a6e12ad891c2585e8ba68084369b23da9c5f"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-29-Dec-2016-156_B_AP.json",
+      "bytes": 1091,
+      "sha256": "e07dd125155b1db7da6e7ad184cd16e14fe3e4772f860e762fd794795ee9fe18"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-29-Dec-2016-156_C_AP.json",
+      "bytes": 1089,
+      "sha256": "f14aaeeb1251518c88a412d4a35f1461b67e8fb5798e4f81f0c927b4b08dd62f"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-29-Dec-2016-156_E_AP.json",
+      "bytes": 1091,
+      "sha256": "b4decf45897322e284b14924bf76c5a0a0e7f00ba776e84b25dc26d3a7fdcf69"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-29-Dec-2016-157_A_AP.json",
+      "bytes": 1092,
+      "sha256": "06b258617f63837b727a07079a8f21c88cd0daafadd5a46b8fa379e4edde650f"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-30-Dec-2016-158_A_AP.json",
+      "bytes": 1091,
+      "sha256": "3d88db15487d83fae1636e9792cfa9cd42f1bca178d61019aff98873839aa75f"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-30-Dec-2016-159_A_AP.json",
+      "bytes": 1091,
+      "sha256": "2b07949e80c88b01e6e8fef2b5d9825305230f85a8d18da6ff6d54143b274702"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-30-Dec-2016-159_A_AP2.json",
+      "bytes": 1092,
+      "sha256": "e1858c59179db14def518c37b3ded0d06ea300dfebbddd3d781bd5a75f2ceaeb"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-30-Dec-2016-159_B_AP.json",
+      "bytes": 1091,
+      "sha256": "2f031bd34dbcd0c08a5e5a7d87d8204e4fd72e330d925d84d5d7f1cb29338281"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-30-Dec-2016-159_C_AP.json",
+      "bytes": 1091,
+      "sha256": "e7d24be868e47f3599a8012eb173b74d8b80e3e686b9c17d8b5f38d939fbd4fd"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/augmentation_parts/sunhl-1th-30-Dec-2016-160_A_AP.json",
+      "bytes": 1091,
+      "sha256": "ddef435f66fb7ac92ed48a6505dd85d5655e2f8c5463af26a9d777ebf2e55025"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/budget_estimate.json",
+      "bytes": 287,
+      "sha256": "1f7105e30ec36cba8d087e99c0f64c3dffed0d38d41df3cfff95ff64ed829c4a"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/evaluation.npz",
+      "bytes": 60226,
+      "sha256": "563229183cd364f567c8b75f633b647ce883e7a51ea5fc73240a554d9f44934c"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/extraction_attempts.json",
+      "bytes": 46568,
+      "sha256": "25e12b073cad110b59623ad0f12008648a4edf9668ae51f5b763bfb6f76a1e21"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/extraction_budget.json",
+      "bytes": 172,
+      "sha256": "11bcfae2fc311f470b10dc5ad162ad819e1e5096eed5d594f4eabb1ebdd52946"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/extraction_environment.json",
+      "bytes": 856,
+      "sha256": "088adc8b7e73e996f9663e374fa55c33488ced107c2d64485937c67b378031d5"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/heads_complete.json",
+      "bytes": 875,
+      "sha256": "9c36f4e9a316dd51c62ee165c564016705b3ac9328ccbade3c569fc4b72810ab"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/image_dimensions.csv",
+      "bytes": 5351,
+      "sha256": "6f00d078aa8d937972afc96c709801302dc8a185adbd301e8e12a5860e89d185"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/imported_controls/projected_mean/cobb_seed0.json",
+      "bytes": 1451,
+      "sha256": "332e567a09f83299e41190f04a7d728108b31ce9e5fba5e241bfcc9844b6e6bb"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/imported_controls/projected_mean/cobb_seed0.npz",
+      "bytes": 4269,
+      "sha256": "1cf2c8739309f13756002c94c069fb1490c5d35f5417e2b2e771dac900592a06"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/imported_controls/projected_mean/cobb_seed1.json",
+      "bytes": 1451,
+      "sha256": "ae07ccb71f45326386874261e6c2b218fd610504f830598f4bdc788865775f0a"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/imported_controls/projected_mean/cobb_seed1.npz",
+      "bytes": 4269,
+      "sha256": "18a8352ef10176f2e4c26e846de2644d6be2712715a70b2ff98ca06d1277ceeb"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/imported_controls/projected_mean/cobb_seed2.json",
+      "bytes": 1451,
+      "sha256": "4f3ebdf0f81f10b95a3431fdabb42d28367e098a8fe2d245e6c33f4461c35236"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/imported_controls/projected_mean/cobb_seed2.npz",
+      "bytes": 4264,
+      "sha256": "cbd16ae1fa04d63fcb78517872650c1d7a408136bb66a6ac90dcde974f989f83"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/imported_controls/projected_mean/landmark_seed0.json",
+      "bytes": 4293,
+      "sha256": "61677a4c66b087ef54741c66614c1a22e2f6bd1b6c21f8f4330ea14708cd9fa7"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/imported_controls/projected_mean/landmark_seed0.npz",
+      "bytes": 121207,
+      "sha256": "3d480e4e99c1074f827846d14ce1fca54111c3077cdd453e6770050ea0b79522"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/imported_controls/projected_mean/landmark_seed1.json",
+      "bytes": 4295,
+      "sha256": "7e3c41c50cd08cb8300128452da167f46bd22aa82543cf5d58843452c667b23e"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/imported_controls/projected_mean/landmark_seed1.npz",
+      "bytes": 121195,
+      "sha256": "c47408c2c2d5c9eab48cb8e3974e3539a4b5283c64bf4fbda45409ad4d2b340d"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/imported_controls/projected_mean/landmark_seed2.json",
+      "bytes": 4295,
+      "sha256": "80847efeddea4e893c70701a0e8e16e6474017b6e1152f7196e0b4cf041b871a"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/imported_controls/projected_mean/landmark_seed2.npz",
+      "bytes": 121179,
+      "sha256": "9f35e8918c163a1d5054f0c66c44217a69c79d07fbe022c4ee704040fe53b6a9"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/manifest.json",
+      "bytes": 26983,
+      "sha256": "0f5a479c5560aa521e0d0e10af5bafc8366f4c5ccdb82ed6c2145ab825750620"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/model_record.json",
+      "bytes": 700,
+      "sha256": "c2837ded381d1a3f2095a02c47236f5413b0942fa0325ff27632bbfe06cd3dee"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/plan.json",
+      "bytes": 3721,
+      "sha256": "c8185b3c8277a277c66d655cc27dd7ac93cdae65ee5ce9f77a3e775a9c681aa9"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/runs/augmented/projected_mean/cobb_seed0.json",
+      "bytes": 1455,
+      "sha256": "2ae59797fa893fd563847d62af5a76831afd68b01bf4c683b1202e1c4741f459"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/runs/augmented/projected_mean/cobb_seed0.log",
+      "bytes": 306,
+      "sha256": "48ea94ea3864ec3b04b1ce3eac96fb53be86428b112633ddc0ee804549444abc"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/runs/augmented/projected_mean/cobb_seed0.npz",
+      "bytes": 4266,
+      "sha256": "595959f308cdf64425388dd1778763816d336075f95f7a14666485d6d44f8a6e"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/runs/augmented/projected_mean/cobb_seed1.json",
+      "bytes": 1456,
+      "sha256": "8f38620256a83d73239415c842a09338f1782f4b0b455cfb7a9564f30af96f60"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/runs/augmented/projected_mean/cobb_seed1.log",
+      "bytes": 241,
+      "sha256": "addd1fec224f1281830e8f0654b81ff69526f063c8d6461248a168cb8a98fbb7"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/runs/augmented/projected_mean/cobb_seed1.npz",
+      "bytes": 4274,
+      "sha256": "15a0e7e9195e93246af2d7b798cac1696112b211445b624a08c64c4effa9d5ed"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/runs/augmented/projected_mean/cobb_seed2.json",
+      "bytes": 1455,
+      "sha256": "7404497812cb2315195f361f2f3f835b709edf82157cba864cb672953136cd17"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/runs/augmented/projected_mean/cobb_seed2.log",
+      "bytes": 307,
+      "sha256": "9811636c77d3d6c4ea822e11714b99bc014f96ac8e390d0fc8e0afdb4556b561"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/runs/augmented/projected_mean/cobb_seed2.npz",
+      "bytes": 4268,
+      "sha256": "d4056076c0db3d5ef3b7a5292128ca35d38bd1c37e548453acbcfdb9ea5bcae9"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/runs/augmented/projected_mean/landmark_seed0.json",
+      "bytes": 4299,
+      "sha256": "591201bf32b4e2287366aa2c3ffd90af63929f25ad2e3d5fcca93801e2762688"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/runs/augmented/projected_mean/landmark_seed0.log",
+      "bytes": 375,
+      "sha256": "ea05fb1a0c4bb9d27237f7fdbae32135d3a3756fd41c360bda248c909c31ac10"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/runs/augmented/projected_mean/landmark_seed0.npz",
+      "bytes": 121136,
+      "sha256": "760a725dd602e022644a4110bd64772e91d583b8fa5427767be7aaf78bd03c98"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/runs/augmented/projected_mean/landmark_seed1.json",
+      "bytes": 4299,
+      "sha256": "adddc2d8c7df0cc4e12e35e72e5eb2f0939c4c5ceffcd3ebcf87fe7edcbb6862"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/runs/augmented/projected_mean/landmark_seed1.log",
+      "bytes": 442,
+      "sha256": "425090410f3258df328d9a382a1c286c26d0b54ec9e6179d64d25fa9fb7bf140"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/runs/augmented/projected_mean/landmark_seed1.npz",
+      "bytes": 121135,
+      "sha256": "ec0d4a3b43b6166e3af3cb4dbb3389be65227202b952338961492ff6f3e054d2"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/runs/augmented/projected_mean/landmark_seed2.json",
+      "bytes": 4299,
+      "sha256": "ede3515d8516843eb3779b2a3e8a036fea1ccb484c9eb493f53415b5aa2ae3ba"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/runs/augmented/projected_mean/landmark_seed2.log",
+      "bytes": 504,
+      "sha256": "f659abb420e90f045ff68c897aae3433526a1197145b922592ce5c06a0d1930f"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/runs/augmented/projected_mean/landmark_seed2.npz",
+      "bytes": 121143,
+      "sha256": "d0bc539f311b6aebc5cd940e14ca2213e03b8992df9a05a53707068baf085cd6"
+    },
+    {
+      "archive_path": "studies/followup_augmentation_v1/training_environment.json",
+      "bytes": 434,
+      "sha256": "2df72dc1f9702cbdbfb6499528c779ff2ec8dd96b9936bc9952cdc6f1ba04607"
+    },
+    {
+      "archive_path": "scripts/medvae_followup/analyse_heads.py",
+      "bytes": 8109,
+      "sha256": "313375789547658e667c232d4d015a6128277abd5f17aa8548db004b55b06b6d"
+    },
+    {
+      "archive_path": "scripts/medvae_followup/collect_results.py",
+      "bytes": 4661,
+      "sha256": "25b26ed09cbaba722854b3129aefb2e3f63affa45c71f1d7f858c076f1b64cd6"
+    },
+    {
+      "archive_path": "scripts/medvae_followup/common.py",
+      "bytes": 8508,
+      "sha256": "673fe9f12369c82eee3e8eb94cb3e9b6651a29dd87d39922c1ecad87f92f409b"
+    },
+    {
+      "archive_path": "scripts/medvae_followup/preflight.py",
+      "bytes": 3066,
+      "sha256": "c66fedbe18bc2ae1a860e9dd255ecbc93c8694556c8fe6ee00b6305863523ca9"
+    },
+    {
+      "archive_path": "scripts/medvae_followup/prepare_annotation_study.py",
+      "bytes": 7456,
+      "sha256": "f715722e90340630df2de0088dd0bdd28c415662e3747f0b0a7779168d9923ce"
+    },
+    {
+      "archive_path": "scripts/medvae_followup/prepare_augmentation.py",
+      "bytes": 12362,
+      "sha256": "fac0c2180b5046b61b980d858d41d04c2e7809c515f08c795bd353f0aeb9a73a"
+    },
+    {
+      "archive_path": "scripts/medvae_followup/projection_common.py",
+      "bytes": 10528,
+      "sha256": "59dc4cb593bcd01611a59e9f3214e4f378d93cca7455568da6a98ffedc032190"
+    },
+    {
+      "archive_path": "scripts/medvae_followup/projection_validation.py",
+      "bytes": 12559,
+      "sha256": "0cfd1672b92845899dccfc6fc827db78c0eec0e36b3aefc350d2448249b8fc05"
+    },
+    {
+      "archive_path": "scripts/medvae_followup/reconstruction_audit.py",
+      "bytes": 20528,
+      "sha256": "9853fee4a6060dbf52966e51657989f61976915a0aa6767422c0cecc616d524f"
+    },
+    {
+      "archive_path": "scripts/medvae_followup/reconstruction_metrics.py",
+      "bytes": 7041,
+      "sha256": "a9cf495470003901b78a5e28b7371f04c644058f1da2d8f52251b4ac52b01710"
+    },
+    {
+      "archive_path": "scripts/medvae_followup/references/augment_and_extract.py",
+      "bytes": 21165,
+      "sha256": "917cbba71870eedfff01e2a70df9851512a4f4b2058d8ea498f9ca87c2cd5e44"
+    },
+    {
+      "archive_path": "scripts/medvae_followup/references/protocol.json",
+      "bytes": 2617,
+      "sha256": "5f99dd22084cbf680fbc2f766fe215429cf64f720665a2912873e7072091299a"
+    },
+    {
+      "archive_path": "scripts/medvae_followup/references/train_frontier.py",
+      "bytes": 36367,
+      "sha256": "221c04e67ab526fdc2bfc75d2eeb7d6ff31c01ff2e89d32c930782d84dadf108"
+    },
+    {
+      "archive_path": "scripts/medvae_followup/run_heads.py",
+      "bytes": 10010,
+      "sha256": "2dff8bba7c4fa0d7b5e132d0738242fa3e703ede59ec2d63ec8d23253ef9269f"
+    },
+    {
+      "archive_path": "scripts/medvae_followup/selftest.py",
+      "bytes": 6490,
+      "sha256": "d179a0119bacf7d68a17a71b37d6f3c7b921757653dca6b8edf363bd264c99ef"
+    }
+  ],
+  "plan_checks": {
+    "followup_augmentation_v1": {
+      "plan_integrity": "ok",
+      "current_scripts_match": true
+    }
+  },
+  "study_completion": {
+    "followup_augmentation_v1": {
+      "heads": true,
+      "analysis": true
+    }
+  },
+  "note": "This bundle can include incomplete studies for diagnosis. No latent caches, training checkpoints or source images are included."
+}

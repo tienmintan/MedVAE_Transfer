@@ -1,0 +1,1162 @@
+{
+  "root": "/lambda/nfs/MedVAE/MedVAE",
+  "measurement": "Logical sizes of regular files; no content deserialisation.",
+  "scope": "Current files under this root, excluding the listed directories and symbolic links.",
+  "classification": "Candidates based on names and extensions. Review categories and directories before citing totals.",
+  "excluded_directory_names": [
+    ".Trash-1000",
+    ".cache",
+    ".git",
+    ".ipynb_checkpoints",
+    ".venv",
+    "__pycache__",
+    "env",
+    "miniconda3",
+    "miniforge3",
+    "node_modules",
+    "site-packages",
+    "venv"
+  ],
+  "totals": {
+    "candidate_baseline_feature_caches": {
+      "files": 10,
+      "bytes": 9832368538,
+      "GB_decimal": 9.832369,
+      "GiB_binary": 9.157107
+    },
+    "candidate_checkpoint_state": {
+      "files": 3024,
+      "bytes": 191552751198,
+      "GB_decimal": 191.552751,
+      "GiB_binary": 178.397401
+    },
+    "candidate_latent_caches": {
+      "files": 143,
+      "bytes": 2620677882,
+      "GB_decimal": 2.620678,
+      "GiB_binary": 2.440696
+    },
+    "other_checkpoint_directory_files_review": {
+      "files": 268,
+      "bytes": 3731552,
+      "GB_decimal": 0.003732,
+      "GiB_binary": 0.003475
+    },
+    "other_saved_arrays_review_for_uncategorised_caches": {
+      "files": 938,
+      "bytes": 665209462,
+      "GB_decimal": 0.665209,
+      "GiB_binary": 0.619525
+    }
+  },
+  "directories": [
+    {
+      "category": "candidate_baseline_feature_caches",
+      "directory": "latents_diffusion_features",
+      "files": 1,
+      "bytes": 295872421,
+      "GB_decimal": 0.295872,
+      "GiB_binary": 0.275553
+    },
+    {
+      "category": "candidate_baseline_feature_caches",
+      "directory": "latents_dino",
+      "files": 3,
+      "bytes": 1775547360,
+      "GB_decimal": 1.775547,
+      "GiB_binary": 1.653607
+    },
+    {
+      "category": "candidate_baseline_feature_caches",
+      "directory": "latents_dino_aug",
+      "files": 3,
+      "bytes": 7739753257,
+      "GB_decimal": 7.739753,
+      "GiB_binary": 7.208207
+    },
+    {
+      "category": "candidate_baseline_feature_caches",
+      "directory": "latents_dino_pca",
+      "files": 3,
+      "bytes": 21195500,
+      "GB_decimal": 0.021195,
+      "GiB_binary": 0.01974
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "cobb_regressor_aspect_4_1",
+      "files": 1,
+      "bytes": 1567825,
+      "GB_decimal": 0.001568,
+      "GiB_binary": 0.00146
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "cobb_regressor_aspect_8_1",
+      "files": 1,
+      "bytes": 1567825,
+      "GB_decimal": 0.001568,
+      "GiB_binary": 0.00146
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "cobb_regressor_tiled",
+      "files": 1,
+      "bytes": 10610193,
+      "GB_decimal": 0.01061,
+      "GiB_binary": 0.009882
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "cobb_regressor_tiled_2d",
+      "files": 1,
+      "bytes": 4894973,
+      "GB_decimal": 0.004895,
+      "GiB_binary": 0.004559
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "cobb_regressor_tiled_2d_reg",
+      "files": 1,
+      "bytes": 4894973,
+      "GB_decimal": 0.004895,
+      "GiB_binary": 0.004559
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "cobb_regressor_whole",
+      "files": 1,
+      "bytes": 2753127,
+      "GB_decimal": 0.002753,
+      "GiB_binary": 0.002564
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "cobb_regressor_whole_1024",
+      "files": 1,
+      "bytes": 2753127,
+      "GB_decimal": 0.002753,
+      "GiB_binary": 0.002564
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "diffusion_ckpt",
+      "files": 1,
+      "bytes": 308221916,
+      "GB_decimal": 0.308222,
+      "GiB_binary": 0.287054
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "diffusion_ckpt_diag96",
+      "files": 1,
+      "bytes": 308226012,
+      "GB_decimal": 0.308226,
+      "GiB_binary": 0.287058
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "diffusion_ckpt_finetune_cropped",
+      "files": 1,
+      "bytes": 308273308,
+      "GB_decimal": 0.308273,
+      "GiB_binary": 0.287102
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "diffusion_ckpt_finetune_v",
+      "files": 1,
+      "bytes": 308273308,
+      "GB_decimal": 0.308273,
+      "GiB_binary": 0.287102
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "diffusion_ckpt_pretrain",
+      "files": 1,
+      "bytes": 308273308,
+      "GB_decimal": 0.308273,
+      "GiB_binary": 0.287102
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "diffusion_ckpt_pretrain_cropped",
+      "files": 1,
+      "bytes": 308273308,
+      "GB_decimal": 0.308273,
+      "GiB_binary": 0.287102
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "diffusion_ckpt_pretrain_v",
+      "files": 1,
+      "bytes": 308273308,
+      "GB_decimal": 0.308273,
+      "GiB_binary": 0.287102
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "diffusion_ckpt_sdvae",
+      "files": 1,
+      "bytes": 308281308,
+      "GB_decimal": 0.308281,
+      "GiB_binary": 0.287109
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "diffusion_ckpt_v2",
+      "files": 1,
+      "bytes": 308226012,
+      "GB_decimal": 0.308226,
+      "GiB_binary": 0.287058
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "medvae/logs/boostnet_finetuning/runs/2026-04-26_22-09-02/checkpoints",
+      "files": 902,
+      "bytes": 61601354298,
+      "GB_decimal": 61.601354,
+      "GiB_binary": 57.370732
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "medvae/logs/boostnet_finetuning_aspect/runs/2026-05-04_16-44-52/checkpoints",
+      "files": 66,
+      "bytes": 4402188084,
+      "GB_decimal": 4.402188,
+      "GiB_binary": 4.099857
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "medvae/logs/boostnet_finetuning_aspect/runs/2026-05-04_16-55-36/checkpoints",
+      "files": 440,
+      "bytes": 30011144910,
+      "GB_decimal": 30.011145,
+      "GiB_binary": 27.950057
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "medvae/logs/boostnet_finetuning_patch/runs/2026-05-09_17-14-34/checkpoints",
+      "files": 1342,
+      "bytes": 91834165787,
+      "GB_decimal": 91.834166,
+      "GiB_binary": 85.527232
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "outputs/diffusion",
+      "files": 1,
+      "bytes": 7882521,
+      "GB_decimal": 0.007883,
+      "GiB_binary": 0.007341
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "outputs/diffusion2",
+      "files": 1,
+      "bytes": 7882521,
+      "GB_decimal": 0.007883,
+      "GiB_binary": 0.007341
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "outputs/diffusion3",
+      "files": 1,
+      "bytes": 8032789,
+      "GB_decimal": 0.008033,
+      "GiB_binary": 0.007481
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "outputs/diffusion4",
+      "files": 1,
+      "bytes": 8047509,
+      "GB_decimal": 0.008048,
+      "GiB_binary": 0.007495
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "outputs/diffusion5",
+      "files": 1,
+      "bytes": 8047573,
+      "GB_decimal": 0.008048,
+      "GiB_binary": 0.007495
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "outputs/diffusion_xa",
+      "files": 1,
+      "bytes": 9099979,
+      "GB_decimal": 0.0091,
+      "GiB_binary": 0.008475
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "outputs/frontier",
+      "files": 12,
+      "bytes": 40572756,
+      "GB_decimal": 0.040573,
+      "GiB_binary": 0.037786
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "outputs/projection_study_fresh_v1/runs/projected_keep/medvae_4_1_2d",
+      "files": 20,
+      "bytes": 67561520,
+      "GB_decimal": 0.067562,
+      "GiB_binary": 0.062922
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "outputs/projection_study_fresh_v1/runs/projected_keep/medvae_4_3_2d",
+      "files": 20,
+      "bytes": 67607600,
+      "GB_decimal": 0.067608,
+      "GiB_binary": 0.062964
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "outputs/projection_study_fresh_v1/runs/projected_keep/medvae_8_1_2d",
+      "files": 20,
+      "bytes": 67561520,
+      "GB_decimal": 0.067562,
+      "GiB_binary": 0.062922
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "outputs/projection_study_fresh_v1/runs/projected_keep/medvae_8_4_2d",
+      "files": 20,
+      "bytes": 67630640,
+      "GB_decimal": 0.067631,
+      "GiB_binary": 0.062986
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "outputs/projection_study_fresh_v1/runs/projected_mean/medvae_4_3_2d",
+      "files": 20,
+      "bytes": 67561520,
+      "GB_decimal": 0.067562,
+      "GiB_binary": 0.062922
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "outputs/projection_study_fresh_v1/runs/projected_mean/medvae_8_4_2d",
+      "files": 20,
+      "bytes": 67561520,
+      "GB_decimal": 0.067562,
+      "GiB_binary": 0.062922
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "outputs/projection_study_fresh_v1/runs/raw_keep/medvae_4_1_2d",
+      "files": 20,
+      "bytes": 67561520,
+      "GB_decimal": 0.067562,
+      "GiB_binary": 0.062922
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "outputs/projection_study_fresh_v1/runs/raw_keep/medvae_4_3_2d",
+      "files": 20,
+      "bytes": 67607600,
+      "GB_decimal": 0.067608,
+      "GiB_binary": 0.062964
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "outputs/projection_study_fresh_v1/runs/raw_keep/medvae_8_1_2d",
+      "files": 20,
+      "bytes": 67561520,
+      "GB_decimal": 0.067562,
+      "GiB_binary": 0.062922
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "outputs/projection_study_fresh_v1/runs/raw_keep/medvae_8_4_2d",
+      "files": 20,
+      "bytes": 67630640,
+      "GB_decimal": 0.067631,
+      "GiB_binary": 0.062986
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "outputs/projection_study_fresh_v1/runs/raw_mean/medvae_4_3_2d",
+      "files": 20,
+      "bytes": 67561520,
+      "GB_decimal": 0.067562,
+      "GiB_binary": 0.062922
+    },
+    {
+      "category": "candidate_checkpoint_state",
+      "directory": "outputs/projection_study_fresh_v1/runs/raw_mean/medvae_8_4_2d",
+      "files": 20,
+      "bytes": 67561520,
+      "GB_decimal": 0.067562,
+      "GiB_binary": 0.062922
+    },
+    {
+      "category": "candidate_latent_caches",
+      "directory": "latents_aspect",
+      "files": 12,
+      "bytes": 81049599,
+      "GB_decimal": 0.08105,
+      "GiB_binary": 0.075483
+    },
+    {
+      "category": "candidate_latent_caches",
+      "directory": "latents_aspect_4_1",
+      "files": 3,
+      "bytes": 5329526,
+      "GB_decimal": 0.00533,
+      "GiB_binary": 0.004964
+    },
+    {
+      "category": "candidate_latent_caches",
+      "directory": "latents_aspect_8_1",
+      "files": 3,
+      "bytes": 1744644,
+      "GB_decimal": 0.001745,
+      "GiB_binary": 0.001625
+    },
+    {
+      "category": "candidate_latent_caches",
+      "directory": "latents_aspect_proj",
+      "files": 6,
+      "bytes": 61411498,
+      "GB_decimal": 0.061411,
+      "GiB_binary": 0.057194
+    },
+    {
+      "category": "candidate_latent_caches",
+      "directory": "latents_aug",
+      "files": 6,
+      "bytes": 67050439,
+      "GB_decimal": 0.06705,
+      "GiB_binary": 0.062446
+    },
+    {
+      "category": "candidate_latent_caches",
+      "directory": "latents_aug_cons",
+      "files": 6,
+      "bytes": 66602883,
+      "GB_decimal": 0.066603,
+      "GiB_binary": 0.062029
+    },
+    {
+      "category": "candidate_latent_caches",
+      "directory": "latents_aug_mod",
+      "files": 6,
+      "bytes": 67676624,
+      "GB_decimal": 0.067677,
+      "GiB_binary": 0.063029
+    },
+    {
+      "category": "candidate_latent_caches",
+      "directory": "latents_boostnet_512",
+      "files": 1,
+      "bytes": 11041747,
+      "GB_decimal": 0.011042,
+      "GiB_binary": 0.010283
+    },
+    {
+      "category": "candidate_latent_caches",
+      "directory": "latents_boostnet_cropped",
+      "files": 1,
+      "bytes": 11048414,
+      "GB_decimal": 0.011048,
+      "GiB_binary": 0.01029
+    },
+    {
+      "category": "candidate_latent_caches",
+      "directory": "latents_clahe",
+      "files": 6,
+      "bytes": 71824476,
+      "GB_decimal": 0.071824,
+      "GiB_binary": 0.066892
+    },
+    {
+      "category": "candidate_latent_caches",
+      "directory": "latents_clahe_rep",
+      "files": 6,
+      "bytes": 71990592,
+      "GB_decimal": 0.071991,
+      "GiB_binary": 0.067046
+    },
+    {
+      "category": "candidate_latent_caches",
+      "directory": "latents_pretrained_tiled",
+      "files": 4,
+      "bytes": 465839085,
+      "GB_decimal": 0.465839,
+      "GiB_binary": 0.433846
+    },
+    {
+      "category": "candidate_latent_caches",
+      "directory": "latents_sdvae",
+      "files": 3,
+      "bytes": 17373582,
+      "GB_decimal": 0.017374,
+      "GiB_binary": 0.01618
+    },
+    {
+      "category": "candidate_latent_caches",
+      "directory": "latents_tiled",
+      "files": 4,
+      "bytes": 466650098,
+      "GB_decimal": 0.46665,
+      "GiB_binary": 0.434602
+    },
+    {
+      "category": "candidate_latent_caches",
+      "directory": "latents_vindr",
+      "files": 1,
+      "bytes": 254267360,
+      "GB_decimal": 0.254267,
+      "GiB_binary": 0.236805
+    },
+    {
+      "category": "candidate_latent_caches",
+      "directory": "latents_vindr_cropped",
+      "files": 22,
+      "bytes": 467219489,
+      "GB_decimal": 0.467219,
+      "GiB_binary": 0.435132
+    },
+    {
+      "category": "candidate_latent_caches",
+      "directory": "latents_vindr_test",
+      "files": 1,
+      "bytes": 1209500,
+      "GB_decimal": 0.00121,
+      "GiB_binary": 0.001126
+    },
+    {
+      "category": "candidate_latent_caches",
+      "directory": "latents_whole",
+      "files": 4,
+      "bytes": 39662462,
+      "GB_decimal": 0.039662,
+      "GiB_binary": 0.036939
+    },
+    {
+      "category": "candidate_latent_caches",
+      "directory": "latents_whole_1024",
+      "files": 4,
+      "bytes": 52481021,
+      "GB_decimal": 0.052481,
+      "GiB_binary": 0.048877
+    },
+    {
+      "category": "candidate_latent_caches",
+      "directory": "outputs/followup_annotation_v1/caches",
+      "files": 4,
+      "bytes": 73292830,
+      "GB_decimal": 0.073293,
+      "GiB_binary": 0.068259
+    },
+    {
+      "category": "candidate_latent_caches",
+      "directory": "outputs/followup_augmentation_v1/caches",
+      "files": 1,
+      "bytes": 55559380,
+      "GB_decimal": 0.055559,
+      "GiB_binary": 0.051744
+    },
+    {
+      "category": "candidate_latent_caches",
+      "directory": "outputs/projection_study_fresh_v1/caches",
+      "files": 36,
+      "bytes": 196116311,
+      "GB_decimal": 0.196116,
+      "GiB_binary": 0.182648
+    },
+    {
+      "category": "candidate_latent_caches",
+      "directory": "outputs/projection_study_v3/caches",
+      "files": 3,
+      "bytes": 14236322,
+      "GB_decimal": 0.014236,
+      "GiB_binary": 0.013259
+    },
+    {
+      "category": "other_checkpoint_directory_files_review",
+      "directory": "diffusion_ckpt",
+      "files": 2,
+      "bytes": 6967,
+      "GB_decimal": 7e-06,
+      "GiB_binary": 6e-06
+    },
+    {
+      "category": "other_checkpoint_directory_files_review",
+      "directory": "diffusion_ckpt_diag96",
+      "files": 2,
+      "bytes": 10307,
+      "GB_decimal": 1e-05,
+      "GiB_binary": 1e-05
+    },
+    {
+      "category": "other_checkpoint_directory_files_review",
+      "directory": "diffusion_ckpt_finetune_cropped",
+      "files": 2,
+      "bytes": 4344,
+      "GB_decimal": 4e-06,
+      "GiB_binary": 4e-06
+    },
+    {
+      "category": "other_checkpoint_directory_files_review",
+      "directory": "diffusion_ckpt_finetune_v",
+      "files": 2,
+      "bytes": 4313,
+      "GB_decimal": 4e-06,
+      "GiB_binary": 4e-06
+    },
+    {
+      "category": "other_checkpoint_directory_files_review",
+      "directory": "diffusion_ckpt_pretrain",
+      "files": 2,
+      "bytes": 3572,
+      "GB_decimal": 4e-06,
+      "GiB_binary": 3e-06
+    },
+    {
+      "category": "other_checkpoint_directory_files_review",
+      "directory": "diffusion_ckpt_pretrain_cropped",
+      "files": 2,
+      "bytes": 4209,
+      "GB_decimal": 4e-06,
+      "GiB_binary": 4e-06
+    },
+    {
+      "category": "other_checkpoint_directory_files_review",
+      "directory": "diffusion_ckpt_pretrain_v",
+      "files": 2,
+      "bytes": 4182,
+      "GB_decimal": 4e-06,
+      "GiB_binary": 4e-06
+    },
+    {
+      "category": "other_checkpoint_directory_files_review",
+      "directory": "diffusion_ckpt_sdvae",
+      "files": 2,
+      "bytes": 10206,
+      "GB_decimal": 1e-05,
+      "GiB_binary": 1e-05
+    },
+    {
+      "category": "other_checkpoint_directory_files_review",
+      "directory": "diffusion_ckpt_v2",
+      "files": 2,
+      "bytes": 10256,
+      "GB_decimal": 1e-05,
+      "GiB_binary": 1e-05
+    },
+    {
+      "category": "other_checkpoint_directory_files_review",
+      "directory": "medvae/logs/boostnet_finetuning/runs/2026-04-26_22-09-02/checkpoints",
+      "files": 82,
+      "bytes": 1204826,
+      "GB_decimal": 0.001205,
+      "GiB_binary": 0.001122
+    },
+    {
+      "category": "other_checkpoint_directory_files_review",
+      "directory": "medvae/logs/boostnet_finetuning_aspect/runs/2026-05-04_16-44-52/checkpoints",
+      "files": 6,
+      "bytes": 86448,
+      "GB_decimal": 8.6e-05,
+      "GiB_binary": 8.1e-05
+    },
+    {
+      "category": "other_checkpoint_directory_files_review",
+      "directory": "medvae/logs/boostnet_finetuning_aspect/runs/2026-05-04_16-55-36/checkpoints",
+      "files": 40,
+      "bytes": 573760,
+      "GB_decimal": 0.000574,
+      "GiB_binary": 0.000534
+    },
+    {
+      "category": "other_checkpoint_directory_files_review",
+      "directory": "medvae/logs/boostnet_finetuning_patch/runs/2026-05-09_17-14-34/checkpoints",
+      "files": 122,
+      "bytes": 1808162,
+      "GB_decimal": 0.001808,
+      "GiB_binary": 0.001684
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": ".",
+      "files": 43,
+      "bytes": 453496294,
+      "GB_decimal": 0.453496,
+      "GiB_binary": 0.422351
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "cobb_regressor_aspect_4_1",
+      "files": 1,
+      "bytes": 21304,
+      "GB_decimal": 2.1e-05,
+      "GiB_binary": 2e-05
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "cobb_regressor_aspect_8_1",
+      "files": 1,
+      "bytes": 21304,
+      "GB_decimal": 2.1e-05,
+      "GiB_binary": 2e-05
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "cobb_regressor_tiled",
+      "files": 1,
+      "bytes": 21304,
+      "GB_decimal": 2.1e-05,
+      "GiB_binary": 2e-05
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "cobb_regressor_tiled_2d",
+      "files": 1,
+      "bytes": 21304,
+      "GB_decimal": 2.1e-05,
+      "GiB_binary": 2e-05
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "cobb_regressor_tiled_2d_reg",
+      "files": 1,
+      "bytes": 21304,
+      "GB_decimal": 2.1e-05,
+      "GiB_binary": 2e-05
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "cobb_regressor_whole",
+      "files": 1,
+      "bytes": 21304,
+      "GB_decimal": 2.1e-05,
+      "GiB_binary": 2e-05
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "cobb_regressor_whole_1024",
+      "files": 1,
+      "bytes": 21304,
+      "GB_decimal": 2.1e-05,
+      "GiB_binary": 2e-05
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "diffusion_ckpt",
+      "files": 10,
+      "bytes": 1974080,
+      "GB_decimal": 0.001974,
+      "GiB_binary": 0.001839
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "diffusion_ckpt_diag96",
+      "files": 15,
+      "bytes": 1117920,
+      "GB_decimal": 0.001118,
+      "GiB_binary": 0.001041
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "diffusion_ckpt_finetune_cropped",
+      "files": 5,
+      "bytes": 659360,
+      "GB_decimal": 0.000659,
+      "GiB_binary": 0.000614
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "diffusion_ckpt_finetune_v",
+      "files": 5,
+      "bytes": 659360,
+      "GB_decimal": 0.000659,
+      "GiB_binary": 0.000614
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "diffusion_ckpt_pretrain",
+      "files": 5,
+      "bytes": 659360,
+      "GB_decimal": 0.000659,
+      "GiB_binary": 0.000614
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "diffusion_ckpt_pretrain_cropped",
+      "files": 5,
+      "bytes": 659360,
+      "GB_decimal": 0.000659,
+      "GiB_binary": 0.000614
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "diffusion_ckpt_pretrain_v",
+      "files": 5,
+      "bytes": 659360,
+      "GB_decimal": 0.000659,
+      "GiB_binary": 0.000614
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "diffusion_ckpt_sdvae",
+      "files": 15,
+      "bytes": 1486560,
+      "GB_decimal": 0.001487,
+      "GiB_binary": 0.001384
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "diffusion_ckpt_v2",
+      "files": 15,
+      "bytes": 2961120,
+      "GB_decimal": 0.002961,
+      "GiB_binary": 0.002758
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "labels_tasks",
+      "files": 3,
+      "bytes": 48794,
+      "GB_decimal": 4.9e-05,
+      "GiB_binary": 4.5e-05
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/diffusion",
+      "files": 1,
+      "bytes": 16000221,
+      "GB_decimal": 0.016,
+      "GiB_binary": 0.014901
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/diffusion2",
+      "files": 1,
+      "bytes": 15753250,
+      "GB_decimal": 0.015753,
+      "GiB_binary": 0.014671
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/diffusion3",
+      "files": 1,
+      "bytes": 15676168,
+      "GB_decimal": 0.015676,
+      "GiB_binary": 0.0146
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/diffusion4",
+      "files": 1,
+      "bytes": 15805915,
+      "GB_decimal": 0.015806,
+      "GiB_binary": 0.01472
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/diffusion5",
+      "files": 1,
+      "bytes": 15509857,
+      "GB_decimal": 0.01551,
+      "GiB_binary": 0.014445
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/diffusion_xa",
+      "files": 1,
+      "bytes": 15638677,
+      "GB_decimal": 0.015639,
+      "GiB_binary": 0.014565
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/followup_annotation_v1",
+      "files": 1,
+      "bytes": 60226,
+      "GB_decimal": 6e-05,
+      "GiB_binary": 5.6e-05
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/followup_annotation_v1/analysis",
+      "files": 16,
+      "bytes": 998074,
+      "GB_decimal": 0.000998,
+      "GiB_binary": 0.00093
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/followup_annotation_v1/imported_controls/projected_keep",
+      "files": 6,
+      "bytes": 376396,
+      "GB_decimal": 0.000376,
+      "GiB_binary": 0.000351
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/followup_annotation_v1/imported_controls/projected_mean",
+      "files": 6,
+      "bytes": 376314,
+      "GB_decimal": 0.000376,
+      "GiB_binary": 0.00035
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/followup_annotation_v1/imported_controls/raw_keep",
+      "files": 6,
+      "bytes": 376505,
+      "GB_decimal": 0.000377,
+      "GiB_binary": 0.000351
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/followup_annotation_v1/imported_controls/raw_mean",
+      "files": 6,
+      "bytes": 376395,
+      "GB_decimal": 0.000376,
+      "GiB_binary": 0.000351
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/followup_annotation_v1/runs/clean/projected_keep",
+      "files": 6,
+      "bytes": 376341,
+      "GB_decimal": 0.000376,
+      "GiB_binary": 0.00035
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/followup_annotation_v1/runs/clean/projected_mean",
+      "files": 6,
+      "bytes": 376383,
+      "GB_decimal": 0.000376,
+      "GiB_binary": 0.000351
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/followup_annotation_v1/runs/clean/raw_keep",
+      "files": 6,
+      "bytes": 376428,
+      "GB_decimal": 0.000376,
+      "GiB_binary": 0.000351
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/followup_annotation_v1/runs/clean/raw_mean",
+      "files": 6,
+      "bytes": 376292,
+      "GB_decimal": 0.000376,
+      "GiB_binary": 0.00035
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/followup_augmentation_v1",
+      "files": 1,
+      "bytes": 60226,
+      "GB_decimal": 6e-05,
+      "GiB_binary": 5.6e-05
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/followup_augmentation_v1/analysis",
+      "files": 4,
+      "bytes": 249510,
+      "GB_decimal": 0.00025,
+      "GiB_binary": 0.000232
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/followup_augmentation_v1/augmentation_parts",
+      "files": 407,
+      "bytes": 56011231,
+      "GB_decimal": 0.056011,
+      "GiB_binary": 0.052165
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/followup_augmentation_v1/imported_controls/projected_mean",
+      "files": 6,
+      "bytes": 376383,
+      "GB_decimal": 0.000376,
+      "GiB_binary": 0.000351
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/followup_augmentation_v1/runs/augmented/projected_mean",
+      "files": 6,
+      "bytes": 376222,
+      "GB_decimal": 0.000376,
+      "GiB_binary": 0.00035
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/followup_reconstruction_v1",
+      "files": 1,
+      "bytes": 60226,
+      "GB_decimal": 6e-05,
+      "GiB_binary": 5.6e-05
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/followup_reconstruction_v1/examples",
+      "files": 12,
+      "bytes": 25981824,
+      "GB_decimal": 0.025982,
+      "GiB_binary": 0.024197
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/frontier",
+      "files": 4,
+      "bytes": 495922,
+      "GB_decimal": 0.000496,
+      "GiB_binary": 0.000462
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/fullres",
+      "files": 2,
+      "bytes": 241590,
+      "GB_decimal": 0.000242,
+      "GiB_binary": 0.000225
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/heatmap",
+      "files": 2,
+      "bytes": 241389,
+      "GB_decimal": 0.000241,
+      "GiB_binary": 0.000225
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/multiseed",
+      "files": 35,
+      "bytes": 763560,
+      "GB_decimal": 0.000764,
+      "GiB_binary": 0.000711
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/overfit",
+      "files": 1,
+      "bytes": 408705,
+      "GB_decimal": 0.000409,
+      "GiB_binary": 0.000381
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/overfit_xa",
+      "files": 1,
+      "bytes": 412127,
+      "GB_decimal": 0.000412,
+      "GiB_binary": 0.000384
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/projection_study_fresh_v1/runs/projected_keep/medvae_4_1_2d",
+      "files": 21,
+      "bytes": 1378846,
+      "GB_decimal": 0.001379,
+      "GiB_binary": 0.001284
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/projection_study_fresh_v1/runs/projected_keep/medvae_4_3_2d",
+      "files": 21,
+      "bytes": 1378889,
+      "GB_decimal": 0.001379,
+      "GiB_binary": 0.001284
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/projection_study_fresh_v1/runs/projected_keep/medvae_8_1_2d",
+      "files": 21,
+      "bytes": 1378636,
+      "GB_decimal": 0.001379,
+      "GiB_binary": 0.001284
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/projection_study_fresh_v1/runs/projected_keep/medvae_8_4_2d",
+      "files": 21,
+      "bytes": 1378797,
+      "GB_decimal": 0.001379,
+      "GiB_binary": 0.001284
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/projection_study_fresh_v1/runs/projected_mean/medvae_4_3_2d",
+      "files": 21,
+      "bytes": 1378899,
+      "GB_decimal": 0.001379,
+      "GiB_binary": 0.001284
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/projection_study_fresh_v1/runs/projected_mean/medvae_8_4_2d",
+      "files": 21,
+      "bytes": 1378872,
+      "GB_decimal": 0.001379,
+      "GiB_binary": 0.001284
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/projection_study_fresh_v1/runs/raw_keep/medvae_4_1_2d",
+      "files": 21,
+      "bytes": 1378914,
+      "GB_decimal": 0.001379,
+      "GiB_binary": 0.001284
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/projection_study_fresh_v1/runs/raw_keep/medvae_4_3_2d",
+      "files": 21,
+      "bytes": 1379131,
+      "GB_decimal": 0.001379,
+      "GiB_binary": 0.001284
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/projection_study_fresh_v1/runs/raw_keep/medvae_8_1_2d",
+      "files": 21,
+      "bytes": 1378759,
+      "GB_decimal": 0.001379,
+      "GiB_binary": 0.001284
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/projection_study_fresh_v1/runs/raw_keep/medvae_8_4_2d",
+      "files": 21,
+      "bytes": 1378893,
+      "GB_decimal": 0.001379,
+      "GiB_binary": 0.001284
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/projection_study_fresh_v1/runs/raw_mean/medvae_4_3_2d",
+      "files": 21,
+      "bytes": 1378913,
+      "GB_decimal": 0.001379,
+      "GiB_binary": 0.001284
+    },
+    {
+      "category": "other_saved_arrays_review_for_uncategorised_caches",
+      "directory": "outputs/projection_study_fresh_v1/runs/raw_mean/medvae_8_4_2d",
+      "files": 21,
+      "bytes": 1378860,
+      "GB_decimal": 0.001379,
+      "GiB_binary": 0.001284
+    }
+  ],
+  "errors": [],
+  "skipped_symbolic_links": [],
+  "historical_encoder_calls": null,
+  "historical_GPU_hours": null
+}

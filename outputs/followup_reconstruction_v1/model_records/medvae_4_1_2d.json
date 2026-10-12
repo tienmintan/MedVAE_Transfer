@@ -1,0 +1,18 @@
+{
+  "path": "/home/ubuntu/.cache/huggingface/hub/models--stanfordmimi--MedVAE/snapshots/8040c5ccb7a51eff6b4cef513c7f20bd1bda983d/model_weights/vae_4x_1c_2D.ckpt",
+  "sha256": "0e4bd8931238a6c52acb3d826025f5bcfa284aa9f98cc5455505f131d690c1ba",
+  "config_sha256": "b08ea5caeeb8a25699bbd209ac1fb5b451955b859748bba365995f6e81eb27c9",
+  "projection_keys": [
+    "channel_ds.0.weight",
+    "channel_ds.0.bias",
+    "channel_ds.2.weight",
+    "channel_ds.2.bias",
+    "channel_ds.4.weight",
+    "channel_ds.4.bias",
+    "channel_proj.weight",
+    "channel_proj.bias"
+  ],
+  "encoder_tensor_count_checked": 90,
+  "implementation_sha256": "45c1d9ba366e2208a3624b08ca8d69071caf50e70fe844596f62da14ed2a3b3f",
+  "decoder_tensors_checked": 114
+}

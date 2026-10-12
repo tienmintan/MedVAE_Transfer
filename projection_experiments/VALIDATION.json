@@ -1,0 +1,42 @@
+{
+  "cpu_unit_tests_passed": 33,
+  "reference_cells_checked": 12,
+  "reference_images_per_cell": 128,
+  "existing_projection_tests_reproduced": 4,
+  "existing_relative_task_bootstrap_reproduced": true,
+  "script_syntax_valid": true,
+  "cli_help_checked": true,
+  "actual_gpu_extraction_or_training_run_here": false,
+  "scope": "33 CPU tests pass on Python 3.10.21 and 3.12.14. Runtime/model stand-ins exercise fresh pairing, precision, failure checks, fitting bookkeeping and resume. The original bundled-source failure was reproduced on actual Python 3.10.21; the corrected dry-run passes with synthetic cache fixtures. User console output reports fresh preparation ready; its new cache bytes were not uploaded for local verification. Actual GPU optimisation remains to run on the experiment machine. The cause of historical cache drift remains unresolved.",
+  "numerical_diagnostic_checks_passed": 6,
+  "reported_mismatch_cause_identified": false,
+  "numerical_recovery_tests_passed": 4,
+  "reviewed_user_diagnosis_sha256": "adf0f2cbdd22ab967497a6ed0c0bda8ff6b0d2f6282f171880e0016dd34a7f66",
+  "user_gpu_same_input_api_checks_passed": 216,
+  "original_elementwise_tolerance_changed": false,
+  "explicit_fixed_cache_policy_added": true,
+  "fixed_cache_limits": {
+    "rms_over_cached_sd": 0.001,
+    "max_over_cached_sd": 0.01
+  },
+  "fresh_study_tests_passed": 4,
+  "user_gpu_case_config_combinations": 72,
+  "fresh_study_excludes_historical_scores": true,
+  "reviewed_all_diagnoses_sha256": "3eb985da58d3b1488c7125de80d27232403098073637836e651b4251a7623371",
+  "protocol_compatibility_tests_passed": 11,
+  "python_versions_tested": [
+    "3.10.21",
+    "3.12.14"
+  ],
+  "original_protocol_failure_reproduced_under_python": "3.10.21",
+  "protocol_reference_files_unchanged": true,
+  "saved_protocol_json_unchanged": true,
+  "protocol_validation": {
+    "reference_anchor": "original full-file SHA256",
+    "definition_comparison": "selected and anchored-reference sources parsed under the same running interpreter",
+    "accepted_wrong_architecture_or_training": false,
+    "geometry_check_fixed": true,
+    "default_source": "bundled audited reference"
+  },
+  "user_fresh_preparation_log_reports_ready": true
+}

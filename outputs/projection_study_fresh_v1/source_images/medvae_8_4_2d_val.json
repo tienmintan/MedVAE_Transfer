@@ -1,0 +1,1226 @@
+[
+  {
+    "image_uuid": "sunhl-1th-03-Jan-2017-164_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-03-Jan-2017-164_A_AP.jpg",
+    "file_sha256": "4fff9586c8b6061f4ed7f38350f379a021e858ed56dea464b6319841426b7dc2",
+    "input_sha256": "719bfb24393493beb7579c4502fa48c520015dbaa688fae52fabbdfb87b874af",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6803575158119202,
+    "input_sd": 0.5433523058891296,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-04-Jan-2017-165_C_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-04-Jan-2017-165_C_AP.jpg",
+    "file_sha256": "af3ab59df23946c7a142b2e45a28af4ba25235290ca727e3fa70fe576e20ad4b",
+    "input_sha256": "ab86ec5a45b7fed19ac80b794ff9280a3da1d9c96f7bbfea79f0e9c3caa25395",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6441366672515869,
+    "input_sd": 0.5300440192222595,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-06-Jan-2017-177_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-06-Jan-2017-177_B_AP.jpg",
+    "file_sha256": "c988f861c11ff5883d97a45b4c22be7b81cd0e64ce7e87aa73cd7cbfc7ac66c7",
+    "input_sha256": "1f9c34577cd5f4a32621f43ee84fcc73db31b102c01c17ae71acf707dc2f0cb1",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6314234733581543,
+    "input_sd": 0.5696847438812256,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-06-Jan-2017-192_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-06-Jan-2017-192_A_AP.jpg",
+    "file_sha256": "aa4f1573d1a229fec9b29d6c77bbae10bdf5b696e2efde128b9640e92e58d9f7",
+    "input_sha256": "8b05b9bc969cb037193d24e07f2ac6fde873fc1325ba647f526fbf35555c047c",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.7082521915435791,
+    "input_sd": 0.490680068731308,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-194_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-09-Jan-2017-194_B_AP.jpg",
+    "file_sha256": "46789c7d7f1fa2a43957697f422766916932e439b7ef8e11688e685c5a418308",
+    "input_sha256": "72bb68fac70ddb3b2c4809e8a195cf3b0adb8ffe44471e243f60f0fae28fd824",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.7051379680633545,
+    "input_sd": 0.40257301926612854,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-195_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-09-Jan-2017-195_B_AP.jpg",
+    "file_sha256": "449821610b9daefe5b8c8bc4e0543d574d175b38479f21434377a8e58d669c98",
+    "input_sha256": "2b2b690554c10bbed966805f9fdf34efba4d0b0342e92c13701df8e1546dc738",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.5854832530021667,
+    "input_sd": 0.6169334650039673,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-197_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-09-Jan-2017-197_A_AP.jpg",
+    "file_sha256": "ec3d1f8602f480acbcbc188e5b6c052f456df1f05e5cd0f4f58dd539a9bf344f",
+    "input_sha256": "531d9d63874e313f0e1b50ca90fdb20b9ba7f9648111bab069a1fb6f58274205",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.59993577003479,
+    "input_sd": 0.5321884155273438,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-197_D_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-09-Jan-2017-197_D_AP.jpg",
+    "file_sha256": "2570d54d10a1c70aa832fce7aea1259ca4fdca9e35e9a998f3e33f6bf257b791",
+    "input_sha256": "78bf29934e13fb3c3d5cc3fc0b980b6939f9df20e7876d179f807acf8febf7ec",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6215026378631592,
+    "input_sd": 0.44673633575439453,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-201_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-09-Jan-2017-201_A_AP.jpg",
+    "file_sha256": "a58c61b36800e0cc1739d584d9d5ac87a534ae2d0aa7b33914aaa64a32b85cf9",
+    "input_sha256": "3097d7132c9861c82e1dabf7967d2198a0d9b883368bd44d1144f7e99727a4af",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.614044189453125,
+    "input_sd": 0.5826337337493896,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-209_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-09-Jan-2017-209_B_AP.jpg",
+    "file_sha256": "042bc8dbdaae7bfa6e5bd2617a5b0697a9a2ba04bb8ff53b45a4d09a23989c7b",
+    "input_sha256": "726c129d197140e1bdd8c5e25cd40b17d423fc8fef5227d152b655eb5393de62",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6180465221405029,
+    "input_sd": 0.5095182061195374,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-216_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-09-Jan-2017-216_B_AP.jpg",
+    "file_sha256": "13a4cd5988af19c0327c8428a9ec2c7b81f38520fd9fa80c7f0eb5f144fb42d5",
+    "input_sha256": "81fbba39bdbc7a4a33cc960f69f103c0a9538b2a3ebecc695d2645324976f98d",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6972796320915222,
+    "input_sd": 0.46115878224372864,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-217_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-09-Jan-2017-217_A_AP.jpg",
+    "file_sha256": "ffc5982ce29e621702ddadab72a354b7c6575e5c64566b6cbc9a94915cec5bf4",
+    "input_sha256": "1c2759fbd24304c37061fd478e503924ca6b0369ef994489dec9727280c441c1",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.5638414621353149,
+    "input_sd": 0.5227081179618835,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-219_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-09-Jan-2017-219_B_AP.jpg",
+    "file_sha256": "b081e9035d6beaa12086d3f5fb4483452271dcd793aa084410a827408a29ea16",
+    "input_sha256": "22fd065c6b5ab78aeaac03968866ab6101f0e5fbac77ab6c0cff6e2c4f6cbf4d",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6836087107658386,
+    "input_sd": 0.4558645486831665,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-220_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-09-Jan-2017-220_A_AP.jpg",
+    "file_sha256": "cb50d91d38dc087cd66f09bac9453d2d8dd5e17fb0bb3210b69f1988a0c99a87",
+    "input_sha256": "6e5568ea9434be030dc30b165d1f928c1c7a862b1d4ce6f8d6286199c6270820",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6418449282646179,
+    "input_sd": 0.46041104197502136,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-221_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-10-Jan-2017-221_B_AP.jpg",
+    "file_sha256": "bab4fee0e617fa5d924c9fc872a782c33535d19f4e94524f86737ada92a12e7d",
+    "input_sha256": "d8fb0e5a1c4262c5876e65bfa638d9999022c13dce7273b62bddf0ed60c8564b",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.7463199496269226,
+    "input_sd": 0.28589698672294617,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-224_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-10-Jan-2017-224_A_AP.jpg",
+    "file_sha256": "4f0704f7ff25446edbc9d87abfd72ac55f126e71e5e2b4091bc8c42fb803d650",
+    "input_sha256": "f372bdc9dca2cba0430d7fe8c9afa22481ad58442ae94972d49c6719c986839a",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.459058940410614,
+    "input_sd": 0.6570168137550354,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-228_D_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-10-Jan-2017-228_D_AP.jpg",
+    "file_sha256": "ff9c1c9d1cce165e58ecfc9f022e9952aa856b154b3da73b56655b6fabcfdc24",
+    "input_sha256": "ed6b48e5ed0ba91c324a38b246a2d5e439eced5f28577896d47d53cf09e3abc4",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6261698603630066,
+    "input_sd": 0.5545333623886108,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-236_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-10-Jan-2017-236_A_AP.jpg",
+    "file_sha256": "a49261b35808edece96aeb1ca4ff49d726b49bcf0997778b12619022114a5e26",
+    "input_sha256": "6becabe5c830e3610924b4eac3fbcffa2290b001933dc6460dfed71351a51c21",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6021963953971863,
+    "input_sd": 0.564167320728302,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-237_G_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-10-Jan-2017-237_G_AP.jpg",
+    "file_sha256": "ef3f1e15c467ab65e05081bda137d6dd5134438a5906621bc961832e492cb6a3",
+    "input_sha256": "4f54c8c80fa223b002580f2e0204c23ac5c28167a2582e65ab2b1af8cec64bed",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.7150899171829224,
+    "input_sd": 0.4003758430480957,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-238_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-10-Jan-2017-238_B_AP.jpg",
+    "file_sha256": "5fbc0fd53baf54d23f8c56d17db30475dcf0b6e884024d906d2850bbefbd4eb9",
+    "input_sha256": "9c29e72538c208c7de16ba9baa0be32e1a1f9ad1133103e53c81dedad5513124",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.5297334790229797,
+    "input_sd": 0.621040403842926,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-242_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-10-Jan-2017-242_A_AP.jpg",
+    "file_sha256": "94e5f553ed8f9e99753782f173cd5bcfdfcfaa4c851797066af158f2f0460b97",
+    "input_sha256": "0e01ae7ad753d7cbad8bf782d97e10b5e7bd5db365847d36784744ceeb3d7d74",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.7216593623161316,
+    "input_sd": 0.4134569466114044,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-243_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-10-Jan-2017-243_B_AP.jpg",
+    "file_sha256": "082a0a2ffcb23028962ba515638a584727be40c0b493f01dea92f6e9c59dfd48",
+    "input_sha256": "37d863aee13df56340b16892795ba1268ad845093e9f6763ef02cc67b50307e6",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6288001537322998,
+    "input_sd": 0.42744892835617065,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-243_C_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-10-Jan-2017-243_C_AP.jpg",
+    "file_sha256": "b50d48a648c3d38068a058e2abb0cade130055c092d5869d4253f94b0f9f06e7",
+    "input_sha256": "f4cff155792fad924cb2348c6537cdd881a438c3c26622d4fcdc0bd9da226965",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.7056467533111572,
+    "input_sd": 0.5060201287269592,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-244_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-10-Jan-2017-244_A_AP.jpg",
+    "file_sha256": "56ff2281bc214845214808e96f05097305b0828f733b14d9e4b72e8864523b69",
+    "input_sha256": "17b21781d16c0a9531ad0ebdee721d0a6bd701ac0e8854018cd4e6957f261ff9",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6109786629676819,
+    "input_sd": 0.5618440508842468,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-250_C_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-10-Jan-2017-250_C_AP.jpg",
+    "file_sha256": "433ba42ba6ba92a15e91ecf1b952e045f6b943c39903f27093e49641de3c97ed",
+    "input_sha256": "54155e49dc26e158d0d243bcd1be19fab068e372c1653e59023b79a9b54d9f1a",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.7077715992927551,
+    "input_sd": 0.3200126588344574,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-250_D_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-10-Jan-2017-250_D_AP.jpg",
+    "file_sha256": "aa0098d7911524b41faf4a7841291d80e641a74a2ec533f3ed07e3c6e49440e1",
+    "input_sha256": "f0a888f52226d17720f041a8ff21264548df289a87dc348ef78ea6aba020d52b",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6287574768066406,
+    "input_sd": 0.45353612303733826,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-250_E_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-10-Jan-2017-250_E_AP.jpg",
+    "file_sha256": "6e89ea0a2f872e5d46c0c66cd331c2497c5c2cf3a9b7b062b9a7a5dd2af85f97",
+    "input_sha256": "9b0262481c8ae1d9969998801d146d966462408eea2697da5467da5a774c4d25",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6525868773460388,
+    "input_sd": 0.5196676254272461,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-254_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-10-Jan-2017-254_A_AP.jpg",
+    "file_sha256": "fd81f4526d1181c3e5be177387900febbd5909f3f970e632a84eb752b38c3efe",
+    "input_sha256": "65f3d7bd7bdbd374dd72676cc0ac34afc4d5ac2b99a3c671767dd8ff61dc75f5",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6075332164764404,
+    "input_sd": 0.5361611843109131,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-254_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-10-Jan-2017-254_B_AP.jpg",
+    "file_sha256": "a7d69b6497b35e567ab161226fb7d22450334507b1babfa5e8eafa80d174d98c",
+    "input_sha256": "fecc1ef407cd1656acccd57f178557be9d79e2769569b2e9ceccce9efb2eaf3c",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.5669589042663574,
+    "input_sd": 0.4767458438873291,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-11-Jan-2017-254_I_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-11-Jan-2017-254_I_AP.jpg",
+    "file_sha256": "1130d0102b4b1574e72dc600e61e79fa752fccbe6f21d4a918d56151b626dd24",
+    "input_sha256": "0ead24679c7ca0fcdfe485e199f5fea3bc01849ec71a8ef8326cd37464d5310b",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.5881969332695007,
+    "input_sd": 0.5283951759338379,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-11-Jan-2017-254_N_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-11-Jan-2017-254_N_AP.jpg",
+    "file_sha256": "032f51edd70b548495ba4e46bf030965945f82d11be29c908a1f5141bd4dfaec",
+    "input_sha256": "7cebc4c4f07a5929007af2561c97dacd60521cdc7aab6418f8ee243e700e494a",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.5444134473800659,
+    "input_sd": 0.595392107963562,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-11-Jan-2017-255_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-11-Jan-2017-255_B_AP.jpg",
+    "file_sha256": "94a997d157aad3a21796edb5b537996ca070e0097fe2049abc6256f40a43a352",
+    "input_sha256": "9a9c3c55f50a3bc66ebdaab9d6fa4831ebdf5b2b62f2d45b249618fd39a14046",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6597952246665955,
+    "input_sd": 0.4947286546230316,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-11-Jan-2017-255_C_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-11-Jan-2017-255_C_AP.jpg",
+    "file_sha256": "40f54d11875c9352fd2555983b7eb754eed435dd7c2790956ed7ba0918f7bef4",
+    "input_sha256": "1b3f18a6ffbbdfdf2d8f7677afd58265428c79516182dc3c8b353309c9cf9188",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6779811382293701,
+    "input_sd": 0.390558123588562,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-11-Jan-2017-255_E_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-11-Jan-2017-255_E_AP.jpg",
+    "file_sha256": "3f8d92800e1c25f3283bbb435f97f1126afa6cf55700bf64563bf68338153922",
+    "input_sha256": "f2ab37caf7a27ae3d2fcca6b371c2192da1b4f293bb9011f69e42571e24cebba",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6743924617767334,
+    "input_sd": 0.5579056739807129,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-257_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-12-Jan-2017-257_A_AP.jpg",
+    "file_sha256": "7ce057ed2c4e236e41018569283dddc9a81e0c04f2503be8a8ef34bdb45aea56",
+    "input_sha256": "2c24052b273c650536942c07772223ceebfa3b15ea8a40b479b794d9c2bfef52",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.5360267162322998,
+    "input_sd": 0.6157637238502502,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-260_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-12-Jan-2017-260_A_AP.jpg",
+    "file_sha256": "ebf0b8301900692c59b3885f2f8577eee000b1b42ab64f2b16b83d8cecb0459e",
+    "input_sha256": "b9fcd6ef70087fc66604eb884433926473a00ee7d1cc96227a9d27b8aec3c3ea",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.5558341145515442,
+    "input_sd": 0.5912212133407593,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-261_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-12-Jan-2017-261_B_AP.jpg",
+    "file_sha256": "65cee1af117848b7d9e31f1d1ffdae3096a1009ed1bff360aa7581afc5137b68",
+    "input_sha256": "d1f81b75db645466ec19655b0f1385744909664d5f023776a568af7c6f19d0ce",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.5949423313140869,
+    "input_sd": 0.5573992729187012,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-262_D_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-12-Jan-2017-262_D_AP.jpg",
+    "file_sha256": "24ef7a1962c7e255ae07db925022afa1d823812d72a9ffaa146acf8fc665e7a1",
+    "input_sha256": "2463f1dd01214b450986f2dbfea919305a1f5dd204a4e61098c54e1e2c4b3443",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.5518118739128113,
+    "input_sd": 0.6421267986297607,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-267_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-12-Jan-2017-267_A_AP.jpg",
+    "file_sha256": "c30cd71547ff6184b43a6d05fdd0f9d2b80036089d871ae6cd012b6b2eb29340",
+    "input_sha256": "ee6017ffdddbd4a68e81501e7fb63cda06b3cfce8edb20d11bdde492598dfa1d",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.7612230777740479,
+    "input_sd": 0.41250351071357727,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-270_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-12-Jan-2017-270_A_AP.jpg",
+    "file_sha256": "a7f57f8e9ec44d05b9495b05a9aafd50a17b3fa4cd83ee3268cd7b1d8cb7b570",
+    "input_sha256": "c68ea6138c10e2cfc1a39ba41bcace2077aee33f8a1cb0627948aa86ccd4cc99",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6801317930221558,
+    "input_sd": 0.5270956754684448,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-272_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-12-Jan-2017-272_A_AP.jpg",
+    "file_sha256": "c48cfbd42f80d5043ba8084ec870c2eae80b6fbcc013c11966db3b4011697568",
+    "input_sha256": "27a4af0b8b6300f5f6d6b1077e61e69454f0bf860754e3bace3db6444eeda596",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6325644850730896,
+    "input_sd": 0.4998396635055542,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-13-Jan-2017-273_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-13-Jan-2017-273_A_AP.jpg",
+    "file_sha256": "7b2ddfb4e2616042b6c6307b189a65d106e546c68aeb873f965ce2b8594f86ad",
+    "input_sha256": "740ecff0372a8cf27ccc8167938eac36f8f0e6bc1e6fd003e82b4a368f566d2f",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.5927219986915588,
+    "input_sd": 0.5085005164146423,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-19-Jan-2017-275_C_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-19-Jan-2017-275_C_AP.jpg",
+    "file_sha256": "a1a63da40dadd423b3ad9cb3d5689b5b4cb7dfc9356443955ed6715451e43e07",
+    "input_sha256": "a45752e9b3c87d6bb54061874793091b991abffe93d9bba5782f3f1419350cff",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.5842495560646057,
+    "input_sd": 0.6004939675331116,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-11_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-20-Jul-2016-11_A_AP.jpg",
+    "file_sha256": "1c9bc73a06a018b5b83c1cbd8615a8481ba6b1500ef203c7afa78ca771024f2f",
+    "input_sha256": "b9951730ba8f00ea9af90c32d138c15247becc21d2127204d49d5d4bd7be452f",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6284450888633728,
+    "input_sd": 0.5438312292098999,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-11_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-20-Jul-2016-11_B_AP.jpg",
+    "file_sha256": "4a2db6d8b9ded303a8569d4d9e8536fe88fbeefb9fbbd83c22e0d3d6aecda6f9",
+    "input_sha256": "ad78c64ac8a987d0296615cd90bb4a8da1d8b1c1287d511ace5e94539cc4cbb2",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.44277364015579224,
+    "input_sd": 0.6270307898521423,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-16_C_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-20-Jul-2016-16_C_AP.jpg",
+    "file_sha256": "f114ba2c628e2f6dc65d9040439fd3061210afad8ae90463a64ee8ca547728fd",
+    "input_sha256": "a0594173dd1fe256fcd1a22119f20405ec6cb3ad4f39bc6da06581a6d3795b1b",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.5514136552810669,
+    "input_sd": 0.5336759090423584,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-2_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-20-Jul-2016-2_A_AP.jpg",
+    "file_sha256": "e909fb7dda33f8f264096a4d6f2d77c66ef516749057832a503c9b86f62e7f61",
+    "input_sha256": "8fa9ab4cc4322b7d534b2c9d10e0e2d89051f88ef4add1f5b55fe7c7f898aa59",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6016682982444763,
+    "input_sd": 0.6456133127212524,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-4_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-20-Jul-2016-4_A_AP.jpg",
+    "file_sha256": "c8b077972f31ceaf7871cfda41a48965586539bc54331686e1930edd11bfb958",
+    "input_sha256": "9b3e72bc3bf91529f0c92c63969d83ace57e1945aab5fc98da7c241826fc1b4b",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.7003293633460999,
+    "input_sd": 0.4750164747238159,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-6_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-20-Jul-2016-6_A_AP.jpg",
+    "file_sha256": "36b5604f77ad155ae9444a170aff9f292e6e29c52deef0276253bb29dba2d59b",
+    "input_sha256": "048b7634163ccb037885b7308d6f2e4776ffa8d9da55d98bdcd025c3381beb62",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.5793780088424683,
+    "input_sd": 0.5919482707977295,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-coronal2",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-20-Jul-2016-coronal2.jpg",
+    "file_sha256": "159e932b37499724bb65eb1a9dfaffb648a489cf450e716abda364c47852daaa",
+    "input_sha256": "e814a0892274d5930b1eeeee2bb3379bd080c5752427d4edbf0b37e3b53669b7",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.7006140947341919,
+    "input_sd": 0.41548219323158264,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-coronal8",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-20-Jul-2016-coronal8.jpg",
+    "file_sha256": "80df45620da34e619bcca77fc0a1b8e0615bcb38391f598c1564582a3c276001",
+    "input_sha256": "295ef199838663454d05a4398c25833feef0e1eab987737a50fda59fdf7a2ad6",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.5136362314224243,
+    "input_sd": 0.6138181090354919,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-132_C_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-21-Nov-2016-132_C_AP.jpg",
+    "file_sha256": "98cc324bae707eebc07aa1863e2f6e41a8941b006a8c5672ed71fcf171faba0d",
+    "input_sha256": "0b67f83e47a46aa84e03d0f9a439a2778465c1bc60539ac3f6046356f0ec9773",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.7151312828063965,
+    "input_sd": 0.5498301386833191,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-132_E_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-21-Nov-2016-132_E_AP.jpg",
+    "file_sha256": "8370213dc8ef81f15ce7dcff192e43f9ffea20492967b9acf97d9aeaf4dea2ae",
+    "input_sha256": "3d681158f35157f8cf78adeb7b03961c7a88fc9964b392e4d114bbb78103f371",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6744597554206848,
+    "input_sd": 0.5822462439537048,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-137_D_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-21-Nov-2016-137_D_AP.jpg",
+    "file_sha256": "587f46274e7e4506c303b1a424a3388640bbb1d5cb880ff5dbe4529a7ae2579b",
+    "input_sha256": "829aa2321a616180a6440f1a9ee9b463ce579717c1ac3137d5147e11d642fae6",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.7086117267608643,
+    "input_sd": 0.5090493559837341,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-138_C_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-21-Nov-2016-138_C_AP.jpg",
+    "file_sha256": "1684b2604a6ac024ea30c1eca98a7f6d42b669b0e13a1554f1b3786e37facbda",
+    "input_sha256": "f23d7b7ee29cb52fff3140bedca717e022f7a456fa94b47d838c34ff88a9f9a9",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.731957733631134,
+    "input_sd": 0.5473359227180481,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-139_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-21-Nov-2016-139_B_AP.jpg",
+    "file_sha256": "79dc561d523c6443d2ba5faf8410e8942a565e5bf942f1ea2867fcae9c0925e3",
+    "input_sha256": "55e8f3859ecd5996013c22e29442bb6fad494a6d33858f08b34a3ec095a2ab18",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.695250928401947,
+    "input_sd": 0.49061915278434753,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-140_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-21-Nov-2016-140_A_AP.jpg",
+    "file_sha256": "5f87caa122c68d2463b3266681ef3b5b50705b64ea70303a3c650c999ae6d618",
+    "input_sha256": "acab9f6cc38ea6ea3cb1a729dbc31e0538c25b3257ad770fd97f9d221ba3b100",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6314354538917542,
+    "input_sd": 0.6222742199897766,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Nov-2016-141_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-22-Nov-2016-141_A_AP.jpg",
+    "file_sha256": "2357ad8b368ec10c16b009ebc4603334992f06788a8dee8089e1d618d9033c43",
+    "input_sha256": "2cd308da51aca102fbb153ed782bbf8cc97e5762948feef9d7065fdcbd40ccde",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6181442141532898,
+    "input_sd": 0.6353142261505127,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-23-Jan-2017-276_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-23-Jan-2017-276_B_AP.jpg",
+    "file_sha256": "ae9cb7e9a01baf49b7bd5f22895cf37ec4e6e9a28b579364508b51bb45386b9b",
+    "input_sha256": "4f9329813c70c3ae9892b2ab4df494fb1170829c2a32429c03ce111700fd55c5",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.5648199915885925,
+    "input_sd": 0.5806028246879578,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-24-Jul-2016-32_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-24-Jul-2016-32_A_AP.jpg",
+    "file_sha256": "701119578cab8c93f89684986e58b803429c357cf5f081629a0629086210407e",
+    "input_sha256": "548e044dcdb006a46a67f2153dd148df985e72e9b1d07b87dc8a81a004cc8b2f",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6568122506141663,
+    "input_sd": 0.5140912532806396,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-24-Jul-2016-38_D_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-24-Jul-2016-38_D_AP.jpg",
+    "file_sha256": "d0c7e681b4a840134aebbf7f19647d835da22e7184620fdc6b0aa6a876e1903d",
+    "input_sha256": "bac616036643f2267c23028681633fdd4b697c2e827dc20fa05aff261ae5bfc4",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.5424010753631592,
+    "input_sd": 0.6116417646408081,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jan-2017-279_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-25-Jan-2017-279_A_AP.jpg",
+    "file_sha256": "8c8a0e67af53cef1ad941a9e0ab1684ab9503bb39e8ce2d3ce0829bd5f9611b8",
+    "input_sha256": "3ba20a4922dae05c06b422cef0a516fe74f3fe78cec26e4771be0284cbc71039",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6297515034675598,
+    "input_sd": 0.47092998027801514,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-15_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-25-Jul-2016-15_A_AP.jpg",
+    "file_sha256": "16573a0d7eee1e837a38d271445bbd24db901882b334d274f6d4fdabf208a969",
+    "input_sha256": "c14cf2d85b97b27ab468d63970dc66809ea556d7ad7516a2fc0335c1ee6269a9",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.567499577999115,
+    "input_sd": 0.4897193908691406,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-15_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-25-Jul-2016-15_B_AP.jpg",
+    "file_sha256": "fbe3f7997922cd88410e2222772ef42434f0057096d965ef413ae4f9230032a8",
+    "input_sha256": "17c2b7779add89fb1ee1b0dfd683ad0ce5d731aac2706bea19554a62b1c02f70",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.510581910610199,
+    "input_sd": 0.5119646191596985,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-15_D_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-25-Jul-2016-15_D_AP.jpg",
+    "file_sha256": "99ba20a4d2f3e95fcecc3baf9b763cd24a1654012d706441d24314bde1882d42",
+    "input_sha256": "df00f81bfee3839a28dca03719ade1904abc11dc0f9741d3d3b2cda8efb57e2f",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6388663649559021,
+    "input_sd": 0.45863690972328186,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-42_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-25-Jul-2016-42_A_AP.jpg",
+    "file_sha256": "648fd887f489964113d722475eb57ded0f5744bbec30c3938fbea06a0dedd661",
+    "input_sha256": "0a3a26bb4121cae8d1f83dec642a3d2a2695bddce08859f09215208243c3fdb9",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.6091828942298889,
+    "input_sd": 0.6440110206604004,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-44_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-25-Jul-2016-44_A_AP.jpg",
+    "file_sha256": "e49a8b8b661d06a2d06d5c2ee1cf7aadda168754fb0f44c7dca43d2a45ecf683",
+    "input_sha256": "2894b0c3a2d405fe7bd64cff7e75de99329fc896a3a89b4d897b8a2519050127",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.7523971796035767,
+    "input_sd": 0.36756181716918945,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-47_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-25-Jul-2016-47_B_AP.jpg",
+    "file_sha256": "eb58585571d98f48ff10406e65d4f7e3bbb495e9ac07a773c9344f162196ca7a",
+    "input_sha256": "1cc71cba615939fd0f59a382097d5d5fee807cf58d0f17cbb04c140589f98e47",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.5772586464881897,
+    "input_sd": 0.5471737384796143,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-52_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-25-Jul-2016-52_A_AP.jpg",
+    "file_sha256": "16ae13375bf910e6a529156d7c98c9ffcab56a9ad0c70cc08d1f9eb3a2be96f4",
+    "input_sha256": "746fa682ef95cab319eb808361ed1a7ea3941af62d2b7f3354c62bb6f3292a61",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.7504773139953613,
+    "input_sd": 0.3382304012775421,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-62_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-25-Jul-2016-62_B_AP.jpg",
+    "file_sha256": "75674c9f4c5ba2d7bcc37dbdea2ab0813fb2166dc72f4c7c10a412ba6b37dc91",
+    "input_sha256": "ccee2ed571622e73ca744be3c2e700b52d8aa1d628e8baec8cbbbc50bff05b77",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.560084879398346,
+    "input_sd": 0.564576268196106,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-78_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-26-Jul-2016-78_A_AP.jpg",
+    "file_sha256": "170c926892740c56c5fad165eedbe85ee0472c6e4c13804a3fc8072951173851",
+    "input_sha256": "164a2f735acc5b5b4dcf385c9a50b2eea4dd6615d97d4ff6a267dc96379138a2",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.7151757478713989,
+    "input_sd": 0.44956740736961365,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-88_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-26-Jul-2016-88_A_AP.jpg",
+    "file_sha256": "d7db42dadc706638308e9f3893a66406cbee7df239063b5f13a9de5dc16815af",
+    "input_sha256": "ce72b9419c1d63ce1de1b0c06b3a663d352489195741574141bf8144aa0976eb",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.570756733417511,
+    "input_sd": 0.5570219159126282,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  }
+]

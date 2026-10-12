@@ -1,0 +1,2037 @@
+[
+  {
+    "image_uuid": "sunhl-1th-02-Jan-2017-162_A_AP",
+    "seconds": 1.3248000759995193,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-02-Jan-2017-162_B_AP",
+    "seconds": 1.2951680169999236,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-03-Jan-2017-163_A_AP",
+    "seconds": 1.0446809850000136,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-03-Jan-2017-163_B_AP",
+    "seconds": 1.0664293910003835,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-03-Jan-2017-165_A_AP",
+    "seconds": 1.1188837300005616,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-04-Jan-2017-165_B_AP",
+    "seconds": 1.1688004859997818,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-05-Jan-2017-167_A_AP",
+    "seconds": 1.3533933210001123,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-05-Jan-2017-167_B_AP",
+    "seconds": 1.3045278480003617,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-05-Jan-2017-169_A_AP",
+    "seconds": 0.8595355880006537,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-05-Jan-2017-170_A_AP",
+    "seconds": 1.2173707720003222,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-05-Jan-2017-171_A_AP",
+    "seconds": 1.1649073629996565,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-05-Jan-2017-172_A_AP",
+    "seconds": 1.1857687949996034,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-05-Jan-2017-172_B_AP",
+    "seconds": 1.2171640149999803,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-05-Jan-2017-173_A_AP",
+    "seconds": 1.2399835950000124,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-05-Jan-2017-174_A_AP",
+    "seconds": 1.1630570799998168,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-05-Jan-2017-175_A_AP",
+    "seconds": 1.31863377100035,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-05-Jan-2017-176_A_AP",
+    "seconds": 1.1241962759995658,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-06-Jan-2017-176_B_AP",
+    "seconds": 1.1932499429995005,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-06-Jan-2017-177_A_AP",
+    "seconds": 1.160328641999513,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-06-Jan-2017-177_C_AP",
+    "seconds": 1.247519889000614,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-06-Jan-2017-178_A_AP",
+    "seconds": 1.2219199109995316,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-06-Jan-2017-178_B_AP",
+    "seconds": 1.1544257919995289,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-06-Jan-2017-179_A_AP",
+    "seconds": 1.2759289770001487,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-06-Jan-2017-180_A_AP",
+    "seconds": 1.242077590000008,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-06-Jan-2017-181_A_AP",
+    "seconds": 1.148477749000449,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-06-Jan-2017-182_A_AP",
+    "seconds": 1.1642297919997873,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-06-Jan-2017-182_B_AP",
+    "seconds": 1.203228721999949,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-06-Jan-2017-182_C_AP",
+    "seconds": 1.2043436210005893,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-06-Jan-2017-184_A_AP",
+    "seconds": 1.1815108769997096,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-06-Jan-2017-187_A_AP",
+    "seconds": 1.2174721060000593,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-06-Jan-2017-188_B_AP",
+    "seconds": 1.230167913000514,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-06-Jan-2017-189_A_AP",
+    "seconds": 1.224264112000128,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-06-Jan-2017-190_A_AP",
+    "seconds": 1.1518144379997466,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-06-Jan-2017-191_A_AP",
+    "seconds": 1.1151664420003726,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-192_B_AP",
+    "seconds": 0.9875910359996851,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-193_A_AP",
+    "seconds": 1.2120891800004756,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-194_A_AP",
+    "seconds": 1.0003968639994127,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-194_C_AP",
+    "seconds": 1.0729490159992565,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-194_D_AP",
+    "seconds": 0.8341489849999562,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-195_A_AP",
+    "seconds": 1.2513570569999501,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-196_B_AP",
+    "seconds": 2.092211774000134,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-196_C_AP",
+    "seconds": 1.1918965750001007,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-196_D_AP",
+    "seconds": 1.2109597780008698,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-196_E_AP",
+    "seconds": 1.2311496219999754,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-197_B_AP",
+    "seconds": 1.0523917910004457,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-197_C_AP",
+    "seconds": 1.3168733789998441,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-197_E_AP",
+    "seconds": 1.28551552800036,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-199_A_AP",
+    "seconds": 1.172054525999556,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-199_B_AP",
+    "seconds": 1.3171834770000714,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-199_C_AP",
+    "seconds": 1.2538318320002872,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-200_A_AP",
+    "seconds": 1.229311389999566,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-202_A_AP",
+    "seconds": 1.1520319129995187,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-202_B_AP",
+    "seconds": 1.19730492600047,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-202_C_AP",
+    "seconds": 1.3674101130000054,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-204_A_AP",
+    "seconds": 1.190410444999543,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-205_A_AP",
+    "seconds": 1.049285026000689,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-205_B_AP",
+    "seconds": 1.1181480159993953,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-205_C_AP",
+    "seconds": 1.0447982810001122,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-205_D_AP",
+    "seconds": 1.1680363159994158,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-205_E_AP",
+    "seconds": 1.3130502809999598,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-206_A_AP",
+    "seconds": 1.1947879809995356,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-206_B_AP",
+    "seconds": 1.2252775400002065,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-207_A_AP",
+    "seconds": 1.2159750880000502,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-207_B_AP",
+    "seconds": 1.195644041000378,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-208_B_AP",
+    "seconds": 1.248684948999653,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-210_A_AP",
+    "seconds": 1.2498639109999203,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-211_B_AP",
+    "seconds": 1.2807031249994907,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-212_A_AP",
+    "seconds": 1.161990913000409,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-212_B_AP",
+    "seconds": 1.0858050870001534,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-212_C_AP",
+    "seconds": 1.3227205860002869,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-214_A_AP",
+    "seconds": 1.1970639649998702,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-214_C_AP",
+    "seconds": 1.3121728100004475,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-215_B_AP",
+    "seconds": 1.128199456999937,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-215_C_AP",
+    "seconds": 1.102601907999997,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-215_D_AP",
+    "seconds": 1.1085785770001166,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-215_E_AP",
+    "seconds": 1.1468953510002393,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-215_G_AP",
+    "seconds": 1.2353977290003968,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-216_A_AP",
+    "seconds": 1.1459218219997638,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-218_C_AP",
+    "seconds": 1.2404153800007407,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-219_A_AP",
+    "seconds": 1.2450245859999995,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-09-Jan-2017-219_C_AP",
+    "seconds": 1.3618880559997706,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-221_A_AP",
+    "seconds": 1.175104719999581,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-221_C_AP",
+    "seconds": 1.232995791000576,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-222_A_AP",
+    "seconds": 1.2785226939995482,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-222_B_AP",
+    "seconds": 1.2014435199998843,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-227_A_AP",
+    "seconds": 1.127163840999856,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-227_B_AP",
+    "seconds": 1.1824432149996937,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-227_C_AP",
+    "seconds": 1.2081408829999418,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-227_D_AP",
+    "seconds": 1.2838856039998063,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-227_E_AP",
+    "seconds": 1.2929378349999752,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-228_A_AP",
+    "seconds": 1.1294261869998081,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-228_B_AP",
+    "seconds": 1.1967794279998998,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-228_C_AP",
+    "seconds": 1.2988393699997687,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-230_A_AP",
+    "seconds": 1.3380159729995285,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-230_B_AP",
+    "seconds": 0.9932468280003377,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-231_A_AP",
+    "seconds": 1.3452464550000514,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-231_B_AP",
+    "seconds": 1.3078606989993204,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-232_A_AP",
+    "seconds": 1.3077345410001726,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-232_B_AP",
+    "seconds": 1.153915699999743,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-233_A_AP",
+    "seconds": 1.4393302789994777,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-234_A_AP",
+    "seconds": 1.4323187809995943,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-234_B_AP",
+    "seconds": 1.4603758199991717,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-235_D_AP",
+    "seconds": 1.2863595870003337,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-237_A_AP",
+    "seconds": 1.0606915219996154,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-237_B_AP",
+    "seconds": 1.2577241400003913,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-237_C_AP",
+    "seconds": 1.2351869290005197,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-237_D_AP",
+    "seconds": 1.1579853069997625,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-237_E_AP",
+    "seconds": 1.198092739000458,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-237_F_AP",
+    "seconds": 1.1478946749994066,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-238_A_AP",
+    "seconds": 1.3717811870001242,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-238_C_AP",
+    "seconds": 1.4711796540004798,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-238_D_AP",
+    "seconds": 0.8948134570000548,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-239_A_AP",
+    "seconds": 1.3082613879996643,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-239_B_AP",
+    "seconds": 1.2419739510005456,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-239_C_AP",
+    "seconds": 1.296514075000232,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-239_D_AP",
+    "seconds": 1.0211757449997094,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-240_A_AP",
+    "seconds": 1.201234939000642,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-240_B_AP",
+    "seconds": 1.1854819219997808,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-241_A_AP",
+    "seconds": 1.2648719369999526,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-241_B_AP",
+    "seconds": 1.3151336119999542,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-241_C_AP",
+    "seconds": 1.4056271700001162,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-243_A_AP",
+    "seconds": 1.182274710999991,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-244_B_AP",
+    "seconds": 1.3088996539991058,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-246_A_AP",
+    "seconds": 1.4157636189993354,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-247_A_AP",
+    "seconds": 1.2999082709993672,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-248_A_AP",
+    "seconds": 1.2696226750003916,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-248_B_AP",
+    "seconds": 1.1958986870004082,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-248_C_AP",
+    "seconds": 1.2695683349993487,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-249_A_AP",
+    "seconds": 1.2486611160002212,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-249_B_AP",
+    "seconds": 1.5183228820005752,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-251_A_AP",
+    "seconds": 1.2302000239997142,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-252_A_AP",
+    "seconds": 1.2498546879996866,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-252_B_AP",
+    "seconds": 1.3116109449993019,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-253_A_AP",
+    "seconds": 1.259052555999915,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-253_B_AP",
+    "seconds": 1.2648413850001816,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-254_C_AP",
+    "seconds": 1.1923826940001163,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Jan-2017-254_D_AP",
+    "seconds": 1.16728856500049,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-11-Jan-2017-254_E_AP",
+    "seconds": 1.0772626969992416,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-11-Jan-2017-254_F_AP",
+    "seconds": 1.1145092719998502,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-11-Jan-2017-254_G_AP",
+    "seconds": 1.2088965840002857,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-11-Jan-2017-254_H_AP",
+    "seconds": 1.1673684489996958,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-11-Jan-2017-254_J_AP",
+    "seconds": 1.282778075999886,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-11-Jan-2017-254_K_AP",
+    "seconds": 1.2484541550002177,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-11-Jan-2017-254_L_AP",
+    "seconds": 1.2094132379997973,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-11-Jan-2017-254_M_AP",
+    "seconds": 1.3404978419994222,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-11-Jan-2017-254_O_AP",
+    "seconds": 1.3597428900002342,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-11-Jan-2017-254_P_AP",
+    "seconds": 1.1743913860000248,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-11-Jan-2017-255_A_AP",
+    "seconds": 1.2237039069996172,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-11-Jan-2017-255_D_AP",
+    "seconds": 1.410071151000011,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-256_A_AP",
+    "seconds": 1.2545418189993143,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-258_A_AP",
+    "seconds": 1.1418012669992095,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-258_B_AP",
+    "seconds": 1.2650508319993605,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-259_A_AP",
+    "seconds": 1.18160537499989,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-259_B_AP",
+    "seconds": 1.3420201769995401,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-259_C_AP",
+    "seconds": 1.2902192460005608,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-261_A_AP",
+    "seconds": 1.2635703140003898,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-262_A_AP",
+    "seconds": 1.2171439639996606,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-262_B_AP",
+    "seconds": 1.2223442780004916,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-262_C_AP",
+    "seconds": 1.168834486000378,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-262_E_AP",
+    "seconds": 1.2500015000005078,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-263_A_AP",
+    "seconds": 1.3265716030000476,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-264_A_AP",
+    "seconds": 1.421057022000241,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-266_A_AP",
+    "seconds": 1.1682986519999758,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-267_B_AP",
+    "seconds": 1.3033213409999007,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-268_A_AP",
+    "seconds": 1.2913590060006754,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-269_A_AP",
+    "seconds": 1.1840336909999678,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-269_B_AP",
+    "seconds": 1.1339996779997819,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-269_C_AP",
+    "seconds": 1.14546094599973,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-271_B_AP",
+    "seconds": 1.1643835609993403,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-12-Jan-2017-271_C_AP",
+    "seconds": 1.1468114950002928,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-13-Jan-2017-273_B_AP",
+    "seconds": 1.3703869050004869,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-16-Jan-2017-274_A_AP",
+    "seconds": 1.6286991340002714,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-19-Jan-2017-274_B_AP",
+    "seconds": 1.2136113220003608,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-19-Jan-2017-275_A_AP",
+    "seconds": 1.154257287999826,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-19-Jan-2017-275_B_AP",
+    "seconds": 1.2973462629997812,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jan-2017-275_D_AP",
+    "seconds": 1.241085956000461,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jan-2017-275_E_AP",
+    "seconds": 1.3214489579995643,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jan-2017-275_F_AP",
+    "seconds": 1.3356326749999425,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jan-2017-275_G_AP",
+    "seconds": 1.2991668909999134,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jan-2017-275_H_AP",
+    "seconds": 1.3628809070005445,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-1_A_AP",
+    "seconds": 1.1785512540000127,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-10_A_AP",
+    "seconds": 1.2019562759996916,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-10_B_AP",
+    "seconds": 1.1765522750001765,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-12_A_AP",
+    "seconds": 1.3184604660000332,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-13_A_AP",
+    "seconds": 1.2727458330000445,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-14_A_AP",
+    "seconds": 1.1887642840001718,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-16_A_AP",
+    "seconds": 1.1030987340000138,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-16_B_AP",
+    "seconds": 1.1942528159997892,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-18_A_AP",
+    "seconds": 1.1960749469999428,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-19_A_AP",
+    "seconds": 1.221514126999864,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-19_B_AP",
+    "seconds": 1.2356877370002621,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-2_B_AP",
+    "seconds": 1.2947452789994713,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-20_B_AP",
+    "seconds": 1.1654499039996153,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-20_C_AP",
+    "seconds": 1.306236051000269,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-20_D_AP",
+    "seconds": 1.0712702509999872,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-3_A_AP",
+    "seconds": 1.2720943280000938,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-3_B_AP",
+    "seconds": 1.167661249000048,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-4_B_AP",
+    "seconds": 1.3654696759995204,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-5_A_AP",
+    "seconds": 1.2747894589992939,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-7_A_AP",
+    "seconds": 1.2678720490002888,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-8_A_AP",
+    "seconds": 1.0129960690001099,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-8_B_AP",
+    "seconds": 1.3582887610000398,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-9_A_AP",
+    "seconds": 1.4853271760002826,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-coronal1",
+    "seconds": 1.21446674300023,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-coronal10",
+    "seconds": 1.3181194420003521,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-coronal11",
+    "seconds": 1.3978317049995894,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-coronal12",
+    "seconds": 1.12822819899975,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-coronal13",
+    "seconds": 1.199642082000537,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-coronal14",
+    "seconds": 1.2504157370003668,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-coronal15",
+    "seconds": 1.216665072000069,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-coronal16",
+    "seconds": 1.1289250350000657,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-coronal17",
+    "seconds": 1.235831228999814,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-coronal3",
+    "seconds": 1.2440988280004603,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-coronal4",
+    "seconds": 1.282375442000557,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-coronal5",
+    "seconds": 1.2131238040001335,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-coronal7",
+    "seconds": 1.3862321030001112,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-20-Jul-2016-coronal9",
+    "seconds": 1.2179365830006645,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Jul-2016-15_E_AP",
+    "seconds": 1.0116733109998677,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Jul-2016-17_A_AP",
+    "seconds": 1.2007451839999703,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Jul-2016-20_A_AP",
+    "seconds": 1.2664506339997388,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Jul-2016-20_E_AP",
+    "seconds": 1.2212289210001472,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Jul-2016-20_F_AP",
+    "seconds": 1.2777967479996732,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Jul-2016-21_A_AP",
+    "seconds": 1.1951965230000496,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Jul-2016-22_A_AP",
+    "seconds": 1.2320882779995372,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Jul-2016-23_A_AP",
+    "seconds": 1.2052675719996842,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Jul-2016-23_B_AP",
+    "seconds": 1.1660330960003193,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Jul-2016-24_A_AP",
+    "seconds": 1.1894080840002061,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Jul-2016-24_B_AP",
+    "seconds": 1.1626264879996597,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Jul-2016-25_A_AP",
+    "seconds": 1.2368981469999198,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Jul-2016-26_A_AP",
+    "seconds": 1.2161627539999245,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Jul-2016-26_B_AP",
+    "seconds": 1.175512257000264,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Jul-2016-27_A_AP",
+    "seconds": 1.1118550299997878,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Jul-2016-28_A_AP",
+    "seconds": 1.2471544320005705,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-131_A_AP",
+    "seconds": 1.210082161000173,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-131_B_AP",
+    "seconds": 1.2564591209993523,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-132_A_AP",
+    "seconds": 1.0456267320005281,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-132_B_AP",
+    "seconds": 1.177771489999941,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-132_D_AP",
+    "seconds": 1.200427996000144,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-133_A_AP",
+    "seconds": 1.2337639950001176,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-133_B_AP",
+    "seconds": 1.2072963070004334,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-134_A_AP",
+    "seconds": 1.0680502940003862,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-134_B_AP",
+    "seconds": 1.220812733999992,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-134_C_AP",
+    "seconds": 1.0522719629998392,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-135_A_AP",
+    "seconds": 1.153850229999989,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-136_A_AP",
+    "seconds": 1.2176206980002462,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-136_B_AP",
+    "seconds": 1.2789628399996218,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-137_A_AP",
+    "seconds": 1.1524170929997126,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-137_B_AP",
+    "seconds": 1.1332367590002832,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-137_C_AP",
+    "seconds": 1.1539515220001704,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-138_A_AP",
+    "seconds": 1.1538463650003905,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-138_B_AP",
+    "seconds": 1.1595069189997957,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-138_D_AP",
+    "seconds": 1.2170828170001187,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-138_D_AP2",
+    "seconds": 1.150945413000045,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-139_A_AP",
+    "seconds": 1.128266978999818,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-139_C_AP",
+    "seconds": 1.1786096189998716,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-140_B_AP",
+    "seconds": 1.1593273500002397,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-21-Nov-2016-140_C_AP",
+    "seconds": 1.2214117129997248,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Nov-2016-141_B_AP",
+    "seconds": 1.129230503999679,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Nov-2016-141_D_AP",
+    "seconds": 1.0880319190000591,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Nov-2016-141_E_AP",
+    "seconds": 1.184012953999627,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Nov-2016-141_F_AP",
+    "seconds": 1.2945530420001887,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Nov-2016-142_A_AP_2",
+    "seconds": 1.2057475749998048,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Nov-2016-142_A_AP",
+    "seconds": 1.2569494280005529,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Nov-2016-143_A_AP",
+    "seconds": 1.0978212239997447,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Nov-2016-144_A_AP",
+    "seconds": 1.2817861000003177,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Nov-2016-145_A_AP",
+    "seconds": 1.1950556020001386,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Nov-2016-146_A_AP",
+    "seconds": 1.1878231870005038,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Nov-2016-147_A_AP",
+    "seconds": 1.2440696039993782,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Nov-2016-148_A_AP",
+    "seconds": 1.165796250999847,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Nov-2016-149_A_AP",
+    "seconds": 1.2168282050006383,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Nov-2016-149_B_AP",
+    "seconds": 1.1137560900006065,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Nov-2016-149_C_AP",
+    "seconds": 1.120245855999201,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Nov-2016-150_A_AP",
+    "seconds": 1.1563416270000744,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Nov-2016-151_A_AP",
+    "seconds": 1.2149771659996986,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Nov-2016-152_A_AP",
+    "seconds": 1.2054082490003566,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Nov-2016-153_A_AP",
+    "seconds": 1.154184062999775,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Nov-2016-153_B_AP",
+    "seconds": 1.2157902429999012,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Nov-2016-153_C_AP",
+    "seconds": 1.2822145669997553,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Nov-2016-154_A_AP",
+    "seconds": 1.1731341899994732,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Nov-2016-154_B_AP",
+    "seconds": 1.274903403999815,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Nov-2016-155_A_AP",
+    "seconds": 1.2093725909999193,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Nov-2016-156_A_AP",
+    "seconds": 1.108943778000139,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-23-Jan-2017-276_A_AP",
+    "seconds": 1.2195595570001387,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-24-Jul-2016-28_B_AP",
+    "seconds": 1.1966851309998674,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-24-Jul-2016-29_A_AP",
+    "seconds": 1.2006852229997094,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-24-Jul-2016-30_A_AP",
+    "seconds": 1.1524811079998472,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-24-Jul-2016-31_A_AP",
+    "seconds": 1.1801594160006061,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-24-Jul-2016-32_B_AP",
+    "seconds": 1.1999103550006112,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-24-Jul-2016-33_A_AP",
+    "seconds": 1.2266446289995656,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-24-Jul-2016-34_A_AP",
+    "seconds": 1.529468937999809,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-24-Jul-2016-35_A_AP",
+    "seconds": 1.1358701380004277,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-24-Jul-2016-35_B_AP",
+    "seconds": 1.1521890049998547,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-24-Jul-2016-35_C_AP",
+    "seconds": 1.2904247179994854,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-24-Jul-2016-35_D_AP",
+    "seconds": 1.1549784920007369,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-24-Jul-2016-35_E_AP",
+    "seconds": 1.1436074800003553,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-24-Jul-2016-36_A_AP",
+    "seconds": 1.2097710340003687,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-24-Jul-2016-37_A_AP",
+    "seconds": 1.2554839919994265,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-24-Jul-2016-37_B_AP",
+    "seconds": 1.2063668070004496,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-24-Jul-2016-37_C_AP",
+    "seconds": 1.2062782739994873,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-24-Jul-2016-38_A_AP",
+    "seconds": 1.1540252759996292,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-24-Jul-2016-38_B_AP",
+    "seconds": 1.1905867710001985,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-24-Jul-2016-38_C_AP",
+    "seconds": 1.1330600629999026,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-24-Jul-2016-39_A_AP",
+    "seconds": 1.159896621000371,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-24-Jul-2016-39_B_AP",
+    "seconds": 1.1818277379998108,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-24-Jul-2016-40_A_AP",
+    "seconds": 1.2137283479996768,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jan-2017-279_B_AP",
+    "seconds": 1.4421979629996713,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jan-2017-279_C_AP",
+    "seconds": 1.4054630979999274,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jan-2017-280_A_AP",
+    "seconds": 1.245538437000505,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jan-2017-281_A_AP",
+    "seconds": 1.1730744469996353,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jan-2017-281_B_AP",
+    "seconds": 1.2079651510002805,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jan-2017-281_C_AP",
+    "seconds": 1.2260634659996867,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jan-2017-281_D_AP",
+    "seconds": 1.236867629999324,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-15_C_AP",
+    "seconds": 1.0648433200003637,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-41_A_AP",
+    "seconds": 1.0131122359998699,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-41_B_AP",
+    "seconds": 1.0288865299999088,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-44_B_AP",
+    "seconds": 1.2005447139999887,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-45_A_AP",
+    "seconds": 1.1761286869996184,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-45_B_AP",
+    "seconds": 1.2013528980005503,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-45_C_AP",
+    "seconds": 1.239208272999349,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-46_A_AP",
+    "seconds": 1.1933148189991698,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-46_B_AP",
+    "seconds": 1.2662022019994765,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-46_C_AP",
+    "seconds": 1.1198178209997423,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-46_D_AP",
+    "seconds": 1.1705155780000496,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-47_A_AP",
+    "seconds": 1.263945231999969,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-48_A_AP",
+    "seconds": 1.2872063409995462,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-49_A_AP",
+    "seconds": 1.177991915000348,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-50_A_AP",
+    "seconds": 1.2198325589997694,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-50_B_AP",
+    "seconds": 1.2590147000000798,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-51_A_AP",
+    "seconds": 1.2267041420000169,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-51_B_AP",
+    "seconds": 1.2463391819992466,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-52_B_AP",
+    "seconds": 1.3032715469998948,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-52_C_AP",
+    "seconds": 1.1269177009999112,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-53_A_AP",
+    "seconds": 1.1008162429998265,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-53_B_AP",
+    "seconds": 1.111598321999736,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-55_A_AP",
+    "seconds": 1.187523866000447,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-55_B_AP",
+    "seconds": 1.2561244839998835,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-56_A_AP",
+    "seconds": 1.0526918750001641,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-56_B_AP",
+    "seconds": 1.2653226229995198,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-56_C_AP",
+    "seconds": 1.2441714790002152,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-56_D_AP",
+    "seconds": 1.2975289400001202,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-57_A_AP",
+    "seconds": 1.1985433079998984,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-57_B_AP",
+    "seconds": 1.258296330000121,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-57_C_AP",
+    "seconds": 1.256830878999608,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-58_A_AP",
+    "seconds": 1.2097576709993518,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-58_B_AP",
+    "seconds": 1.2005741510001826,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-59_A_AP",
+    "seconds": 1.2825503779995415,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-59_B_AP",
+    "seconds": 1.2233249210003123,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-60_A_AP",
+    "seconds": 1.2724205949998577,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-60_B_AP",
+    "seconds": 1.284267966999323,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-60_D_AP",
+    "seconds": 1.3089811469999404,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-61_A_AP",
+    "seconds": 1.1207451039999796,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-62_A_AP",
+    "seconds": 1.2619799190006233,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-62_C_AP",
+    "seconds": 1.2237369230006152,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-63_A_AP",
+    "seconds": 1.1196557049997864,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-63_B_AP",
+    "seconds": 1.7270949430003384,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-63_C_AP",
+    "seconds": 1.277723844999855,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-64_A_AP",
+    "seconds": 0.9761774879998484,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-65_A_AP",
+    "seconds": 1.1164458089997424,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-25-Jul-2016-66_A_AP",
+    "seconds": 1.1501531619996967,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-66_B_AP",
+    "seconds": 1.0949384569994436,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-67_A_AP",
+    "seconds": 1.1128335630000947,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-68_A_AP",
+    "seconds": 1.0969528810001066,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-69_A_AP",
+    "seconds": 1.2628272259998994,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-70_A_AP",
+    "seconds": 1.1515091810006197,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-70_B_AP",
+    "seconds": 1.16077896600018,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-70_C_AP",
+    "seconds": 1.2312700960001166,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-71_A_AP",
+    "seconds": 1.145198432000143,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-72_A_AP",
+    "seconds": 1.2166465790005532,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-72_B_AP",
+    "seconds": 1.2939777589999721,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-74_A_AP",
+    "seconds": 1.1928834529999222,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-75_A_AP",
+    "seconds": 1.2300348480002867,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-75_B_AP",
+    "seconds": 1.2045040980001431,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-76_A_AP",
+    "seconds": 1.072650443999919,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-76_B_AP",
+    "seconds": 1.0055582300001333,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-76_C_AP",
+    "seconds": 1.1900789860001169,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-77_A_AP",
+    "seconds": 1.1799722360001397,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-77_B_AP",
+    "seconds": 1.169084281999858,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-77_C_AP",
+    "seconds": 1.1587757380002586,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-77_D_AP",
+    "seconds": 1.1966522359998635,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-78_B_AP",
+    "seconds": 1.2700321750007788,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-79_A_AP",
+    "seconds": 1.217519449000065,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-79_B_AP",
+    "seconds": 1.237528181000016,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-79_C_AP",
+    "seconds": 1.180150658000457,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-80_A_AP",
+    "seconds": 1.150497847999759,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-81_A_AP",
+    "seconds": 1.1562969440001325,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-82_A_AP",
+    "seconds": 1.2063126310004009,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-85_A_AP",
+    "seconds": 1.220490726999742,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-86_A_AP",
+    "seconds": 1.421188369000447,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-88_B_AP",
+    "seconds": 1.1651085590001458,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-89_A_AP",
+    "seconds": 1.1860632790003365,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-89_B_AP",
+    "seconds": 1.1543295969995597,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-89_C_AP",
+    "seconds": 1.1657097930001328,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-89_D_AP",
+    "seconds": 1.1673049959999844,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-90_A_AP",
+    "seconds": 1.1308183030005239,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-90_B_AP",
+    "seconds": 1.2784040389997244,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-91_A_AP",
+    "seconds": 0.9904191099994932,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-26-Jul-2016-91_B_AP",
+    "seconds": 1.169366087000526,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-29-Dec-2016-156_B_AP",
+    "seconds": 1.3094367200001216,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-29-Dec-2016-156_C_AP",
+    "seconds": 1.2204979280004409,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-29-Dec-2016-156_E_AP",
+    "seconds": 1.2496786210003847,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-29-Dec-2016-157_A_AP",
+    "seconds": 1.2268762929998047,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-30-Dec-2016-158_A_AP",
+    "seconds": 1.1624486609998712,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-30-Dec-2016-159_A_AP",
+    "seconds": 0.9700943689995256,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-30-Dec-2016-159_A_AP2",
+    "seconds": 1.1211209150005743,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-30-Dec-2016-159_B_AP",
+    "seconds": 1.2008152770004017,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-30-Dec-2016-159_C_AP",
+    "seconds": 1.249979711999913,
+    "status": "ok"
+  },
+  {
+    "image_uuid": "sunhl-1th-30-Dec-2016-160_A_AP",
+    "seconds": 1.1895190839995848,
+    "status": "ok"
+  }
+]
