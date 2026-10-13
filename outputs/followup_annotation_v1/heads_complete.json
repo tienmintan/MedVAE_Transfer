@@ -1,0 +1,30 @@
+{
+  "plan_fingerprint": "cc124e00a4637da4a7245bb775792ba048f5eb75c9a736174465b5a3ba33dbc2",
+  "fits": 24,
+  "fit_metadata_sha256": {
+    "runs/clean/raw_keep/cobb_seed0.json": "658435e88bf54f7a36c78996326257311f9f97053b50201bcb04f861372b0179",
+    "runs/clean/raw_keep/landmark_seed0.json": "13c1fd1f0bd6e0ecfd846dd63e99d13f4b60cd10d52704053acc1f9f4f15f579",
+    "runs/clean/raw_mean/cobb_seed0.json": "580cf4f869c178d15becfd3a86ac29ba51697fa3d562d6ab94f56aa5de9ff5a5",
+    "runs/clean/raw_mean/landmark_seed0.json": "5d9791dbfad0a5c87e2bba7c4e9a26167937d0e7b776e751e28dd2f8532f7db2",
+    "runs/clean/projected_keep/cobb_seed0.json": "1832977302a72cc775b4c1ae32aa163c52bf4e9ba2f011b153da74c94118840c",
+    "runs/clean/projected_keep/landmark_seed0.json": "0fdc67804a930c440c12c1348213dcab501233b86dcbc77f0d287c93fdaf04ea",
+    "runs/clean/projected_mean/cobb_seed0.json": "332e567a09f83299e41190f04a7d728108b31ce9e5fba5e241bfcc9844b6e6bb",
+    "runs/clean/projected_mean/landmark_seed0.json": "61677a4c66b087ef54741c66614c1a22e2f6bd1b6c21f8f4330ea14708cd9fa7",
+    "runs/clean/raw_keep/cobb_seed1.json": "3aae667b6ccdbb255f0c7deb54d88e31116a88408359ce88efec6fa6f6940919",
+    "runs/clean/raw_keep/landmark_seed1.json": "e32cb81c172a40827c3fc53b0f7f5e8ea4a9ab314fad668c0a99b9f729bbeb53",
+    "runs/clean/raw_mean/cobb_seed1.json": "518141b0157f99eefe0e0710d42e4f2160b9be045b9417ec3ca6273e7e6aaa39",
+    "runs/clean/raw_mean/landmark_seed1.json": "62ecceef88eed96451ddf389c75353a447b6e1410788f18f002c7f8790ecdd87",
+    "runs/clean/projected_keep/cobb_seed1.json": "3ecba20ec0d9d868118ddf5145e885c63ea70ac590a33f8dbce9b12b489b5bb6",
+    "runs/clean/projected_keep/landmark_seed1.json": "6019f04c91e520f9791a0ed504c0577300741b6e5dc9ddb5479ab0e1d330785d",
+    "runs/clean/projected_mean/cobb_seed1.json": "ae07ccb71f45326386874261e6c2b218fd610504f830598f4bdc788865775f0a",
+    "runs/clean/projected_mean/landmark_seed1.json": "7e3c41c50cd08cb8300128452da167f46bd22aa82543cf5d58843452c667b23e",
+    "runs/clean/raw_keep/cobb_seed2.json": "ade8f32119f6dba8361cb436c8582a0407899b12e144169cc3c39db42f89c64b",
+    "runs/clean/raw_keep/landmark_seed2.json": "4898a93514b9e05a9974c7b71bc431421467bb945609db6627ab0fe728b4bdab",
+    "runs/clean/raw_mean/cobb_seed2.json": "a5a91569a6d0fdbfbedfc79b7ea5b65f95b750a92d5d34ccbb58f3734b47ad9b",
+    "runs/clean/raw_mean/landmark_seed2.json": "eca6fdf89ebade5e546912cfdc14c6f4c099bdb5b2e8e68b7b1ca6ff623db63b",
+    "runs/clean/projected_keep/cobb_seed2.json": "27ab0b21916c3bc2329e68e9e5bd0dddba2c83d5f18533bb84e95fedc0f8a112",
+    "runs/clean/projected_keep/landmark_seed2.json": "7585e61f2dae99cea3772f2fa78065e2cd098241e8ca9465e852a9d01136755b",
+    "runs/clean/projected_mean/cobb_seed2.json": "4f3ebdf0f81f10b95a3431fdabb42d28367e098a8fe2d245e6c33f4461c35236",
+    "runs/clean/projected_mean/landmark_seed2.json": "80847efeddea4e893c70701a0e8e16e6474017b6e1152f7196e0b4cf041b871a"
+  }
+}

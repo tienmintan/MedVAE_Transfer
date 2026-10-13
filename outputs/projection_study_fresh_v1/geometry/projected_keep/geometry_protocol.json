@@ -1,0 +1,32 @@
+{
+  "variant": "projected_keep",
+  "grouping": "vmajor",
+  "corner_permutation": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "provided_to_derived_assignment": [
+    1,
+    0,
+    2
+  ],
+  "stored_angle_names": [
+    "major",
+    "upper_proximal_thoracic",
+    "lower_thoracolumbar_lumbar"
+  ],
+  "geometry_source_sha256": "12f8ae09f2f2f39f593d4cb987c071a534cd862c648511b4d240c46d786f7091",
+  "script_sha256": "afc294371584e2bf3cbb94bc14cfd0512f612179fc8b14b2af0aa96c7dbbd280",
+  "common_sha256": "59dc4cb593bcd01611a59e9f3214e4f378d93cca7455568da6a98ffedc032190",
+  "bootstrap_resamples": 10000,
+  "bootstrap_seed": 0,
+  "n": 128,
+  "families": {
+    "geometric_readouts": 5,
+    "direct_per_angle": 3
+  },
+  "convention": "Original pixel-space endplate-vector geometry; no new clipping or angular wrapping",
+  "interpretation": "Differences between readouts are descriptive; no ordering or causal mechanism test is performed."
+}

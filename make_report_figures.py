@@ -212,53 +212,6 @@ def fig_augmentation(root, out):
     print("  wrote fig_augmentation.pdf")
 
 
-
-def fig_ladder(root, out):
-    """The granularity dose-response --- the strongest single result, so the
-    p-values go in the figure rather than only in the caption."""
-    df = read(root, "mechanism/mechanism_ladder.csv")
-    if df is None: return
-    d = df[df.rung.isin(["position", "orientation", "apex_orientation"])]
-    fig, ax = plt.subplots(figsize=(4.4, 3.2))
-    x = np.arange(len(d))
-    ax.bar(x, d.rel_pct, 0.55, color=[LIGHT, "#6FA5BE", TEAL])
-    for xi, (_, r) in zip(x, d.iterrows()):
-        ax.text(xi, r.rel_pct + 0.25, f"{r.rel_pct:.1f}%", ha="center", fontsize=8.5)
-        ax.text(xi, -0.9, f"$p$ = {r.p_paired:.2g}", ha="center", fontsize=7,
-                color=GREY)
-    ax.set_xticks(x)
-    ax.set_xticklabels(["position", "orientation", "apex\norientation"])
-    ax.set_ylabel("degradation, $4\\times \\rightarrow 8\\times$ (%)")
-    ax.set_ylim(-1.6, max(d.rel_pct) * 1.18)
-    fig.savefig(out / "fig_ladder.pdf"); plt.close(fig)
-    print("  wrote fig_ladder.pdf")
-
-
-def fig_per_angle(root, out):
-    df = read(root, "mechanism/per_angle.csv")
-    if df is None: return
-    fig, ax = plt.subplots(figsize=(4.8, 3.2))
-    x = np.arange(len(df))
-    colours = [RED if abs(v) >= 5 else GREY for v in df.rel_pct]
-    ax.bar(x, df.rel_pct, 0.55, color=colours)
-    top = df.rel_pct.max()
-    for xi, (_, r) in zip(x, df.iterrows()):
-        # value label always above the bar, never below the axis
-        ax.text(xi, max(r.rel_pct, 0) + top * 0.04, f"{r.rel_pct:+.1f}%",
-                ha="center", fontsize=8.5)
-        if r.p_paired < 0.05:
-            ax.text(xi, max(r.rel_pct, 0) + top * 0.12,
-                    f"$p$ = {r.p_paired:.3g}", ha="center", fontsize=7, color=GREY)
-    ax.axhline(0, color="0.4", lw=0.8)
-    ax.set_xticks(x)
-    ax.set_xticklabels([t.replace(" (", "\n(") for t in df.measured_identity],
-                       fontsize=7.5)
-    ax.set_ylabel("degradation, $4\\times \\rightarrow 8\\times$ (%)")
-    ax.set_ylim(min(df.rel_pct.min() * 1.5, -1), top * 1.24)
-    fig.savefig(out / "fig_per_angle.pdf"); plt.close(fig)
-    print("  wrote fig_per_angle.pdf")
-
-
 # ---------------------------------------------------------------- tables
 def tables(root, out, frontier_rel):
     txt = []
@@ -291,29 +244,6 @@ def tables(root, out, frontier_rel):
         txt.append(latex_table(d, ["config", "task", "error", "seed sd"], {},
                    "Downstream task error for all configurations. "
                    f"Source: \\texttt{{{_esc(frontier_rel)}}}.", "tab:frontier"))
-    lad = read(root, "mechanism/mechanism_ladder.csv")
-    if lad is not None:
-        d = lad.copy()
-        d["4x"] = d.apply(lambda r: f"{r.err_4x:.4f}" if r.unit == "norm" else f"{r.err_4x:.3f}", axis=1)
-        d["8x"] = d.apply(lambda r: f"{r.err_8x:.4f}" if r.unit == "norm" else f"{r.err_8x:.3f}", axis=1)
-        d["rel"] = d.rel_pct.map(lambda v: f"{v:+.1f}\\%")
-        d["p"] = d.p_paired.map(lambda v: f"{v:.3g}")
-        d["rung"] = d.rung.str.replace("_", " ")
-        txt.append(latex_table(d, ["rung", "unit", "4x", "8x", "rel", "p"], {},
-                   "The mechanism ladder. The first three rungs degrade "
-                   "monotonically and significantly; the Cobb rungs do not.",
-                   "tab:ladder"))
-    ang = read(root, "mechanism/per_angle.csv")
-    if ang is not None:
-        d = ang.copy()
-        d["rel"] = d.rel_pct.map(lambda v: f"{v:+.1f}\\%")
-        d["p"] = d.p_paired.map(lambda v: f"{v:.3g}")
-        txt.append(latex_table(d, ["stored_column", "measured_identity",
-                                   "err_4x", "err_8x", "rel", "p"],
-                   {2: "{:.3f}", 3: "{:.3f}"},
-                   "Per-angle decomposition. Columns are named as stored; the "
-                   "measured identity is established in Section~\\ref{sec:m-data}.",
-                   "tab:perangle"))
     (out / "tables.tex").write_text("\n\n".join(txt))
     print(f"  wrote tables.tex ({len(txt)} tables)")
 
@@ -337,8 +267,6 @@ def main():
     fig_dissociation(a.results, a.out, a.frontier)
     fig_pareto(a.results, a.out, a.frontier)
     fig_augmentation(a.results, a.out)
-    fig_ladder(a.results, a.out)
-    fig_per_angle(a.results, a.out)
     tables(a.results, a.out, a.frontier)
     print(f"\ndone. Figures and tables.tex in {a.out}")
     print("Add \\usepackage{booktabs} to the preamble if not already present.")

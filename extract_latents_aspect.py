@@ -73,9 +73,48 @@ def transform_image(path):
 
 
 @torch.no_grad()
+def encode_latent_projected(mvae, x):
+    """MedVAE's Stage-2 PROJECTED latent, the representation the original paper
+    uses for its downstream evaluations.
+
+    z_bar = channel_proj(channel_ds(z) + z)
+
+    channel_ds is Conv1x1 -> ReLU -> Conv3x3 -> ReLU -> Conv1x1 and channel_proj
+    is a 1x1 convolution, so the projection mixes channels at each position with
+    a receptive field of three positions. It cannot alter spatial resolution or
+    recover discarded spatial detail; it is, however, the component trained to
+    make additional latent channels useful, which is why the channel comparison
+    needs it.
+
+    Falls back to compute_latent_proj's own signalling when a checkpoint has no
+    projection layers (apply_channel_ds=False), rather than silently returning
+    the unprojected latent.
+    """
+    m = mvae.model
+    if not hasattr(m, "compute_latent_proj"):
+        raise RuntimeError(
+            "this MedVAE build has no compute_latent_proj; cannot extract the "
+            "projected latent. Re-run without --projected.")
+    out = m.compute_latent_proj(x, sample_posterior=False)
+    if not (isinstance(out, (tuple, list)) and len(out) == 3):
+        raise RuntimeError(f"unexpected compute_latent_proj return: {type(out)}")
+    z, _posterior, z_bar = out
+    if z_bar is None:
+        raise RuntimeError(
+            "compute_latent_proj returned None for the projected latent, which "
+            "means this checkpoint was built with apply_channel_ds=False and has "
+            "no Stage-2 projection. Re-run without --projected.")
+    return z_bar.squeeze(0).float().cpu()
+
+
+@torch.no_grad()
 def encode_latent(mvae, x):
     """Deterministic latent (posterior mode/mean). Robust to MedVAE's encode
-    returning a tensor, a tuple, or a distribution object."""
+    returning a tensor, a tuple, or a distribution object.
+
+    NOTE: this is the raw encoder output z, NOT the Stage-2 projected latent
+    that MedVAE's own downstream evaluations use. Pass --projected to obtain
+    the latter."""
     out = mvae.model.encode(x)
     if isinstance(out, (tuple, list)):
         out = out[0]
@@ -90,6 +129,10 @@ def encode_latent(mvae, x):
     else:
         raise RuntimeError(f"Unrecognised encode() return: {type(out)}")
     return z.squeeze(0).float().cpu()   # (Cz, H, W)
+
+
+# set in main() from --projected; keeps the two call sites identical
+_ENCODE = encode_latent
 
 
 def match_in_channels(x, n_in):
@@ -107,7 +150,7 @@ def probe_in_channels(mvae, x1, device):
     """Find how many input channels this checkpoint's encoder wants (1, 3, or 4)."""
     for c in (1, 3, 4):
         try:
-            encode_latent(mvae, match_in_channels(x1, c).to(device))
+            _ENCODE(mvae, match_in_channels(x1, c).to(device))
             return c
         except Exception:
             continue
@@ -215,7 +258,8 @@ def extract(args, df, lookups):
         n_in = probe_in_channels(mvae, probe_x, device)
         print(f"[{CONFIG_LABELS[config]}] encoder expects {n_in}-channel input")
         for split in ("train", "val", "test"):
-            dst = out / f"latents_{config}_{split}.npz"
+            suffix = "_proj" if args.projected else ""
+            dst = out / f"latents_{config}{suffix}_{split}.npz"
             if dst.exists() and not args.force:
                 print(f"skip (exists): {dst.name}"); continue
             sub = df[df["split"] == split].reset_index(drop=True)
@@ -232,14 +276,16 @@ def extract(args, df, lookups):
                 if u not in uuid_to_row:
                     print(f"  WARN no landmark row for {u}, skipping"); continue
                 x = match_in_channels(transform_image(Path(args.img_dir) / f"{u}.jpg"), n_in).to(device)
-                lat_list.append(encode_latent(mvae, x).numpy())
+                lat_list.append(_ENCODE(mvae, x).numpy())
                 uuids.append(u)
                 cobb.append(r[cobb_cols].to_numpy(dtype=np.float32))
                 lmk.append(lmk_all[uuid_to_row[u]].astype(np.float32))
 
             latents = np.stack(lat_list).astype(np.float32)
             np.savez_compressed(dst, latents=latents, uuids=np.array(uuids),
-                                cobb=np.stack(cobb), landmarks=np.stack(lmk))
+                                cobb=np.stack(cobb), landmarks=np.stack(lmk),
+                                representation=np.array(
+                                    "projected" if args.projected else "encoder_output"))
             print(f"  wrote {dst.name}  latents={latents.shape}  n={len(uuids)}")
 
 
@@ -247,6 +293,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--csv", type=Path, required=True,
                     help="boostnet csv with image_uuid, split, and 3 Cobb-angle cols")
+    ap.add_argument("--projected", action="store_true",
+                    help="extract MedVAE's Stage-2 projected latent (z_bar) "
+                         "instead of the raw encoder output (z). This is the "
+                         "representation the original paper evaluates on.")
     ap.add_argument("--img-dir", type=Path, required=True)
     ap.add_argument("--landmarks-dir", type=Path, required=True,
                     help="dir containing training/landmarks.csv and test/landmarks.csv")
@@ -257,6 +307,16 @@ def main():
     ap.add_argument("--verify", action="store_true")
     ap.add_argument("--force", action="store_true")
     args = ap.parse_args()
+
+    # Choose the representation once, here, so both call sites agree.
+    global _ENCODE
+    if args.projected:
+        _ENCODE = encode_latent_projected
+        print("EXTRACTING THE PROJECTED LATENT (z_bar = channel_proj(channel_ds(z) + z))")
+        print("  This is the representation MedVAE's own downstream evaluations use.")
+        print("  Output files are suffixed '_proj' so they cannot be confused with z.\n")
+    else:
+        _ENCODE = encode_latent
 
     df = pd.read_csv(args.csv)
     lookups = {}

@@ -1,0 +1,37 @@
+{
+  "plan_fingerprint": "8f53cc1c95be026ce1b9ecaabb356de9cee0422e6b54cf7a67d4b4c1c6bb20f6",
+  "sha256": "98de2d4d92233de4366d0067432a155b521a56c3b7c1d46235922c7fef9da1ff",
+  "source": {
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-24-Jul-2016-35_A_AP.jpg",
+    "file_sha256": "d03e582a7c5b6e024377c5c2e45ac93f2be79156b777ca2246a8d59419558eff",
+    "input_sha256": "bdf663c5ea2c5aa6b34ccf4151c083f591dc71781d6dc2a1c438ec4856b087e3",
+    "input_shape": [
+      1,
+      3,
+      384,
+      384
+    ],
+    "input_min": -1.0,
+    "input_max": 1.0,
+    "input_mean": -0.5850346684455872,
+    "input_sd": 0.5767573118209839,
+    "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+  },
+  "rng_seed": 1084603406,
+  "attempts": 6,
+  "accepted": 5,
+  "raw_check": {
+    "max_abs": 0.0,
+    "rms": 0.0,
+    "atol": 0.001,
+    "rtol": 0.001
+  },
+  "projected_check": {
+    "max_abs": 0.0,
+    "rms": 0.0,
+    "atol": 0.001,
+    "rtol": 0.001
+  },
+  "max_tilt_difference": 5.684341886080802e-14,
+  "elapsed_seconds": 1.1210323360000984
+}

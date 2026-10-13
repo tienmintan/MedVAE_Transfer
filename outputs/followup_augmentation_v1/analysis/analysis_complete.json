@@ -1,0 +1,39 @@
+{
+  "plan_fingerprint": "8f53cc1c95be026ce1b9ecaabb356de9cee0422e6b54cf7a67d4b4c1c6bb20f6",
+  "n_images": 128,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "primary_tests": 2,
+  "secondary_tests": 1,
+  "input_prediction_sha256": {
+    "imported_controls/projected_mean/cobb_seed0.npz": "1cf2c8739309f13756002c94c069fb1490c5d35f5417e2b2e771dac900592a06",
+    "imported_controls/projected_mean/cobb_seed1.npz": "18a8352ef10176f2e4c26e846de2644d6be2712715a70b2ff98ca06d1277ceeb",
+    "imported_controls/projected_mean/cobb_seed2.npz": "cbd16ae1fa04d63fcb78517872650c1d7a408136bb66a6ac90dcde974f989f83",
+    "imported_controls/projected_mean/landmark_seed0.npz": "3d480e4e99c1074f827846d14ce1fca54111c3077cdd453e6770050ea0b79522",
+    "imported_controls/projected_mean/landmark_seed1.npz": "c47408c2c2d5c9eab48cb8e3974e3539a4b5283c64bf4fbda45409ad4d2b340d",
+    "imported_controls/projected_mean/landmark_seed2.npz": "9f35e8918c163a1d5054f0c66c44217a69c79d07fbe022c4ee704040fe53b6a9",
+    "runs/augmented/projected_mean/cobb_seed0.npz": "595959f308cdf64425388dd1778763816d336075f95f7a14666485d6d44f8a6e",
+    "runs/augmented/projected_mean/cobb_seed1.npz": "15a0e7e9195e93246af2d7b798cac1696112b211445b624a08c64c4effa9d5ed",
+    "runs/augmented/projected_mean/cobb_seed2.npz": "d4056076c0db3d5ef3b7a5292128ca35d38bd1c37e548453acbcfdb9ea5bcae9",
+    "runs/augmented/projected_mean/landmark_seed0.npz": "760a725dd602e022644a4110bd64772e91d583b8fa5427767be7aaf78bd03c98",
+    "runs/augmented/projected_mean/landmark_seed1.npz": "ec0d4a3b43b6166e3af3cb4dbb3389be65227202b952338961492ff6f3e054d2",
+    "runs/augmented/projected_mean/landmark_seed2.npz": "d0bc539f311b6aebc5cd940e14ca2213e03b8992df9a05a53707068baf085cd6"
+  },
+  "output_sha256": {
+    "comparisons.csv": "ca6acd6047f53d9efdfa80eeb366ce80baffeef0daebbd5df3b8e38d2d9a8790",
+    "paired_differences.csv": "74b1aff16026dd16a44c4e013660da28a2756b82e82eedda3db9979f0daa12f4",
+    "per_image.csv": "760f5b58d2b6a31b9b6d4e2f2dccc1a1ce6d96182694f453a8950189e6b94abf",
+    "per_seed.csv": "6787ce05f6473e49c1b0b5f4f89f775a3b8fa70e0eba800dba5fe2e6d4fd2cb3",
+    "summary.csv": "d802d83f8e03f16b580cd93182f1874a48a4a3c17a92811f2dbb9596b919b705"
+  },
+  "interpretation": [
+    "Negative cell differences favour the first named pipeline.",
+    "Interaction = (projected_mean - raw_mean) - (projected_keep - raw_keep). Negative means projection helps more when channels are averaged.",
+    "Change in interaction = clean interaction - unclean interaction.",
+    "Intervals are unadjusted and conditional on these three fitted seeds; the resampling unit is the image.",
+    "A non-significant difference does not establish equivalence or robustness. These tests reuse the thesis test set."
+  ]
+}

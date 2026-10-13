@@ -1,0 +1,12 @@
+{
+  "plan_fingerprint": "8f53cc1c95be026ce1b9ecaabb356de9cee0422e6b54cf7a67d4b4c1c6bb20f6",
+  "fits": 6,
+  "fit_metadata_sha256": {
+    "runs/augmented/projected_mean/cobb_seed0.json": "2ae59797fa893fd563847d62af5a76831afd68b01bf4c683b1202e1c4741f459",
+    "runs/augmented/projected_mean/landmark_seed0.json": "591201bf32b4e2287366aa2c3ffd90af63929f25ad2e3d5fcca93801e2762688",
+    "runs/augmented/projected_mean/cobb_seed1.json": "8f38620256a83d73239415c842a09338f1782f4b0b455cfb7a9564f30af96f60",
+    "runs/augmented/projected_mean/landmark_seed1.json": "adddc2d8c7df0cc4e12e35e72e5eb2f0939c4c5ceffcd3ebcf87fe7edcbb6862",
+    "runs/augmented/projected_mean/cobb_seed2.json": "7404497812cb2315195f361f2f3f835b709edf82157cba864cb672953136cd17",
+    "runs/augmented/projected_mean/landmark_seed2.json": "ede3515d8516843eb3779b2a3e8a036fea1ccb484c9eb493f53415b5aa2ae3ba"
+  }
+}

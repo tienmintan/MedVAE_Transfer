@@ -1,0 +1,7 @@
+variant,comparison,config_a,config_b,cobb_relative_percent,landmark_relative_percent,cobb_minus_landmark_pp,ci95_lo_pp,ci95_hi_pp,scope
+raw_keep,single_channel,medvae_4_1_2d,medvae_8_1_2d,5.069539986516292,2.2199417095407403,2.8495982769755512,-2.7365110504631707,8.599332654148776,descriptive unadjusted cross-task interval; not an equivalence test
+raw_keep,matched_storage,medvae_4_1_2d,medvae_8_4_2d,2.984397845741249,0.009809236436209012,2.97458860930504,-1.9357912305609646,8.207266207096279,descriptive unadjusted cross-task interval; not an equivalence test
+raw_keep,multichannel_reference,medvae_4_3_2d,medvae_8_4_2d,6.158217602848448,0.15731350048195925,6.000904102366489,0.6599340126280445,11.819376290453697,descriptive unadjusted cross-task interval; not an equivalence test
+projected_keep,single_channel,medvae_4_1_2d,medvae_8_1_2d,0.15913458271916703,1.835128878833281,-1.6759942961141139,-7.010038759954953,3.7953764951475386,descriptive unadjusted cross-task interval; not an equivalence test
+projected_keep,matched_storage,medvae_4_1_2d,medvae_8_4_2d,4.128292373756914,4.047072514938366,0.08121985881854865,-5.75814205254095,6.31321140265958,descriptive unadjusted cross-task interval; not an equivalence test
+projected_keep,multichannel_reference,medvae_4_3_2d,medvae_8_4_2d,10.974187407904989,4.254565048129844,6.719622359775145,0.3147285115614786,13.327781703342692,descriptive unadjusted cross-task interval; not an equivalence test

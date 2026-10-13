@@ -1,0 +1,808 @@
+{
+  "specs": [
+    {
+      "family": "matched_storage",
+      "comparison": "projected retained 4_1 to 8_4 (36 KiB each)",
+      "task": "cobb",
+      "a": [
+        [
+          1,
+          "projected_keep",
+          "medvae_4_1_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_keep",
+          "medvae_8_4_2d"
+        ]
+      ]
+    },
+    {
+      "family": "matched_storage",
+      "comparison": "projected retained 4_1 to 8_4 (36 KiB each)",
+      "task": "landmark",
+      "a": [
+        [
+          1,
+          "projected_keep",
+          "medvae_4_1_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_keep",
+          "medvae_8_4_2d"
+        ]
+      ]
+    },
+    {
+      "family": "single_channel_spatial",
+      "comparison": "projected 4_1 to 8_1",
+      "task": "cobb",
+      "a": [
+        [
+          1,
+          "projected_keep",
+          "medvae_4_1_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_keep",
+          "medvae_8_1_2d"
+        ]
+      ]
+    },
+    {
+      "family": "single_channel_spatial",
+      "comparison": "projected 4_1 to 8_1",
+      "task": "landmark",
+      "a": [
+        [
+          1,
+          "projected_keep",
+          "medvae_4_1_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_keep",
+          "medvae_8_1_2d"
+        ]
+      ]
+    },
+    {
+      "family": "projection_effect",
+      "comparison": "raw to projected, keep, medvae_4_1_2d",
+      "task": "cobb",
+      "a": [
+        [
+          1,
+          "raw_keep",
+          "medvae_4_1_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_keep",
+          "medvae_4_1_2d"
+        ]
+      ]
+    },
+    {
+      "family": "projection_effect",
+      "comparison": "raw to projected, keep, medvae_4_1_2d",
+      "task": "landmark",
+      "a": [
+        [
+          1,
+          "raw_keep",
+          "medvae_4_1_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_keep",
+          "medvae_4_1_2d"
+        ]
+      ]
+    },
+    {
+      "family": "projection_effect",
+      "comparison": "raw to projected, keep, medvae_4_3_2d",
+      "task": "cobb",
+      "a": [
+        [
+          1,
+          "raw_keep",
+          "medvae_4_3_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_keep",
+          "medvae_4_3_2d"
+        ]
+      ]
+    },
+    {
+      "family": "projection_effect",
+      "comparison": "raw to projected, keep, medvae_4_3_2d",
+      "task": "landmark",
+      "a": [
+        [
+          1,
+          "raw_keep",
+          "medvae_4_3_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_keep",
+          "medvae_4_3_2d"
+        ]
+      ]
+    },
+    {
+      "family": "projection_effect",
+      "comparison": "raw to projected, keep, medvae_8_1_2d",
+      "task": "cobb",
+      "a": [
+        [
+          1,
+          "raw_keep",
+          "medvae_8_1_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_keep",
+          "medvae_8_1_2d"
+        ]
+      ]
+    },
+    {
+      "family": "projection_effect",
+      "comparison": "raw to projected, keep, medvae_8_1_2d",
+      "task": "landmark",
+      "a": [
+        [
+          1,
+          "raw_keep",
+          "medvae_8_1_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_keep",
+          "medvae_8_1_2d"
+        ]
+      ]
+    },
+    {
+      "family": "projection_effect",
+      "comparison": "raw to projected, keep, medvae_8_4_2d",
+      "task": "cobb",
+      "a": [
+        [
+          1,
+          "raw_keep",
+          "medvae_8_4_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_keep",
+          "medvae_8_4_2d"
+        ]
+      ]
+    },
+    {
+      "family": "projection_effect",
+      "comparison": "raw to projected, keep, medvae_8_4_2d",
+      "task": "landmark",
+      "a": [
+        [
+          1,
+          "raw_keep",
+          "medvae_8_4_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_keep",
+          "medvae_8_4_2d"
+        ]
+      ]
+    },
+    {
+      "family": "projection_effect",
+      "comparison": "raw to projected, mean, medvae_4_3_2d",
+      "task": "cobb",
+      "a": [
+        [
+          1,
+          "raw_mean",
+          "medvae_4_3_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_mean",
+          "medvae_4_3_2d"
+        ]
+      ]
+    },
+    {
+      "family": "projection_effect",
+      "comparison": "raw to projected, mean, medvae_4_3_2d",
+      "task": "landmark",
+      "a": [
+        [
+          1,
+          "raw_mean",
+          "medvae_4_3_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_mean",
+          "medvae_4_3_2d"
+        ]
+      ]
+    },
+    {
+      "family": "projection_effect",
+      "comparison": "raw to projected, mean, medvae_8_4_2d",
+      "task": "cobb",
+      "a": [
+        [
+          1,
+          "raw_mean",
+          "medvae_8_4_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_mean",
+          "medvae_8_4_2d"
+        ]
+      ]
+    },
+    {
+      "family": "projection_effect",
+      "comparison": "raw to projected, mean, medvae_8_4_2d",
+      "task": "landmark",
+      "a": [
+        [
+          1,
+          "raw_mean",
+          "medvae_8_4_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_mean",
+          "medvae_8_4_2d"
+        ]
+      ]
+    },
+    {
+      "family": "pooling_effect",
+      "comparison": "retained to mean channels, raw, medvae_4_3_2d",
+      "task": "cobb",
+      "a": [
+        [
+          1,
+          "raw_keep",
+          "medvae_4_3_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "raw_mean",
+          "medvae_4_3_2d"
+        ]
+      ]
+    },
+    {
+      "family": "pooling_effect",
+      "comparison": "retained to mean channels, raw, medvae_4_3_2d",
+      "task": "landmark",
+      "a": [
+        [
+          1,
+          "raw_keep",
+          "medvae_4_3_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "raw_mean",
+          "medvae_4_3_2d"
+        ]
+      ]
+    },
+    {
+      "family": "pooling_effect",
+      "comparison": "retained to mean channels, raw, medvae_8_4_2d",
+      "task": "cobb",
+      "a": [
+        [
+          1,
+          "raw_keep",
+          "medvae_8_4_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "raw_mean",
+          "medvae_8_4_2d"
+        ]
+      ]
+    },
+    {
+      "family": "pooling_effect",
+      "comparison": "retained to mean channels, raw, medvae_8_4_2d",
+      "task": "landmark",
+      "a": [
+        [
+          1,
+          "raw_keep",
+          "medvae_8_4_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "raw_mean",
+          "medvae_8_4_2d"
+        ]
+      ]
+    },
+    {
+      "family": "pooling_effect",
+      "comparison": "retained to mean channels, projected, medvae_4_3_2d",
+      "task": "cobb",
+      "a": [
+        [
+          1,
+          "projected_keep",
+          "medvae_4_3_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_mean",
+          "medvae_4_3_2d"
+        ]
+      ]
+    },
+    {
+      "family": "pooling_effect",
+      "comparison": "retained to mean channels, projected, medvae_4_3_2d",
+      "task": "landmark",
+      "a": [
+        [
+          1,
+          "projected_keep",
+          "medvae_4_3_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_mean",
+          "medvae_4_3_2d"
+        ]
+      ]
+    },
+    {
+      "family": "pooling_effect",
+      "comparison": "retained to mean channels, projected, medvae_8_4_2d",
+      "task": "cobb",
+      "a": [
+        [
+          1,
+          "projected_keep",
+          "medvae_8_4_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_mean",
+          "medvae_8_4_2d"
+        ]
+      ]
+    },
+    {
+      "family": "pooling_effect",
+      "comparison": "retained to mean channels, projected, medvae_8_4_2d",
+      "task": "landmark",
+      "a": [
+        [
+          1,
+          "projected_keep",
+          "medvae_8_4_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_mean",
+          "medvae_8_4_2d"
+        ]
+      ]
+    },
+    {
+      "family": "same_grid_checkpoints",
+      "comparison": "projected keep, medvae_4_1_2d to medvae_4_3_2d",
+      "task": "cobb",
+      "a": [
+        [
+          1,
+          "projected_keep",
+          "medvae_4_1_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_keep",
+          "medvae_4_3_2d"
+        ]
+      ]
+    },
+    {
+      "family": "same_grid_checkpoints",
+      "comparison": "projected keep, medvae_4_1_2d to medvae_4_3_2d",
+      "task": "landmark",
+      "a": [
+        [
+          1,
+          "projected_keep",
+          "medvae_4_1_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_keep",
+          "medvae_4_3_2d"
+        ]
+      ]
+    },
+    {
+      "family": "same_grid_checkpoints",
+      "comparison": "projected keep, medvae_8_1_2d to medvae_8_4_2d",
+      "task": "cobb",
+      "a": [
+        [
+          1,
+          "projected_keep",
+          "medvae_8_1_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_keep",
+          "medvae_8_4_2d"
+        ]
+      ]
+    },
+    {
+      "family": "same_grid_checkpoints",
+      "comparison": "projected keep, medvae_8_1_2d to medvae_8_4_2d",
+      "task": "landmark",
+      "a": [
+        [
+          1,
+          "projected_keep",
+          "medvae_8_1_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_keep",
+          "medvae_8_4_2d"
+        ]
+      ]
+    },
+    {
+      "family": "same_grid_checkpoints",
+      "comparison": "projected mean, medvae_4_1_2d to medvae_4_3_2d",
+      "task": "cobb",
+      "a": [
+        [
+          1,
+          "projected_keep",
+          "medvae_4_1_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_mean",
+          "medvae_4_3_2d"
+        ]
+      ]
+    },
+    {
+      "family": "same_grid_checkpoints",
+      "comparison": "projected mean, medvae_4_1_2d to medvae_4_3_2d",
+      "task": "landmark",
+      "a": [
+        [
+          1,
+          "projected_keep",
+          "medvae_4_1_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_mean",
+          "medvae_4_3_2d"
+        ]
+      ]
+    },
+    {
+      "family": "same_grid_checkpoints",
+      "comparison": "projected mean, medvae_8_1_2d to medvae_8_4_2d",
+      "task": "cobb",
+      "a": [
+        [
+          1,
+          "projected_keep",
+          "medvae_8_1_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_mean",
+          "medvae_8_4_2d"
+        ]
+      ]
+    },
+    {
+      "family": "same_grid_checkpoints",
+      "comparison": "projected mean, medvae_8_1_2d to medvae_8_4_2d",
+      "task": "landmark",
+      "a": [
+        [
+          1,
+          "projected_keep",
+          "medvae_8_1_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_mean",
+          "medvae_8_4_2d"
+        ]
+      ]
+    },
+    {
+      "family": "projection_pooling_interaction",
+      "comparison": "change in pooling penalty, medvae_4_3_2d",
+      "task": "cobb",
+      "a": [
+        [
+          1,
+          "raw_mean",
+          "medvae_4_3_2d"
+        ],
+        [
+          -1,
+          "raw_keep",
+          "medvae_4_3_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_mean",
+          "medvae_4_3_2d"
+        ],
+        [
+          -1,
+          "projected_keep",
+          "medvae_4_3_2d"
+        ]
+      ]
+    },
+    {
+      "family": "projection_pooling_interaction",
+      "comparison": "change in pooling penalty, medvae_4_3_2d",
+      "task": "landmark",
+      "a": [
+        [
+          1,
+          "raw_mean",
+          "medvae_4_3_2d"
+        ],
+        [
+          -1,
+          "raw_keep",
+          "medvae_4_3_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_mean",
+          "medvae_4_3_2d"
+        ],
+        [
+          -1,
+          "projected_keep",
+          "medvae_4_3_2d"
+        ]
+      ]
+    },
+    {
+      "family": "projection_pooling_interaction",
+      "comparison": "change in pooling penalty, medvae_8_4_2d",
+      "task": "cobb",
+      "a": [
+        [
+          1,
+          "raw_mean",
+          "medvae_8_4_2d"
+        ],
+        [
+          -1,
+          "raw_keep",
+          "medvae_8_4_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_mean",
+          "medvae_8_4_2d"
+        ],
+        [
+          -1,
+          "projected_keep",
+          "medvae_8_4_2d"
+        ]
+      ]
+    },
+    {
+      "family": "projection_pooling_interaction",
+      "comparison": "change in pooling penalty, medvae_8_4_2d",
+      "task": "landmark",
+      "a": [
+        [
+          1,
+          "raw_mean",
+          "medvae_8_4_2d"
+        ],
+        [
+          -1,
+          "raw_keep",
+          "medvae_8_4_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_mean",
+          "medvae_8_4_2d"
+        ],
+        [
+          -1,
+          "projected_keep",
+          "medvae_8_4_2d"
+        ]
+      ]
+    },
+    {
+      "family": "matched_storage_interaction",
+      "comparison": "change in 8_4-minus-4_1 penalty after projection",
+      "task": "cobb",
+      "a": [
+        [
+          1,
+          "raw_keep",
+          "medvae_8_4_2d"
+        ],
+        [
+          -1,
+          "raw_keep",
+          "medvae_4_1_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_keep",
+          "medvae_8_4_2d"
+        ],
+        [
+          -1,
+          "projected_keep",
+          "medvae_4_1_2d"
+        ]
+      ]
+    },
+    {
+      "family": "matched_storage_interaction",
+      "comparison": "change in 8_4-minus-4_1 penalty after projection",
+      "task": "landmark",
+      "a": [
+        [
+          1,
+          "raw_keep",
+          "medvae_8_4_2d"
+        ],
+        [
+          -1,
+          "raw_keep",
+          "medvae_4_1_2d"
+        ]
+      ],
+      "b": [
+        [
+          1,
+          "projected_keep",
+          "medvae_8_4_2d"
+        ],
+        [
+          -1,
+          "projected_keep",
+          "medvae_4_1_2d"
+        ]
+      ]
+    }
+  ],
+  "family_sizes": {
+    "single_channel_spatial": 2,
+    "projection_effect": 12,
+    "matched_storage_interaction": 2,
+    "matched_storage": 2,
+    "pooling_effect": 8,
+    "same_grid_checkpoints": 8,
+    "projection_pooling_interaction": 4
+  },
+  "total_tests": 38,
+  "image_bootstrap_resamples": 10000,
+  "bootstrap_seed": 0,
+  "reference_reuse": {
+    "raw_keep": [],
+    "projected_keep": []
+  },
+  "study_kind": "fresh_paired",
+  "raw_cache_policy": "not_applicable_fresh_extraction",
+  "historical_reencoding_summary": null,
+  "note": "Exploratory, fixed fitted ensembles; image resampling does not include refitting uncertainty.",
+  "script_sha256": "550bd3723a050acf3e04aeb7e83a8e27006d67faf5a54678c72da2185f9d04a0",
+  "common_sha256": "59dc4cb593bcd01611a59e9f3214e4f378d93cca7455568da6a98ffedc032190"
+}

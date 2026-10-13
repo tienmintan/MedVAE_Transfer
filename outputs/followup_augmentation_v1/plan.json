@@ -1,0 +1,77 @@
+{
+  "kind": "augmentation",
+  "config": "medvae_4_3_2d",
+  "variants": [
+    "projected_mean"
+  ],
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "tasks": [
+    "cobb",
+    "landmark"
+  ],
+  "training": {
+    "epochs": 200,
+    "batch_size": 32,
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "patience": 25
+  },
+  "parent_annotation": "/lambda/nfs/MedVAE/MedVAE/outputs/followup_annotation_v1",
+  "parent_plan_fingerprint": "cc124e00a4637da4a7245bb775792ba048f5eb75c9a736174465b5a3ba33dbc2",
+  "original_study": "/lambda/nfs/MedVAE/MedVAE/outputs/projection_study_fresh_v1",
+  "n_original": 407,
+  "n_aug_per_original": 5,
+  "train_total": 2442,
+  "val": 72,
+  "test": 128,
+  "excluded_training_ids": [
+    "sunhl-1th-20-Jul-2016-coronal6",
+    "sunhl-1th-30-Dec-2016-161_A_AP"
+  ],
+  "preset": {
+    "max_deg": 0.0,
+    "max_scale": 0.08,
+    "max_shift": 0.0,
+    "jitter": 0.12,
+    "gamma": 0.18,
+    "noise": 0.015,
+    "blur": 0.5
+  },
+  "geometric_rule": "Uniform scale about the native image centre; reject if any landmark leaves the 2-pixel image margin; no rotation, translation or flip",
+  "sampling": "SHA256-derived RNG seed per image, master seed 0; exactly five accepted variants, at most 100 attempts per image",
+  "representation": "compute_latent_proj(x,sample_posterior=False)[2], then float32 channel mean",
+  "encoding": "Original cached features retained; raw and projected fresh encodings of EVERY original training image checked against the verified caches at atol=rtol=0.001",
+  "photometric_serialisation": "Pillow grayscale, source preset, JPEG quality 95, same aspect loader; original and validation/test caches unchanged",
+  "expected_new_fits": 6,
+  "primary_family": {
+    "n": 2,
+    "tests": "augmented-minus-clean Cobb and landmark errors"
+  },
+  "secondary_family": {
+    "n": 1,
+    "tests": "isotropic landmark sensitivity"
+  },
+  "scope": "Practical augmentation pipeline with the same maximum epochs; additional training examples also increase updates per epoch. This does not isolate augmentation from additional optimisation.",
+  "inference": "Three-seed ensembles; paired images; two-sided t-tests, 10000 bootstrap samples; Bonferroni across two primary comparisons, plus three-test sensitivity. Exploratory reused test set.",
+  "source_sha256": {
+    "analyse_heads.py": "313375789547658e667c232d4d015a6128277abd5f17aa8548db004b55b06b6d",
+    "collect_results.py": "25b26ed09cbaba722854b3129aefb2e3f63affa45c71f1d7f858c076f1b64cd6",
+    "common.py": "673fe9f12369c82eee3e8eb94cb3e9b6651a29dd87d39922c1ecad87f92f409b",
+    "preflight.py": "c66fedbe18bc2ae1a860e9dd255ecbc93c8694556c8fe6ee00b6305863523ca9",
+    "prepare_annotation_study.py": "f715722e90340630df2de0088dd0bdd28c415662e3747f0b0a7779168d9923ce",
+    "prepare_augmentation.py": "fac0c2180b5046b61b980d858d41d04c2e7809c515f08c795bd353f0aeb9a73a",
+    "projection_common.py": "59dc4cb593bcd01611a59e9f3214e4f378d93cca7455568da6a98ffedc032190",
+    "projection_validation.py": "0cfd1672b92845899dccfc6fc827db78c0eec0e36b3aefc350d2448249b8fc05",
+    "reconstruction_audit.py": "9853fee4a6060dbf52966e51657989f61976915a0aa6767422c0cecc616d524f",
+    "reconstruction_metrics.py": "a9cf495470003901b78a5e28b7371f04c644058f1da2d8f52251b4ac52b01710",
+    "references/augment_and_extract.py": "917cbba71870eedfff01e2a70df9851512a4f4b2058d8ea498f9ca87c2cd5e44",
+    "references/train_frontier.py": "221c04e67ab526fdc2bfc75d2eeb7d6ff31c01ff2e89d32c930782d84dadf108",
+    "run_heads.py": "2dff8bba7c4fa0d7b5e132d0738242fa3e703ede59ec2d63ec8d23253ef9269f",
+    "selftest.py": "d179a0119bacf7d68a17a71b37d6f3c7b921757653dca6b8edf363bd264c99ef"
+  },
+  "fingerprint": "8f53cc1c95be026ce1b9ecaabb356de9cee0422e6b54cf7a67d4b4c1c6bb20f6"
+}

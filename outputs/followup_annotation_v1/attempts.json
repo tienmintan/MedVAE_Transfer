@@ -1,0 +1,242 @@
+[
+  {
+    "job": [
+      "clean",
+      "raw_keep",
+      "cobb",
+      0
+    ],
+    "seconds": 10.051372808999986,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "clean",
+      "raw_keep",
+      "landmark",
+      0
+    ],
+    "seconds": 13.260230535000119,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "clean",
+      "raw_mean",
+      "cobb",
+      0
+    ],
+    "seconds": 12.30672941199964,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "clean",
+      "raw_mean",
+      "landmark",
+      0
+    ],
+    "seconds": 13.360016858000108,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "clean",
+      "projected_keep",
+      "cobb",
+      0
+    ],
+    "seconds": 10.148570535999625,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "clean",
+      "projected_keep",
+      "landmark",
+      0
+    ],
+    "seconds": 17.376614407000034,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "clean",
+      "projected_mean",
+      "cobb",
+      0
+    ],
+    "seconds": 11.551393889999872,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "clean",
+      "projected_mean",
+      "landmark",
+      0
+    ],
+    "seconds": 11.44984162899982,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "clean",
+      "raw_keep",
+      "cobb",
+      1
+    ],
+    "seconds": 10.346412963000148,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "clean",
+      "raw_keep",
+      "landmark",
+      1
+    ],
+    "seconds": 18.577849372999935,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "clean",
+      "raw_mean",
+      "cobb",
+      1
+    ],
+    "seconds": 11.199342763000004,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "clean",
+      "raw_mean",
+      "landmark",
+      1
+    ],
+    "seconds": 13.911725442999796,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "clean",
+      "projected_keep",
+      "cobb",
+      1
+    ],
+    "seconds": 15.673952074999761,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "clean",
+      "projected_keep",
+      "landmark",
+      1
+    ],
+    "seconds": 9.996268953999788,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "clean",
+      "projected_mean",
+      "cobb",
+      1
+    ],
+    "seconds": 9.04330998200021,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "clean",
+      "projected_mean",
+      "landmark",
+      1
+    ],
+    "seconds": 20.327889891000268,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "clean",
+      "raw_keep",
+      "cobb",
+      2
+    ],
+    "seconds": 10.603349255000012,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "clean",
+      "raw_keep",
+      "landmark",
+      2
+    ],
+    "seconds": 15.772061865000069,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "clean",
+      "raw_mean",
+      "cobb",
+      2
+    ],
+    "seconds": 10.704285693999736,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "clean",
+      "raw_mean",
+      "landmark",
+      2
+    ],
+    "seconds": 20.077917646999595,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "clean",
+      "projected_keep",
+      "cobb",
+      2
+    ],
+    "seconds": 11.800257410000086,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "clean",
+      "projected_keep",
+      "landmark",
+      2
+    ],
+    "seconds": 17.727528334999988,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "clean",
+      "projected_mean",
+      "cobb",
+      2
+    ],
+    "seconds": 12.361899555000036,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "clean",
+      "projected_mean",
+      "landmark",
+      2
+    ],
+    "seconds": 15.318858266999996,
+    "status": "ok"
+  }
+]

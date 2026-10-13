@@ -1,0 +1,59 @@
+{
+  "status": "ready",
+  "plan_fingerprint": "717a9cb0a328fde9da4df68ba12dba938f9bd13ede4de73d514834f3eddb6f49",
+  "evaluation_sha256": "563229183cd364f567c8b75f633b647ce883e7a51ea5fc73240a554d9f44934c",
+  "images_sha256": "1ff81acd94bd095f20543fd8ea99e497f27f5047b898cd326cb7b7ac11160937",
+  "checkpoints": {
+    "medvae_4_1_2d": {
+      "path": "/home/ubuntu/.cache/huggingface/hub/models--stanfordmimi--MedVAE/snapshots/8040c5ccb7a51eff6b4cef513c7f20bd1bda983d/model_weights/vae_4x_1c_2D.ckpt",
+      "sha256": "0e4bd8931238a6c52acb3d826025f5bcfa284aa9f98cc5455505f131d690c1ba",
+      "config_sha256": "b08ea5caeeb8a25699bbd209ac1fb5b451955b859748bba365995f6e81eb27c9",
+      "projection_keys": [
+        "channel_ds.0.weight",
+        "channel_ds.0.bias",
+        "channel_ds.2.weight",
+        "channel_ds.2.bias",
+        "channel_ds.4.weight",
+        "channel_ds.4.bias",
+        "channel_proj.weight",
+        "channel_proj.bias"
+      ],
+      "encoder_tensor_count_checked": 90,
+      "implementation_sha256": "45c1d9ba366e2208a3624b08ca8d69071caf50e70fe844596f62da14ed2a3b3f"
+    },
+    "medvae_8_1_2d": {
+      "path": "/home/ubuntu/.cache/huggingface/hub/models--stanfordmimi--MedVAE/snapshots/8040c5ccb7a51eff6b4cef513c7f20bd1bda983d/model_weights/vae_8x_1c_2D.ckpt",
+      "sha256": "4d99374ce8a6fcaf4a5b0117dd4396b520e273e5c92660772a710421337ddc52",
+      "config_sha256": "fc4020b5216be4502266e15045e0acecad2d9bb0e4e480f32f752106d9d2b095",
+      "projection_keys": [
+        "channel_ds.0.weight",
+        "channel_ds.0.bias",
+        "channel_ds.2.weight",
+        "channel_ds.2.bias",
+        "channel_ds.4.weight",
+        "channel_ds.4.bias",
+        "channel_proj.weight",
+        "channel_proj.bias"
+      ],
+      "encoder_tensor_count_checked": 108,
+      "implementation_sha256": "45c1d9ba366e2208a3624b08ca8d69071caf50e70fe844596f62da14ed2a3b3f"
+    },
+    "medvae_8_4_2d": {
+      "path": "/home/ubuntu/.cache/huggingface/hub/models--stanfordmimi--MedVAE/snapshots/8040c5ccb7a51eff6b4cef513c7f20bd1bda983d/model_weights/vae_8x_4c_2D.ckpt",
+      "sha256": "9457e018edd267cfa526878730f5c04699f9c6a9a646a8d51d89aa9d7ccb99f8",
+      "config_sha256": "1e5303b434edf387f7424dae04fb8a09fe6b7cb70f7303d99605ea5084eb6d1c",
+      "projection_keys": [
+        "channel_ds.0.weight",
+        "channel_ds.0.bias",
+        "channel_ds.2.weight",
+        "channel_ds.2.bias",
+        "channel_ds.4.weight",
+        "channel_ds.4.bias",
+        "channel_proj.weight",
+        "channel_proj.bias"
+      ],
+      "encoder_tensor_count_checked": 160,
+      "implementation_sha256": "45c1d9ba366e2208a3624b08ca8d69071caf50e70fe844596f62da14ed2a3b3f"
+    }
+  }
+}

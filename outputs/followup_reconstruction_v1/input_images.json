@@ -1,0 +1,898 @@
+[
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-310_C_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-310_C_AP.jpg",
+    "sha256": "642f42787161ca72dd84500bafa8ee9d43096184a5ae023ba48d1a02a9af55b3",
+    "width": 1141,
+    "height": 2614
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-310_a_ap",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-310_a_ap.jpg",
+    "sha256": "2e8e5eb846a3448b171a8bf716b9953770ed02c08866dae677253a289419b032",
+    "width": 1084,
+    "height": 2437
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-311_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-311_A_AP.jpg",
+    "sha256": "31baad819af610b041a3e5a110b5d1d26ff36a3bdd7a652b988a3b577fdddca9",
+    "width": 839,
+    "height": 1802
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-311_C_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-311_C_AP.jpg",
+    "sha256": "d51fc1acf9e09d1793b3dcd4461d241acb31731cc96ca63e7ae967759f4cc53e",
+    "width": 865,
+    "height": 1745
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-311_D_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-311_D_AP.jpg",
+    "sha256": "a2f1052bd0dfff1890f5daa5fad71d82e205f176a23af8b0ef67cfce3ce30634",
+    "width": 906,
+    "height": 1901
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-311_E_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-311_E_AP.jpg",
+    "sha256": "4e24147e3978343c745f63762708f1d0f1ef3244f84d4d52e028a3d7b2b760a9",
+    "width": 943,
+    "height": 2036
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-311_J_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-311_J_AP.jpg",
+    "sha256": "ae4a1a273da12552dd43018aa61c2bd92d202083fc2afc4d4a9b73109cd13698",
+    "width": 927,
+    "height": 1802
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-311_K_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-311_K_AP.jpg",
+    "sha256": "e0a1ea90f0d0a0b8fe80edfd86f7b2821aea6501761cb7e42864d77a52624ef7",
+    "width": 964,
+    "height": 1984
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-311_L_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-311_L_AP.jpg",
+    "sha256": "9bd598e1e245401922a6e4111bd10f40ceab592306fff5b83f22972354cd0b07",
+    "width": 959,
+    "height": 2057
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-311_M_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-311_M_AP.jpg",
+    "sha256": "50e93edd0f7cf8cf3d696adea7e4d19eb5800c3158b8d334151313b1724ae5b4",
+    "width": 933,
+    "height": 2099
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-311_O_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-311_O_AP.jpg",
+    "sha256": "4f927b7fbf9a8f490bd2d24fb8b07e44df1d40391733d81ade3512c269a5ae78",
+    "width": 985,
+    "height": 2307
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-311_P_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-311_P_AP.jpg",
+    "sha256": "0a1e6471557676eb96c6f3a237619fe167c5b8332f14b12fadede76db5a73434",
+    "width": 1167,
+    "height": 2104
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-311_Q_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-311_Q_AP.jpg",
+    "sha256": "049cf089802f8bd064f7f2e138ceadc7772169d58994e83b25d5b86dd8944bb8",
+    "width": 1198,
+    "height": 2057
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-312_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-312_A_AP.jpg",
+    "sha256": "9643cb2289b9fd9142fd4b096901b6e9d90484480577defe27618d330d747b37",
+    "width": 1203,
+    "height": 2599
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-312_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-312_B_AP.jpg",
+    "sha256": "34d141c0c8c6851b773c9dd50a7f00d1bd1adf26cfdd85ad463111f2fd126300",
+    "width": 1068,
+    "height": 2635
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-312_C_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-312_C_AP.jpg",
+    "sha256": "d377f942857a659562983ca4a8ce7f1ec8f1fbeeda38f5c3bab94b59fd86c200",
+    "width": 1162,
+    "height": 2609
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-312_D_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-312_D_AP.jpg",
+    "sha256": "d501553c8a18a904333c00cef0739f35cd3be1dc6d43f0dee9ab9fecf162ab51",
+    "width": 1323,
+    "height": 2828
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-312_E_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-312_E_AP.jpg",
+    "sha256": "62ab25323720035f46df1fc06216aa06498e0d8fd1b78a13ce44a4451a91940e",
+    "width": 1266,
+    "height": 2807
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-313_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-313_A_AP.jpg",
+    "sha256": "f78f3c89880b0c80723e7cbc40a274b88341d35f9fdeb0ce4e1b19670621aeb7",
+    "width": 1146,
+    "height": 2682
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-313_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-313_B_AP.jpg",
+    "sha256": "356d820574b04b8c855dd7d3f4e01ea1666a6304a9db5a60215251f5587f4d23",
+    "width": 1125,
+    "height": 2620
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-313_C_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-313_C_AP.jpg",
+    "sha256": "69c535e9df8d0d733e7f78bf956ffa5f7a3413cf57696e5ef83d90cd632c28b7",
+    "width": 1250,
+    "height": 2692
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-313_D_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-313_D_AP.jpg",
+    "sha256": "6a8030eba1bfab2993645c427967b482fa0f1188c14a490fa4c4f1045abbcdc6",
+    "width": 1386,
+    "height": 2687
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-313_E_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-313_E_AP.jpg",
+    "sha256": "d5f59a1940c818e42b5145c6d017a3321a8e68db8aecb570216510845714814c",
+    "width": 1125,
+    "height": 2760
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-314_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-314_A_AP.jpg",
+    "sha256": "cb9a536d5443a6123d89ef1f50d2a26c13445ee09408f51a056e3856c0a43505",
+    "width": 1130,
+    "height": 2541
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-314_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-314_B_AP.jpg",
+    "sha256": "915931260b08046878147eac2bdfe43bd4b022709bb45436e3521fedd879e04b",
+    "width": 1146,
+    "height": 2656
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-314_C_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-314_C_AP.jpg",
+    "sha256": "e58269d9dda8038455fc1f750be3c38a8514e68bf01ab913d79eaff66edba1ec",
+    "width": 1380,
+    "height": 2442
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-315_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-315_A_AP.jpg",
+    "sha256": "8a669f17ac7fb18c5a63231ef8f98a41b6ad637c9dee960e10159e56cccfc9c7",
+    "width": 427,
+    "height": 1159
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-315_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-315_B_AP.jpg",
+    "sha256": "e0fa756e15e00b08bfc4528fdcd36955657c76073c6f69318e7597e1ad742249",
+    "width": 1078,
+    "height": 2599
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-316_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-316_A_AP.jpg",
+    "sha256": "82d98f82debac817eb5d2e16b36d3bff8be88dc049277b06f9904886de5078b9",
+    "width": 901,
+    "height": 2401
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-316_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-316_B_AP.jpg",
+    "sha256": "b21a7e252d9ba1e1fa21c26adfe63019a1ec1d60d063198d8af74344b3303213",
+    "width": 974,
+    "height": 2573
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-317_C_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-317_C_AP.jpg",
+    "sha256": "f4b09a3c2dc60cbd9ba9a6134417783a63f305c1181381ec2edf0bdb932c6886",
+    "width": 1182,
+    "height": 2708
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-317_E_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-317_E_AP.jpg",
+    "sha256": "d98ec8462a8009468f1190df3ed0b21cfbf9f58a526b93f06020d3111d1eba09",
+    "width": 1214,
+    "height": 2614
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-317_F_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-317_F_AP.jpg",
+    "sha256": "7d74e5dd5f1b4a61613c923f1117a52943964ad33a7363f54c1bf0429bd5ebf6",
+    "width": 1141,
+    "height": 2687
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-318_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-318_A_AP.jpg",
+    "sha256": "e91cf53b2677ffb1f065959b4750b4304242ed460e41e8a530c2a602a31930a9",
+    "width": 985,
+    "height": 2469
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-319_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-319_A_AP.jpg",
+    "sha256": "f9db2f8e9a49e30d8fd0dbeff5dae7de2063cb77c8cf692e6ce79301bc04f378",
+    "width": 728,
+    "height": 1176
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-319_C_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-319_C_AP.jpg",
+    "sha256": "6fb4ca47fb9cfb990e6108038a25601d61a255a602aa023e2beac11b55f979c9",
+    "width": 720,
+    "height": 1314
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-320_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-320_A_AP.jpg",
+    "sha256": "859a0bfa501cac34f76943a54d7dab4058f0ddf6e83c912b0e74a58314717ab6",
+    "width": 1281,
+    "height": 2500
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-321_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-321_A_AP.jpg",
+    "sha256": "125fedf7f9e2dc32cdf0ea61d77f998e5f46906fc508b40001405866aa37ea3a",
+    "width": 751,
+    "height": 1480
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-321_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-321_B_AP.jpg",
+    "sha256": "4f9e0f2b5d603287afdc4be882b8fde5408d1ff780f00fe124e2b25d8191cc84",
+    "width": 775,
+    "height": 1666
+  },
+  {
+    "image_uuid": "sunhl-1th-01-Mar-2017-321_D_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-01-Mar-2017-321_D_AP.jpg",
+    "sha256": "09e7ef82ad059fe56dba5edb9f75944adc10497c2f1327ddcf571a289f7216b1",
+    "width": 906,
+    "height": 1937
+  },
+  {
+    "image_uuid": "sunhl-1th-07-Feb-2017-282_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-07-Feb-2017-282_A_AP.jpg",
+    "sha256": "58b6b6f243f336d71b01f8612bec60e2c5f793ca5db12df057e432e47757bb47",
+    "width": 943,
+    "height": 2552
+  },
+  {
+    "image_uuid": "sunhl-1th-07-Feb-2017-283_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-07-Feb-2017-283_A_AP.jpg",
+    "sha256": "c9f3a74ab8b362b17a10b9c7aebbd13a819bf0fd1903b7136aab83e01a80dda3",
+    "width": 1182,
+    "height": 2854
+  },
+  {
+    "image_uuid": "sunhl-1th-08-Feb-2017-284_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-08-Feb-2017-284_A_AP.jpg",
+    "sha256": "fc60d1f9e7fb203251d8f01936d16006c035aad907af3d62e88bcb59e25fe1fd",
+    "width": 969,
+    "height": 2427
+  },
+  {
+    "image_uuid": "sunhl-1th-08-Feb-2017-284_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-08-Feb-2017-284_B_AP.jpg",
+    "sha256": "2d72a23739abb0c5dfb182f9e83d2018dd51d79b72e9a67f7e75b2033a7826f9",
+    "width": 1052,
+    "height": 2573
+  },
+  {
+    "image_uuid": "sunhl-1th-10-Feb-2017-284_C_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-10-Feb-2017-284_C_AP.jpg",
+    "sha256": "164207f157cbe67ae9100434ccd7488e4387fe83e290e0b29f48a31b6fae7700",
+    "width": 943,
+    "height": 2463
+  },
+  {
+    "image_uuid": "sunhl-1th-14-Feb-2017-285_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-14-Feb-2017-285_A_AP.jpg",
+    "sha256": "13b55cdc6b40fcecd743105d147de5d5a0355b6455cc4c33180e7ae96c86deda",
+    "width": 1099,
+    "height": 2583
+  },
+  {
+    "image_uuid": "sunhl-1th-14-Feb-2017-285_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-14-Feb-2017-285_B_AP.jpg",
+    "sha256": "b608895dc0b662933d0e604b29404975617a3ccb15e1ccd2549884bd3c92cc40",
+    "width": 906,
+    "height": 2578
+  },
+  {
+    "image_uuid": "sunhl-1th-15-Feb-2017-286_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-15-Feb-2017-286_A_AP.jpg",
+    "sha256": "0e23b71b9cf219914a5f961bcccebbaa805e603d728e86233af39135423a7a18",
+    "width": 1021,
+    "height": 2515
+  },
+  {
+    "image_uuid": "sunhl-1th-15-Feb-2017-286_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-15-Feb-2017-286_B_AP.jpg",
+    "sha256": "8a3d715f2f82b9035130e9723c89f5f0022dd530d46735d64b964db4168a5e5d",
+    "width": 990,
+    "height": 2552
+  },
+  {
+    "image_uuid": "sunhl-1th-15-Feb-2017-287_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-15-Feb-2017-287_A_AP.jpg",
+    "sha256": "99bf209a1fac0dfe17b7a3b251646cf39372ba5b2d291c3be44e9870cd324861",
+    "width": 891,
+    "height": 2167
+  },
+  {
+    "image_uuid": "sunhl-1th-15-Feb-2017-287_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-15-Feb-2017-287_B_AP.jpg",
+    "sha256": "1e3cbe5f821dc1d3318fd47d5b843f5c494e4f85a87cd2234d7ae287817692a2",
+    "width": 933,
+    "height": 2182
+  },
+  {
+    "image_uuid": "sunhl-1th-15-Feb-2017-287_C_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-15-Feb-2017-287_C_AP.jpg",
+    "sha256": "e9733412ef3979cd72cde4f9ef5aa42a021271728e340a754139254af07f27ec",
+    "width": 1084,
+    "height": 2187
+  },
+  {
+    "image_uuid": "sunhl-1th-15-Feb-2017-287_D_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-15-Feb-2017-287_D_AP.jpg",
+    "sha256": "98e8511dbe0843217811411e3ad17c2b730c0dddce76fa4982c4183b0216fadc",
+    "width": 1052,
+    "height": 2375
+  },
+  {
+    "image_uuid": "sunhl-1th-15-Feb-2017-287_E_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-15-Feb-2017-287_E_AP.jpg",
+    "sha256": "7664801698c174c2ccc80bab5278688a542d250a664752a8e9ff1d8ee68e0017",
+    "width": 1110,
+    "height": 2141
+  },
+  {
+    "image_uuid": "sunhl-1th-15-Feb-2017-287_F_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-15-Feb-2017-287_F_AP.jpg",
+    "sha256": "d6d30b1a7079077d89488a3bb718264e52d08389c7a7e3a9f4d9bff761155667",
+    "width": 1031,
+    "height": 2281
+  },
+  {
+    "image_uuid": "sunhl-1th-15-Feb-2017-288_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-15-Feb-2017-288_A_AP.jpg",
+    "sha256": "05b48ce5410df2d52d915166ac3b07f36e1b0bd7c2f2f6854dd6f1225cf9137a",
+    "width": 912,
+    "height": 2620
+  },
+  {
+    "image_uuid": "sunhl-1th-15-Feb-2017-288_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-15-Feb-2017-288_B_AP.jpg",
+    "sha256": "970910cc73965d2c2aabfd70fa6878e13088f10e47fe624e32888f64b5e84054",
+    "width": 1005,
+    "height": 2552
+  },
+  {
+    "image_uuid": "sunhl-1th-15-Feb-2017-289_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-15-Feb-2017-289_A_AP.jpg",
+    "sha256": "249651dd0a15413423ecb35374fc3360953b15853b85408a16eb80c2bc9ad843",
+    "width": 571,
+    "height": 1221
+  },
+  {
+    "image_uuid": "sunhl-1th-15-Feb-2017-289_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-15-Feb-2017-289_B_AP.jpg",
+    "sha256": "f51d6b4366189d1fdbefc8019b3884dcb0ce2b4e84bf4ae73a7588f3bd18906d",
+    "width": 682,
+    "height": 1324
+  },
+  {
+    "image_uuid": "sunhl-1th-15-Feb-2017-290_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-15-Feb-2017-290_A_AP.jpg",
+    "sha256": "57d110c44a818ba251b30aaab4a424ea7b3b72fa95dd184f60ad9014b1a8337e",
+    "width": 1094,
+    "height": 2432
+  },
+  {
+    "image_uuid": "sunhl-1th-15-Feb-2017-291_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-15-Feb-2017-291_A_AP.jpg",
+    "sha256": "06d9dc7905c4c893b75f38644c12713739aaf095eda83e9eb2188ae989bacc82",
+    "width": 854,
+    "height": 2005
+  },
+  {
+    "image_uuid": "sunhl-1th-15-Feb-2017-291_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-15-Feb-2017-291_B_AP.jpg",
+    "sha256": "d2aa8970bb661d2a17562f4864b91aadcb67b5841fd5a8ad953f606efa9864c6",
+    "width": 974,
+    "height": 2125
+  },
+  {
+    "image_uuid": "sunhl-1th-15-Feb-2017-291_C_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-15-Feb-2017-291_C_AP.jpg",
+    "sha256": "8224f0c7025e167b4f14f00261836e9c461d7f39a2b12857b5a8b9b615f3ebb8",
+    "width": 922,
+    "height": 2333
+  },
+  {
+    "image_uuid": "sunhl-1th-16-Feb-2017-291_D_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-16-Feb-2017-291_D_AP.jpg",
+    "sha256": "66211d6c5c04db5aed22a233dc77d7e4c45f63161fdbae04957191cd5b93bf6f",
+    "width": 1026,
+    "height": 2469
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Feb-2017-291_E_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-22-Feb-2017-291_E_AP.jpg",
+    "sha256": "e99a39f97afa68bf435f222d6e71ad11ed7380f45f5d044a2f7585eab430f116",
+    "width": 1026,
+    "height": 2411
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Feb-2017-291_E_AP2",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-22-Feb-2017-291_E_AP2.jpg",
+    "sha256": "a208b10fb96b3b0c19565dc77453744021d401905094158994e125b1dd8503fe",
+    "width": 628,
+    "height": 2321
+  },
+  {
+    "image_uuid": "sunhl-1th-22-Feb-2017-291_F_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-22-Feb-2017-291_F_AP.jpg",
+    "sha256": "7a090d4b3bc2f52fcd5c34401c504d213cbf38101494eeeaac0875b5721daa25",
+    "width": 1011,
+    "height": 2448
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-239_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-239_A_AP.jpg",
+    "sha256": "760f3cfb26b561a888f5f76e6d18d7c7ecd791a2a0b5c79c8803a33d721cce95",
+    "width": 1110,
+    "height": 2635
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-239_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-239_B_AP.jpg",
+    "sha256": "e4de6ebd60b186ffb8ddf5d82b85462019122af03a37990f01a51c67413809d8",
+    "width": 1224,
+    "height": 2583
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-239_C_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-239_C_AP.jpg",
+    "sha256": "f5d000f6cad7c7c969d097d1c237db11dedeea393c0addb8799493ed40a65365",
+    "width": 1235,
+    "height": 2625
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-239_D_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-239_D_AP.jpg",
+    "sha256": "c82ec96c8522dd589bfbc40a615bf1d9a9d2b16a787d8d7273601bc3d6646572",
+    "width": 558,
+    "height": 1318
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-240_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-240_A_AP.jpg",
+    "sha256": "55c47f95594d5f72103f03acdff420300fd12af25bc804c8ee9084262cfdc7cf",
+    "width": 1016,
+    "height": 2370
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-240_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-240_B_AP.jpg",
+    "sha256": "af912e55f806efe24e731f78344fb400578ed4d8b50a13632bafcabbb26ed9a6",
+    "width": 1021,
+    "height": 2354
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-241_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-241_A_AP.jpg",
+    "sha256": "cea49bc7704df9fc7e1728f5393e15aaa5098fb44f503af29a7472f537039b5d",
+    "width": 1115,
+    "height": 2526
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-241_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-241_B_AP.jpg",
+    "sha256": "c4a85f30b835613bcf36cbdac177e134e2a05cc7b69ad669c025feb5d1163072",
+    "width": 1141,
+    "height": 2734
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-241_C_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-241_C_AP.jpg",
+    "sha256": "c13af604e9b6003e6a95cfc6c21dfdba8dadda5f3d66aa09e7550121ce29c7ea",
+    "width": 1094,
+    "height": 2771
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-242_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-242_A_AP.jpg",
+    "sha256": "7ff60c72e1de533e04463870a4430cb7036732ffdc5905398a98ee0659a6563c",
+    "width": 1005,
+    "height": 2755
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-243_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-243_A_AP.jpg",
+    "sha256": "a5510b96c0fe43fe09e8259f3feec2bfa3f2cfa4236d305e270a07bdec8a85c5",
+    "width": 948,
+    "height": 2541
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-243_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-243_B_AP.jpg",
+    "sha256": "2cb0d4bba782a7399ed7d6b7a1eedb1933c4374dbac37debc179b9a364ff4746",
+    "width": 959,
+    "height": 2448
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-243_C_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-243_C_AP.jpg",
+    "sha256": "7096cb51aa87e0a897d97a28063a662f249a6defe696dfd0b2f19ffb35a089d6",
+    "width": 1057,
+    "height": 2427
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-244_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-244_A_AP.jpg",
+    "sha256": "1e772e931a1ddbb7eafa8a1df160dd2c20b47a9813f709485feb1d49146b1e59",
+    "width": 1188,
+    "height": 2489
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-244_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-244_B_AP.jpg",
+    "sha256": "f49c5f79bf4060e23bda4bdaca1711af665a8014271c7b7ab85a26487f898838",
+    "width": 1120,
+    "height": 2588
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-291_H_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-291_H_AP.jpg",
+    "sha256": "7721767b362d54707c899f56b3e89e1e2f1f5fef99e26096dce4a84452ad2a3c",
+    "width": 1000,
+    "height": 2354
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-291_I_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-291_I_AP.jpg",
+    "sha256": "853cf9b651624571f52c188cafe6be28aba828f61680dbae91be6a2ff2eeec8b",
+    "width": 959,
+    "height": 2760
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-291_L_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-291_L_AP.jpg",
+    "sha256": "70afe3dc31c1a9dcc21cfecf5b3a14681fe2927429d30abfbf5d5339cae7e1b0",
+    "width": 1151,
+    "height": 2651
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-291_M_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-291_M_AP.jpg",
+    "sha256": "e4e6a8b20e98488f0fbbd08c725b9752a35c42fcf3ae4e7e20fc9df8f02b5e3a",
+    "width": 1110,
+    "height": 2562
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-291_N_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-291_N_AP.jpg",
+    "sha256": "8d83474fe6701685c6d1dac0c0438747bfebd6a0bd09ad11f45f7be039ec42e1",
+    "width": 1005,
+    "height": 2489
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-291_O_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-291_O_AP.jpg",
+    "sha256": "5ec28412359216ca0acf3a89207b88ca00959e52da6776cbb11ec4576b300de8",
+    "width": 1193,
+    "height": 2609
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-292_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-292_A_AP.jpg",
+    "sha256": "6a83b8727126390f025ae10d9a098e373487ecf8533baa52dccfb3f630e28640",
+    "width": 835,
+    "height": 1795
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-292_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-292_B_AP.jpg",
+    "sha256": "149f038a40869d4680dcedcf13c31ef1ac5e6da6dab6e723881f81b9d60a35eb",
+    "width": 743,
+    "height": 1560
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-293_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-293_A_AP.jpg",
+    "sha256": "16cb792a0ed919fadfafbde85669d9af97c53e62c37a16a39ae80ec7c68b0d9e",
+    "width": 1130,
+    "height": 2802
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-293_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-293_B_AP.jpg",
+    "sha256": "0193628677b0969698e6eec02de54b187777393ee2d442615a1a1f7bde2cf090",
+    "width": 1094,
+    "height": 2843
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-294_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-294_A_AP.jpg",
+    "sha256": "955d46c7ff904aff172e032f0cebb546c286c96771f9a5e66e732426869b6b87",
+    "width": 683,
+    "height": 1865
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-294_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-294_B_AP.jpg",
+    "sha256": "0bfc7a0e916924eb025408a1087fc670fb1fd18b658a49ce3fd67b2e6f0a8009",
+    "width": 938,
+    "height": 2114
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-294_C_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-294_C_AP.jpg",
+    "sha256": "b014f15083ac2e94ed6a0f1c41b690fff2ef12084ada0126475af1b299066bae",
+    "width": 959,
+    "height": 2182
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-294_D_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-294_D_AP.jpg",
+    "sha256": "f92e4325da2ccaeee42dc0d42c08f83a159e226217dacaace19d49a5d497678d",
+    "width": 959,
+    "height": 2458
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-295_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-295_A_AP.jpg",
+    "sha256": "f106d47f93038fcf7da3589af0e73fca1fc16cb80b5ce4a2c022f71168f6b4ab",
+    "width": 959,
+    "height": 2250
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-295_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-295_B_AP.jpg",
+    "sha256": "68dd34ade98be09ede1ad45ecc10a8bf8cfcfd6df41c1b8c245d5a20b50d5d72",
+    "width": 875,
+    "height": 2297
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-295_C_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-295_C_AP.jpg",
+    "sha256": "cfcb6f5434a7a4ac87d013069ce4fda55c68f91f41764ea4680610947269e978",
+    "width": 953,
+    "height": 2109
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-295_D_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-295_D_AP.jpg",
+    "sha256": "8a95deb3316ced486d86f0cdf868e444c32ef5a787a9fa5b5e44fc7c1b729505",
+    "width": 896,
+    "height": 2167
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-295_E_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-295_E_AP.jpg",
+    "sha256": "640629b63a4d5885f1262c428c6831d39a390511b128b161764635936f727c0c",
+    "width": 813,
+    "height": 2239
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-295_F_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-295_F_AP.jpg",
+    "sha256": "da1118f3517c843f2d654d86b9daa4e77cc2c8877938b96162500c7f9871d3f2",
+    "width": 839,
+    "height": 2245
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-295_G_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-295_G_AP.jpg",
+    "sha256": "746793661779ac8eb33fe759a7b4fbf8883e2f58178c2c1f0a73b9cf175b0db9",
+    "width": 906,
+    "height": 2219
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-295_H_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-295_H_AP.jpg",
+    "sha256": "e627780a0efd1addc5bfaddcdf16802fdc230341dd9bb0af28657abb7da58423",
+    "width": 1146,
+    "height": 2547
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-295_I_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-295_I_AP.jpg",
+    "sha256": "4053aafd3fd8ce4b42faeb52fd03bb301ad114973832e47237a6535faab87856",
+    "width": 1068,
+    "height": 2437
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-295_J_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-295_J_AP.jpg",
+    "sha256": "431fcfa968f9846a5019a4c33608b5109bd88d1805344a98dc6118cf4eda70ea",
+    "width": 1057,
+    "height": 2469
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-295_K_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-295_K_AP.jpg",
+    "sha256": "bc3f776d6aa5dc90703f37d07f119cd703248dc70e1c793212603d996dc4ceba",
+    "width": 1208,
+    "height": 2573
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-296_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-296_A_AP.jpg",
+    "sha256": "b9d18d6e459117207f57ba3a7c31c8151e77985a49d6e473bb18a502e8eef529",
+    "width": 828,
+    "height": 1911
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-297_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-297_A_AP.jpg",
+    "sha256": "f5bc33f8b8d43554bb8b4644c02f43ce40a3bd2b218c7399214a0e0c1bf2db75",
+    "width": 1120,
+    "height": 2833
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-298_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-298_A_AP.jpg",
+    "sha256": "9f153509344af2b261c23d865bc66604bb630b78da7babe735744bd66d31fe9f",
+    "width": 594,
+    "height": 1616
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-298_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-298_B_AP.jpg",
+    "sha256": "ff242ee1db9687f289480360a05dd73d8c449b5c88809a9bcedb7c821ff97232",
+    "width": 1245,
+    "height": 2557
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-300_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-300_A_AP.jpg",
+    "sha256": "8dcc77eb07ad04a9b57098959e3163a7a1cab7a1109efddb03dd54e9953d359b",
+    "width": 1057,
+    "height": 2354
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-300_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-300_B_AP.jpg",
+    "sha256": "a031bf722d575674cc68f377b1c2e7611864f24735335baf0d85c3340bda9efa",
+    "width": 1016,
+    "height": 2291
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-300_C_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-300_C_AP.jpg",
+    "sha256": "51d3cc02143a6e613f623c2400519e387d531baf2029222bba26066eae88e31e",
+    "width": 1026,
+    "height": 2297
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-300_D_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-300_D_AP.jpg",
+    "sha256": "00a6afd750844c20077533357e93eb9734bdad1fed40fdc1be9ff4350307ebb8",
+    "width": 1089,
+    "height": 2359
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-300_E_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-300_E_AP.jpg",
+    "sha256": "2dce17d677670d6749a7ea4f611ac2262466c00dcb0505eefc89ddfc0e29fe9d",
+    "width": 1099,
+    "height": 2344
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-300_F_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-300_F_AP.jpg",
+    "sha256": "8ff87ec2d7819a6a31b1a7e911387d9d59fdea433c1237abb84b72c69a295bc7",
+    "width": 1146,
+    "height": 2500
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-300_G_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-300_G_AP.jpg",
+    "sha256": "20c0b2f70eef9ff973fe64e9c8e60fbb7e601bb6f71e8f39334ba86054a43d79",
+    "width": 1110,
+    "height": 2557
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-300_H_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-300_H_AP.jpg",
+    "sha256": "937d57fb5d85a19e52cbb7145ae986d38802f1ebe648cea686299dfa3d0358a5",
+    "width": 1016,
+    "height": 2567
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-300_I_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-300_I_AP.jpg",
+    "sha256": "94f895951262b56ad970335ea811129ecc5adeb5b9d479e33fd438f767982079",
+    "width": 1302,
+    "height": 2411
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-300_J_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-300_J_AP.jpg",
+    "sha256": "6e817b4e8504da62833f376621e66318579225e18d3b9960e59f0c3b09dce8a6",
+    "width": 1224,
+    "height": 2437
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-300_K_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-300_K_AP.jpg",
+    "sha256": "00a3bd3a959bc856469aebe818c4931d131553b82e9a5aab49b1697ee29f82fe",
+    "width": 1151,
+    "height": 2552
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-307_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-307_A_AP.jpg",
+    "sha256": "449391ac96a5d31b4889038068bab3eba26c791c3e18b9a6849389fb24b95797",
+    "width": 1089,
+    "height": 2208
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-307_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-307_B_AP.jpg",
+    "sha256": "69917f9b214d37104d2b5aec5497b37b23720df95ef51e4ccc17a20628c3b7d0",
+    "width": 1094,
+    "height": 2375
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-308_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-308_A_AP.jpg",
+    "sha256": "b658d22da27fcb7ff6a442be2e1a1525f17a9c672da0d0948bde1de253cb9e2e",
+    "width": 1255,
+    "height": 2776
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-309_A_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-309_A_AP.jpg",
+    "sha256": "4747206ebb5f220fb99a77d4324df04c81960106b708cca985b9f5c439dc8259",
+    "width": 1240,
+    "height": 2880
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-309_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-309_B_AP.jpg",
+    "sha256": "33ced6412dd91d24b7c094cfab513898a751f30e01596988e13f9f31568097f3",
+    "width": 1177,
+    "height": 2776
+  },
+  {
+    "image_uuid": "sunhl-1th-28-Feb-2017-310_B_AP",
+    "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-28-Feb-2017-310_B_AP.jpg",
+    "sha256": "a54557af648f562a3e05998b1e3eb396a319cd7310c6b74a0ec8e672a5352f17",
+    "width": 1068,
+    "height": 2604
+  }
+]

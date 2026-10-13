@@ -1,0 +1,74 @@
+{
+  "stage": "heads",
+  "imports": {
+    "numpy": {
+      "import": "ok",
+      "version": "1.26.4"
+    },
+    "scipy": {
+      "import": "ok",
+      "version": "1.13.1"
+    },
+    "pandas": {
+      "import": "ok",
+      "version": "2.2.3"
+    },
+    "matplotlib": {
+      "import": "ok",
+      "version": "3.9.4"
+    },
+    "PIL": {
+      "import": "ok",
+      "version": "10.4.0"
+    },
+    "torch": {
+      "import": "ok",
+      "version": "2.14.0+cu130"
+    }
+  },
+  "cache_files_checked": 12,
+  "trainer_sha256": "221c04e67ab526fdc2bfc75d2eeb7d6ff31c01ff2e89d32c930782d84dadf108",
+  "study": "/lambda/nfs/MedVAE/MedVAE/outputs/projection_study_fresh_v1",
+  "img_dir": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet",
+  "missing": [],
+  "runtime": {
+    "python": "3.10.21",
+    "packages": {
+      "torch": "2.14.0",
+      "torchvision": "0.29.0",
+      "monai": "1.4.0",
+      "numpy": "1.26.4",
+      "Pillow": "10.4.0",
+      "huggingface-hub": "0.36.2"
+    },
+    "cuda": "13.0",
+    "cudnn": 92400,
+    "gpu": {
+      "name": "NVIDIA A10",
+      "compute_capability": [
+        8,
+        6
+      ],
+      "memory_bytes": 23684841472
+    },
+    "precision": {
+      "api": "fp32_precision",
+      "values": {
+        "global": "ieee",
+        "cuda_matmul": "ieee",
+        "cudnn": "ieee",
+        "cudnn_conv": "ieee",
+        "cudnn_rnn": "ieee"
+      },
+      "cudnn_benchmark": false,
+      "cudnn_deterministic": false
+    },
+    "environment": {
+      "NVIDIA_TF32_OVERRIDE": null,
+      "TORCH_ALLOW_TF32_CUBLAS_OVERRIDE": null,
+      "CUBLAS_WORKSPACE_CONFIG": null
+    }
+  },
+  "historical_control_runtime_matches": true,
+  "runtime_differences": {}
+}
