@@ -1,5 +1,5 @@
 # ---- upstream MedVAE package and its data/weights: 176 GB ----
-medvae/
+/medvae
 
 # ---- model checkpoints: 2.9 GB across 284 files ----
 *.pt
