@@ -1,7 +1,7 @@
-# ---- upstream MedVAE package and its data/weights: 176 GB ----
+# ---- upstream MedVAE package and data/weights: 176 GB ----
 /medvae
 
-# ---- model checkpoints: 2.9 GB across 284 files ----
+# ---- model checkpoints: 2.9 GB (284 files) ----
 *.pt
 *.pth
 *.ckpt
@@ -10,11 +10,11 @@ diffusion_ckpt*/
 lightning_logs/
 wandb/
 
-# ---- latent caches: 12.6 GB, all regenerable ----
+# ---- latent caches: 12.6 GB (all of them are regenerable) ----
 latents*/
 *.npz
 
-# ---- outputs: keep csv, drop everything heavy ----
+# ---- outputs: keep csv and dropped everything heavy ----
 outputs/**/*.npz
 outputs/**/*.pt
 
