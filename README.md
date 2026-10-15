@@ -244,9 +244,20 @@ This redraws Figures 3.2, 5.2, 6.1, 7.1 and 7.2 from saved CSV files, without a 
 
 ## Checkpoints
 
-Two trained generators from Chapter 8 are provided as a release of this repository. Other trained models are not included, but the commands above retrain them.
+The two trained generators from Chapter 8 are attached to the [v1.0 release](https://github.com/tienmintan/MedVAE_Transfer/releases/tag/v1.0) of this repository. Other trained models are not included; the commands above retrain them.
 
-TODO: publish the release, then list its two files here and the script that loads each. `diffusion_latent.py` loads `diffusion.pt` from its `--out-dir`; `sample_diffusion.py` loads a `final.pt` written by `train_diffusion.py` through `--checkpoint`.
+| File | Generator | How it is loaded |
+|---|---|---|
+| `landmark_generator.pt` | Landmark-conditioned generator (Sections 8.2 to 8.6), the run saved in `results/diffusion5/` | `diffusion_latent.py` reads `diffusion.pt` from its `--out-dir` |
+| `cobb_generator_cropped.pt` | Cobb-conditioned generator, cropped pipeline (Section 8.1, Appendix B.1) | `sample_diffusion.py --checkpoint` |
+
+```bash
+mkdir -p outputs/diffusion5
+curl -L -o outputs/diffusion5/diffusion.pt \
+    https://github.com/tienmintan/MedVAE_Transfer/releases/download/v1.0/landmark_generator.pt
+curl -L -o cobb_generator_cropped.pt \
+    https://github.com/tienmintan/MedVAE_Transfer/releases/download/v1.0/cobb_generator_cropped.pt
+```
 
 ## Acknowledgements
 
