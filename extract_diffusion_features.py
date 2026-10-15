@@ -1,9 +1,9 @@
 """
-extract_diffusion_features.py
+extract_diffusion_features.py: extract intermediate U-Net activations from the trained diffusion model as regressor inputs.
 
-Phase B: extract intermediate U-Net activations from the trained
-unconditional diffusion model and save them as a latents file that the
-matched regressor can consume.
+Extracts intermediate U-Net activations from the trained unconditional
+diffusion model and saves them as a latents file that the matched
+regressor can consume.
 
 Pipeline per image:
   1. Load its precomputed SD-VAE latent from the cropped-pipeline
@@ -15,11 +15,11 @@ Pipeline per image:
   3. Construct x_t at a fixed timestep by adding a fixed-seed noise
      sample. q_sample: x_t = sqrt(α_cum) * x_0 + sqrt(1 - α_cum) * noise.
   4. Forward through the U-Net's encoder up to a chosen intermediate
-     level, with null Cobb conditioning (drop_mask=True → learned null
+     level, with null Cobb conditioning (drop_mask=True -> learned null
      embedding regardless of cobb values).
   5. Capture the activation at that level as the image's feature vector.
 
-We bypass the full U-Net forward and inline the encoder up to the
+The full U-Net forward is bypassed: the encoder is inlined up to the
 chosen level. This saves compute (no decoder pass needed) and avoids
 registering forward hooks that would otherwise persist across calls.
 
@@ -31,8 +31,10 @@ Default extraction settings:
   --timestep 250 : moderate noise level under the cosine T=1000 schedule,
                    where sqrt(α_cum) ≈ 0.92.
 
-Output format matches the latents files consumed by
-train_cobb_regressor_matched.py (latents, angles, uuids, splits).
+Inputs:  the diffusion checkpoint (--checkpoint) and the merged BoostNet
+         SD-VAE latents from extract_latents_boostnet_cropped.py.
+Outputs: --out .npz in the format consumed by
+         train_cobb_regressor_matched.py (latents, angles, uuids, splits).
 
 Usage:
     python extract_diffusion_features.py \\
@@ -56,9 +58,7 @@ from tqdm import tqdm
 from diffusion_model import UNet, GaussianDiffusion, EMA
 
 
-# ---------------------------------------------------------------------------
 # Checkpoint loading (mirrors sample_diffusion.py.load_checkpoint)
-# ---------------------------------------------------------------------------
 
 def load_diffusion_checkpoint(ckpt_path: Path, device: torch.device):
     """Load the U-Net + diffusion process + latent-standardisation stats."""
@@ -85,26 +85,24 @@ def load_diffusion_checkpoint(ckpt_path: Path, device: torch.device):
     return model, diffusion, latent_mean, latent_std, hp
 
 
-# ---------------------------------------------------------------------------
 # Encoder feature extraction
-# ---------------------------------------------------------------------------
 
 @torch.no_grad()
 def extract_encoder_features(
     model: UNet,
     x_t: torch.Tensor,           # (B, C_in, H, W) standardised + noisy latents
     t: torch.Tensor,             # (B,) timestep
-    cobb: torch.Tensor,          # (B, 3) — ignored when drop_mask=True
+    cobb: torch.Tensor,          # (B, 3); ignored when drop_mask=True
     drop_mask: torch.Tensor,     # (B,) bool
     level: int,
 ) -> torch.Tensor:
     """Inline the U-Net's encoder up to the chosen down_block level.
 
-    Returns the activation that would be appended to `skips[level]` —
+    Returns the activation that would be appended to `skips[level]`,
     i.e. the output of the second ResBlock at that level, before
     downsampling.
 
-    Mirrors the encoder portion of UNet.forward exactly, just stops early.
+    Mirrors the encoder portion of UNet.forward and stops early.
     """
     emb = model.time_embed(t) + model.cobb_embed(cobb, drop_mask)
 
@@ -120,9 +118,7 @@ def extract_encoder_features(
     )
 
 
-# ---------------------------------------------------------------------------
 # Main
-# ---------------------------------------------------------------------------
 
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__,
@@ -147,22 +143,22 @@ def main() -> int:
     p.add_argument("--batch-size", type=int, default=32)
     p.add_argument("--noise-seed", type=int, default=20260616,
                     help="Seed for the fixed noise vector used at the "
-                         "extraction timestep. Same seed → deterministic.")
+                         "extraction timestep. Same seed -> deterministic.")
     p.add_argument("--device", default="cuda")
     args = p.parse_args()
 
     if not args.checkpoint.is_file():
-        print(f"ERROR: checkpoint not found at {args.checkpoint}", file=sys.stderr)
+        print(f"Error: checkpoint not found at {args.checkpoint}", file=sys.stderr)
         return 1
     if not args.boostnet_latents.is_file():
-        print(f"ERROR: latents not found at {args.boostnet_latents}",
+        print(f"Error: latents not found at {args.boostnet_latents}",
               file=sys.stderr)
         return 1
 
     device = torch.device(args.device)
     args.out.parent.mkdir(parents=True, exist_ok=True)
 
-    # ---- Load diffusion model ----
+    # Load diffusion model
     print(f"Loading diffusion checkpoint from {args.checkpoint}")
     model, diffusion, latent_mean, latent_std, hp = load_diffusion_checkpoint(
         args.checkpoint, device
@@ -174,15 +170,15 @@ def main() -> int:
     print(f"  Latent normalisation: mean={latent_mean:.4f}, std={latent_std:.4f}")
 
     if args.level < 0 or args.level >= len(hp["channels"]):
-        print(f"ERROR: --level {args.level} out of range for model with "
+        print(f"Error: --level {args.level} out of range for model with "
               f"{len(hp['channels'])} levels", file=sys.stderr)
         return 1
     if args.timestep < 0 or args.timestep >= hp["T"]:
-        print(f"ERROR: --timestep {args.timestep} out of range [0, {hp['T']})",
+        print(f"Error: --timestep {args.timestep} out of range [0, {hp['T']})",
               file=sys.stderr)
         return 1
 
-    # ---- Load BoostNet SD-VAE latents ----
+    # Load BoostNet SD-VAE latents
     print(f"\nLoading BoostNet SD-VAE latents from {args.boostnet_latents}")
     data = np.load(args.boostnet_latents, allow_pickle=True)
     raw_latents = data["latents"]
@@ -191,13 +187,13 @@ def main() -> int:
     uuids = data["uuids"]
     print(f"  Shape: {raw_latents.shape}")
     if raw_latents.shape[1] != hp["in_channels"]:
-        print(f"WARNING: latent channels {raw_latents.shape[1]} != model "
-              f"in_channels {hp['in_channels']}. Forward pass may error.",
+        print(f"WARNING: latent channel count {raw_latents.shape[1]} does not match the model's "
+              f"in_channels ({hp['in_channels']}). The forward pass is likely to fail.",
               file=sys.stderr)
     print(f"  Source splits: " + str({s: int((splits == s).sum())
                                         for s in np.unique(splits)}))
 
-    # Translate "boostnet_train" → "train" etc. The cropped-pipeline
+    # Translate "boostnet_train" -> "train" etc. The cropped-pipeline
     # extraction tags splits with a "boostnet_" prefix (so VinDr and
     # BoostNet can coexist in a shared pool), but train_cobb_regressor_matched.py
     # checks `splits == "train"`. Without this translation the regressor
@@ -209,22 +205,22 @@ def main() -> int:
 
     n_images = len(raw_latents)
 
-    # ---- Standardise ----
+    # Standardise
     x_0_std = ((raw_latents - latent_mean) / latent_std).astype(np.float32)
     x_0_std_t = torch.from_numpy(x_0_std)
 
-    # ---- Fixed noise ----
+    # Fixed noise
     rng = torch.Generator(device="cpu").manual_seed(args.noise_seed)
     noise = torch.randn(x_0_std_t.shape, generator=rng).float()
 
-    # ---- Construct x_t coefficients at the fixed timestep ----
+    # Construct x_t coefficients at the fixed timestep
     sa = diffusion.sqrt_alphas_cumprod[args.timestep].item()
     soma = diffusion.sqrt_one_minus_alphas_cumprod[args.timestep].item()
     print(f"\nAt t={args.timestep}: sqrt(α_cum)={sa:.4f}, "
           f"sqrt(1-α_cum)={soma:.4f}")
     print(f"Extracting from down_blocks level {args.level}")
 
-    # ---- Forward in batches ----
+    # Forward in batches
     print(f"\nForwarding {n_images} latents through the U-Net encoder "
           f"in batches of {args.batch_size}...")
     all_features = []
@@ -255,7 +251,7 @@ def main() -> int:
           f"std={all_features.std():.3f}, "
           f"range=[{all_features.min():.3f}, {all_features.max():.3f}]")
 
-    # ---- Save ----
+    # Save
     np.savez_compressed(
         args.out,
         latents=all_features.astype(np.float32),
@@ -266,7 +262,7 @@ def main() -> int:
     print(f"\nWrote {args.out}")
     print(f"  Uncompressed size: {all_features.nbytes / 1e6:.1f} MB")
 
-    print(f"\nNext steps:")
+    print(f"\nNext:")
     print(f"  1. Add a new condition to run_multiseed_matched.py:")
     print(f"       {{")
     print(f'           "key":     "matched_diffusion_features",')

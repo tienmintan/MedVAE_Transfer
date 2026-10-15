@@ -1,23 +1,26 @@
 """
-sdvae_reconstruction_check.py
+sdvae_reconstruction_check.py: check how well Stable Diffusion's VAE reconstructs BoostNet spine X-rays.
 
-Diagnostic: can Stable Diffusion's VAE reconstruct BoostNet spine X-rays?
-
-Before committing to SD-VAE as a diffusion backbone, we need to verify it
-can actually represent our data. SD-VAE was trained on natural images
-(LAION dataset) — spine X-rays are visually distinct, so the domain gap
-could be severe.
+Checks whether SD-VAE can represent BoostNet radiographs before it is used as
+a diffusion backbone. SD-VAE was trained on natural images (LAION dataset);
+spine X-rays are visually distinct, so the domain gap could be severe.
 
 This script:
   1. Loads stabilityai/sd-vae-ft-mse (the SD 1.5 fine-tuned MSE VAE)
   2. Loads a few BoostNet test images
   3. Encodes each at 256x768 (aspect-preserving rectangular shape, multiple
-     of 32 for clean U-Net downsampling, latent shape 32x96x4)
-  4. Decodes back, computes PSNR/MS-SSIM
+     of 32 so U-Net downsampling divides without remainder, latent shape 32x96x4)
+  4. Decodes back, computes PSNR
   5. Saves a side-by-side comparison figure
 
-If reconstructions look reasonable -> proceed to SD-VAE extraction + diffusion
-If reconstructions look bad     -> SD-VAE has too much domain gap, abandon
+Interpretation:
+  reconstructions look reasonable -> SD-VAE is usable for latent extraction
+                                     and diffusion
+  reconstructions look poor       -> the domain gap is too large for SD-VAE
+
+Inputs:  --csv (image_uuid, split); JPEG images in --img-dir.
+Outputs: a comparison figure at --out; per-image and mean PSNR printed to
+         stdout.
 
 Usage:
     python sdvae_reconstruction_check.py \\
@@ -39,8 +42,8 @@ from diffusers import AutoencoderKL
 
 
 # Target shape for inputs to SD-VAE.
-# Multiple of 32 in both dims (for clean U-Net downsampling later).
-# Aspect ratio 1:3 — closer to BoostNet's native 1:2.8 than 384x1024 would be,
+# Multiple of 32 in both dims (so U-Net downsampling divides without remainder).
+# Aspect ratio 1:3, closer to BoostNet's native 1:2.8 than 384x1024 would be,
 # while keeping the spatial extent manageable.
 W_FIX, H_FIX = 256, 768
 LATENT_DOWNSAMPLE = 8     # SD-VAE has 8x spatial compression
@@ -56,7 +59,7 @@ def encode_decode_sdvae(vae, image_pil, device, dtype):
     arr = np.array(pil).astype(np.float32) / 255.0    # (H, W) in [0, 1]
 
     # SD-VAE expects 3-channel RGB input in [-1, 1].
-    # Repeat grayscale across channels.
+    # Repeat greyscale across channels.
     inp = torch.from_numpy(arr).unsqueeze(0).unsqueeze(0)              # (1, 1, H, W)
     inp = inp.repeat(1, 3, 1, 1)                                       # (1, 3, H, W)
     inp = (inp * 2.0) - 1.0                                            # [0, 1] -> [-1, 1]
@@ -66,7 +69,7 @@ def encode_decode_sdvae(vae, image_pil, device, dtype):
     latent = vae.encode(inp).latent_dist.mode()      # (1, 4, H/8, W/8)
     recon = vae.decode(latent).sample                # (1, 3, H, W) in [-1, 1]
 
-    # Back to grayscale [0, 1] for comparison
+    # Back to greyscale [0, 1] for comparison
     recon = recon.mean(dim=1).float()                # average RGB -> 1 ch
     recon = (recon + 1.0) / 2.0                      # [-1, 1] -> [0, 1]
     recon = recon.clamp(0.0, 1.0).squeeze(0).cpu().numpy()
@@ -166,9 +169,9 @@ def main():
     mean_psnr = np.mean([r[3] for r in results])
     print(f"\nMean PSNR: {mean_psnr:.2f} dB")
     print(f"\nDecision criterion:")
-    print(f"  PSNR > 30 dB and recons look sharp        -> proceed to diffusion")
-    print(f"  PSNR 25-30 dB but recons look blurry      -> borderline, judgment call")
-    print(f"  PSNR < 25 dB or recons have artifacts     -> domain gap too severe")
+    print(f"  PSNR > 30 dB and recons look sharp        -> usable as a diffusion backbone")
+    print(f"  PSNR 25-30 dB but recons look blurry      -> borderline; needs visual judgement")
+    print(f"  PSNR < 25 dB or recons have artefacts     -> domain gap too severe")
 
 
 if __name__ == "__main__":

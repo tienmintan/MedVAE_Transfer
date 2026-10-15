@@ -1,28 +1,32 @@
 """
-extract_latents_whole.py
+extract_latents_whole.py: extract per-image latents by whole-image encoding, without tiling.
 
-Phase 3 redux — extract per-image latents via WHOLE-IMAGE encoding at 384x768,
-one forward pass per image, no tiling. Saves one .npz per split, mirroring
-the format of extract_latents_tiled.py so it slots into the existing
-downstream regressor pipeline.
+Extracts per-image latents via whole-image encoding at W_FIX x H_FIX
+(currently 384x1024, set in the module), one forward
+pass per image, no tiling. Saves one .npz per split in the format of
+extract_latents_tiled.py, so the output fits the downstream regressor
+pipeline.
 
 Why this instead of tile-and-stitch latent extraction:
-  - One latent per image (size 96x192) instead of a tiled grid (576x192).
+  - One latent per image (96x256 at 384x1024) instead of a tiled grid (576x192).
   - No tile boundaries, no overlapping latents averaged together, no per-tile
-    normalization quirks.
+    normalisation quirks.
   - Avoids the latent-space cosine blending logic which adds complexity.
-  - The qualitative whole-image reconstruction experiment showed that the
-    patch encoder generalises cleanly to 384x768 inference, so the latents
-    should be coherent.
+  - The whole-image reconstruction check (evaluate_whole_image.py) tests
+    whether the patch encoder generalises to whole-image inference; if it
+    does, the latents should be coherent.
 
 Trade-offs vs tile-and-stitch:
-  - Still requires a resize (~880x2480 → 384x768). This is a milder
-    interpolation than the original 384x384 squash, but is not native
-    resolution. Native resolution doesn't fit in memory due to bottleneck
-    self-attention.
-  - Whole-image inference produces ~3 dB worse reconstructions than tile-
-    and-stitch in PSNR terms, though visually indistinguishable. Latent
-    quality may follow the same pattern.
+  - Still requires a resize (~880x2480 -> 384x1024). This is a milder
+    interpolation than the 384x384 squash of the aspect-padded pipeline,
+    but is not native resolution. Native resolution does not fit in memory
+    due to bottleneck self-attention.
+  - Whole-image and tile-and-stitch reconstructions are compared in PSNR
+    by evaluate_whole_image.py; latent quality may follow the same pattern.
+
+Inputs:  --csv (image_uuid, split); JPEG images in --img-dir; the
+         patch-finetuned checkpoint (--ckpt).
+Outputs: <out-dir>/latents_{train,val,test}.npz (compressed).
 
 Usage:
     python extract_latents_whole.py \\
@@ -45,7 +49,7 @@ from evaluate_reconstruction_tiled import load_finetuned_medvae
 
 H_FIX, W_FIX = 1024, 384   # PIL uses (W, H); store consistently
 DOWNSAMPLE   = 4
-LATENT_H, LATENT_W = H_FIX // DOWNSAMPLE, W_FIX // DOWNSAMPLE   # 192, 96
+LATENT_H, LATENT_W = H_FIX // DOWNSAMPLE, W_FIX // DOWNSAMPLE   # 256, 96
 
 
 @torch.no_grad()
@@ -56,13 +60,13 @@ def encode_whole(model, image: torch.Tensor, device, dtype):
     Returns: (Cz, LATENT_H, LATENT_W) on CPU as float32.
     """
     # Per-image min-max normalisation matching the patch-training scheme,
-    # just applied at whole-image scale instead of per-patch.
+    # applied at whole-image scale instead of per-patch.
     imin, imax = image.min(), image.max()
     if imax > imin:
         norm = (image - imin) / (imax - imin)
     else:
         norm = torch.zeros_like(image)
-    norm = (norm - 0.5) / 0.5     # [0, 1] → [-1, 1]
+    norm = (norm - 0.5) / 0.5     # [0, 1] -> [-1, 1]
 
     inp = norm.unsqueeze(0).to(device=device, dtype=dtype)
     with torch.autocast(device_type=device.type, dtype=dtype):

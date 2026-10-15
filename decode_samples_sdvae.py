@@ -1,10 +1,14 @@
 """
-decode_samples_sdvae.py
+decode_samples_sdvae.py: decode synthetic latents to pixel-space spine X-rays with the SD-VAE decoder.
 
-Decode synthetic latents back to pixel-space spine X-rays via Stable
-Diffusion's VAE decoder. Reads the same .npz schema as decode_samples.py
-but expects 4-channel latents at SD-VAE's spatial extent (e.g., 96x32 for
-inputs encoded at 768x256).
+Counterpart of decode_samples.py for Stable Diffusion's VAE
+(stabilityai/sd-vae-ft-mse). It reads the same .npz schema but expects
+4-channel latents at SD-VAE's spatial extent (e.g., 96x32 for inputs encoded
+at 768x256).
+
+Inputs:  a .npz file containing 'latents' (N, 4, H, W) and optionally
+         'angles' or 'target_angles'.
+Outputs: a grid PNG at --out, titled with the target Cobb angles where present.
 
 Usage:
     python decode_samples_sdvae.py \\
@@ -25,10 +29,10 @@ from diffusers import AutoencoderKL
 
 @torch.no_grad()
 def decode_one(vae, latent: torch.Tensor, device, dtype) -> np.ndarray:
-    """Decode a single (1, 4, H, W) latent to a (3*H, 3*W) grayscale image.
+    """Decode a single (1, 4, H, W) latent to a greyscale image.
 
-    SD-VAE outputs RGB; we average across channels for display since the
-    inputs were grayscale-as-3-channel.
+    SD-VAE outputs RGB; the channels are averaged for display because the
+    inputs were greyscale replicated to 3 channels.
     """
     latent = latent.to(device=device, dtype=dtype)
     decoded = vae.decode(latent).sample                  # (1, 3, H*8, W*8) in [-1, 1]

@@ -1,17 +1,21 @@
 """
-sample_diffusion.py
+sample_diffusion.py: generate synthetic latents from the trained Cobb-conditioned diffusion model.
 
-Generate synthetic latents from the trained conditional diffusion model.
 Targets a specified distribution of Cobb angles and saves the resulting
 latents in the same .npz schema as extract_latents_whole.py, so the
 downstream Cobb regressor can consume them directly for augmentation.
 
 Two sampling modes for the Cobb targets:
   - 'match-train': sample Cobb angle vectors from the empirical distribution
-    of the real training set (recommended for augmentation experiments —
+    of the real training set (recommended for augmentation experiments, as it
     keeps the synthetic-set distribution close to the real one)
   - 'uniform': sample uniformly from a given range per angle (useful for
     generating severe / underrepresented cases for class-imbalance studies)
+
+Inputs:  a diffusion checkpoint (--checkpoint) with EMA weights and the Cobb
+         and latent standardisation statistics; --labels-csv for match-train.
+Outputs: --out .npz with latents (un-standardised, MedVAE native scale),
+         angles, uuids ("synth_*") and splits ("train").
 
 Usage:
     # Generate 500 synthetic latents matching the training distribution
@@ -49,7 +53,8 @@ from diffusion_model import UNet, GaussianDiffusion, EMA
 def load_checkpoint(ckpt_path: Path, device: torch.device):
     """Reconstruct the model from a checkpoint, loaded with EMA weights."""
     # weights_only=False because the checkpoint contains numpy arrays
-    # (cobb_mean, cobb_std). Safe since we created this checkpoint ourselves.
+    # (cobb_mean, cobb_std). Safe because the checkpoint is produced by this
+    # project's own training script.
     ckpt = torch.load(ckpt_path, map_location="cpu", weights_only=False)
     hp = ckpt["hyperparams"]
     model = UNet(in_channels=hp["in_channels"],
@@ -65,7 +70,7 @@ def load_checkpoint(ckpt_path: Path, device: torch.device):
                                    parameterization=hp.get("parameterization", "eps"))
     cobb_mean = torch.from_numpy(ckpt["cobb_mean"]).to(device)
     cobb_std  = torch.from_numpy(ckpt["cobb_std"]).to(device)
-    # Latent standardisation stats — required to un-standardise samples back
+    # Latent standardisation stats, required to un-standardise samples back
     # to MedVAE's native distribution before they can be decoded
     latent_mean = float(ckpt.get("latent_mean", 0.0))
     latent_std  = float(ckpt.get("latent_std", 1.0))
@@ -149,9 +154,9 @@ def main():
     raw_angles, std_angles = get_target_angles(args, args.n_samples, device,
                                                 cobb_mean, cobb_std)
     print(f"Target Cobb angles (raw):")
-    print(f"  Range PT: [{raw_angles[:,0].min():.1f}, {raw_angles[:,0].max():.1f}]")
-    print(f"  Range MT: [{raw_angles[:,1].min():.1f}, {raw_angles[:,1].max():.1f}]")
-    print(f"  Range TL: [{raw_angles[:,2].min():.1f}, {raw_angles[:,2].max():.1f}]")
+    print(f"  Range, major curve (col 0): [{raw_angles[:,0].min():.1f}, {raw_angles[:,0].max():.1f}]")
+    print(f"  Range, col 1:               [{raw_angles[:,1].min():.1f}, {raw_angles[:,1].max():.1f}]")
+    print(f"  Range, col 2:               [{raw_angles[:,2].min():.1f}, {raw_angles[:,2].max():.1f}]")
 
     # Sample in batches
     all_latents = []
@@ -189,7 +194,7 @@ def main():
     print(f"  native (un-standardised) stats: mean={all_latents.mean():.3f} "
           f"std={all_latents.std():.3f}")
 
-    # Synthetic uuids — distinct from real ones so we can identify them later
+    # Synthetic uuids, distinct from real ones so synthetic samples can be identified later
     synth_uuids = np.array([f"synth_{i:06d}" for i in range(args.n_samples)])
 
     np.savez_compressed(
@@ -202,7 +207,7 @@ def main():
         splits=np.array(["train"] * args.n_samples),
     )
     print(f"Wrote {args.out}")
-    print(f"\nNext step: use these latents to augment Cobb regressor training.")
+    print(f"\nNext: use these latents to augment Cobb regressor training.")
 
 
 if __name__ == "__main__":

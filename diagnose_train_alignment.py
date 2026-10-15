@@ -1,16 +1,21 @@
 """
-diagnose_train_alignment.py — find the train landmark<->uuid crosswalk.
+diagnose_train_alignment.py: find the crosswalk between training landmark rows and pipeline image UUIDs.
 
-Read-only. The test split maps fine via landmark_row_lookup_test_fixed.csv;
-training does not, because training/filenames.csv stems and the pipeline's
-image_uuids use different naming. This script inspects the real files and
-reports the relationship so we can build a correct train lookup (rather than
-silently dropping 96% of the training set, as the extraction just did).
+Read-only. The test split maps via landmark_row_lookup_test_fixed.csv; the
+training split does not, because training/filenames.csv stems and the
+pipeline's image_uuids use different naming. This script inspects the files
+and reports how the two relate, so that a correct train lookup can be built;
+without one, unmatched training images are silently dropped.
 
-Run:
+Inputs:  --csv (pipeline CSV with image_uuid and, optionally, split); --landmarks-dir
+         containing training/landmarks.csv and training/filenames.csv;
+         --workdir, searched for existing lookup or crosswalk CSVs.
+Outputs: none; the report is printed to stdout.
+
+Usage:
   python diagnose_train_alignment.py \
     --csv ./medvae/data/boostnet_with_angles.csv \
-    --landmarks-dir ~/MedVAE/data/boostnet_labeldata/labels \
+    --landmarks-dir ./data/boostnet_labeldata/labels \
     --workdir .
 """
 import argparse
@@ -39,7 +44,7 @@ def main():
     args = ap.parse_args()
 
     print("=" * 70)
-    print("1) TRAINING landmark files")
+    print("1) Training landmark files")
     print("=" * 70)
     tdir = args.landmarks_dir / "training"
     lm = pd.read_csv(tdir / "landmarks.csv", header=None)
@@ -55,14 +60,14 @@ def main():
         print(f"  entries have extensions: {has_ext}")
         show("  filenames col0 stems", fn_stems)
         if lm.shape[0] != len(fn_stems):
-            print(f"  !! row-count mismatch: {len(fn_stems)} filenames vs "
-                  f"{lm.shape[0]} landmark rows — order pairing is suspect.")
+            print(f"  WARNING: row-count check failed ({len(fn_stems)} filenames vs "
+                  f"{lm.shape[0]} landmark rows). Pairing filenames with landmark rows by order is likely invalid.")
     else:
-        print("  NO training/filenames.csv found.")
+        print("  No training/filenames.csv found.")
     print("  files in training dir:", [p.name for p in tdir.glob('*')])
 
     print("\n" + "=" * 70)
-    print("2) PIPELINE csv")
+    print("2) Pipeline CSV")
     print("=" * 70)
     df = pd.read_csv(args.csv)
     print(f"{args.csv.name} shape: {df.shape}")
@@ -82,7 +87,7 @@ def main():
             print(f"  candidate column '{c}': {sample.head(3).tolist()}")
 
     print("\n" + "=" * 70)
-    print("3) OVERLAP under several normalisations")
+    print("3) Overlap under several normalisations")
     print("=" * 70)
     if fn_stems is not None:
         norms = {
@@ -100,10 +105,10 @@ def main():
             print(f"  {name:<22}: overlap {len(ov)} / {len(u_set)} train+val uuids")
         # show the ones that match raw, to see their shape
         raw_match = sorted(set(fn_stems) & uset)
-        show("\n  RAW-matching uuids (the ~handful that survived)", raw_match)
-        # and a few that DON'T match, for contrast
+        show("\n  Raw-matching uuids", raw_match)
+        # and a few that do not match, for contrast
         nomatch = sorted(uset - set(fn_stems))
-        show("  NON-matching pipeline uuids", nomatch)
+        show("  Non-matching pipeline uuids", nomatch)
 
     print("\n" + "=" * 70)
     print("4) existing lookup/crosswalk files in workdir")
@@ -120,7 +125,7 @@ def main():
                 print(f"  {p.name}: cols={list(h.columns)}")
             except Exception as e:
                 print(f"  {p.name}: (unreadable: {e})")
-    # also peek at the working test lookup to mirror its schema for train
+    # also read the working test lookup, whose schema the train lookup should mirror
     tl = args.workdir / "landmark_row_lookup_test_fixed.csv"
     if tl.exists():
         t = pd.read_csv(tl)

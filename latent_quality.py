@@ -1,51 +1,55 @@
 """
-latent_quality.py — is the MedVAE latent a suitable substrate for diffusion?
+latent_quality.py: measure whether the MedVAE latent has the properties latent diffusion assumes.
 
-WHY. Landmark-conditioned diffusion in MedVAE latent space produces realistic
-samples but follows its conditioning only weakly (r ~ 0.3). One explanation is
-that MedVAE is the wrong kind of autoencoder for this: standard latent
-diffusion uses a VAE trained WITH a KL penalty precisely so the latent is
-smooth and roughly Gaussian. MedVAE is a COMPRESSIVE, task-agnostic encoder
-whose purpose is to discard information — nothing forces its latent to have the
-properties diffusion assumes.
+Tests one possible explanation for weak conditioning adherence of
+landmark-conditioned diffusion in MedVAE latent space: that MedVAE is the
+wrong kind of autoencoder for this. Standard latent diffusion uses a VAE
+trained with a KL penalty so that the latent is smooth and roughly Gaussian.
+MedVAE is a compressive, task-agnostic encoder whose purpose is to discard
+information; nothing forces its latent to have the properties diffusion
+assumes.
 
-That is a hypothesis, and it has been asserted rather than measured. This
-script measures it, against a PIXEL-SPACE reference so the numbers mean
-something.
+Each property is measured against a pixel-space reference, which gives the
+numbers a point of comparison.
 
-WHAT IS MEASURED
+Measures:
 
-  1. GAUSSIANITY. Diffusion assumes the data is roughly standard-normal at
+  1. Gaussianity. Diffusion assumes the data is roughly standard-normal at
      t=T and interpolates towards it. Heavy tails or strong skew make the
      forward process a poor match for the data.
 
-  2. SPATIAL CORRELATION. Diffusion adds i.i.d. noise. If neighbouring latent
+  2. Spatial correlation. Diffusion adds i.i.d. noise. If neighbouring latent
      positions are very strongly correlated, i.i.d. noise is a mismatched
      corruption process.
 
-  3. INTERPOLATION SMOOTHNESS — the most important test. Decode the midpoint
+  3. Interpolation smoothness (the most important test). Decode the midpoint
      of two real latents. In a smooth latent this yields a plausible
      intermediate spine; in a latent with holes it yields something incoherent.
      Diffusion trajectories pass through exactly this off-data region, so a
-     latent that fails here is a bad substrate REGARDLESS of its statistics.
+     latent that fails here is a poor substrate regardless of its statistics.
 
-  4. LOCAL CONTINUITY. Perturb a latent slightly and measure how far the decode
+  4. Local continuity. Perturb a latent slightly and measure how far the decode
      moves. A latent where tiny moves cause large image changes is hard to
      denoise stably.
 
-  5. EFFECTIVE DIMENSIONALITY. How many PCA components carry the variance. A
+  5. Effective dimensionality. How many PCA components carry the variance. A
      latent whose variance concentrates in very few directions is effectively
      lower-dimensional than its shape suggests, which wastes diffusion capacity.
 
-INTERPRETATION. Every measure is reported alongside the same measure computed
-on downsampled PIXELS. Pixels are a substrate that pixel-space diffusion is
-known to handle, so "worse than pixels" is the meaningful comparison — not any
-absolute threshold.
+Interpretation: every measure is reported alongside the same measure computed
+on downsampled pixels. Pixels are a substrate that pixel-space diffusion is
+known to handle, so "worse than pixels" is the relevant comparison, rather
+than any absolute threshold.
 
-Run:
+Inputs:  --latents-dir (latents_{config}_train.npz with latents and uuids),
+         --img-dir (the matching images) and the MedVAE decoder for --config.
+Outputs: the five measures and a verdict printed to stdout (--out-dir is
+         created but no files are written to it).
+
+Usage:
   python latent_quality.py --latents-dir ./latents_aspect --img-dir ./medvae/data/boostnet \\
       --config medvae_4_1_2d --out-dir ./outputs/latent_quality
-  python latent_quality.py --smoke
+  python latent_quality.py --smoke      # synthetic-data self-test
 """
 import argparse
 from pathlib import Path
@@ -53,9 +57,7 @@ from pathlib import Path
 import numpy as np
 
 
-# ==========================================================================
-# statistics
-# ==========================================================================
+# --- Statistics ---
 def moments(x):
     """Mean, sd, skew, excess kurtosis of a flat array."""
     x = np.asarray(x, dtype=np.float64).ravel()
@@ -117,7 +119,7 @@ def effective_dim(arr, thresh=0.95):
     return k, pr, len(w)
 
 
-# ==========================================================================
+# --- Measurement ---
 def run(args):
     import torch
     from PIL import Image
@@ -133,7 +135,7 @@ def run(args):
     lat = lat[:n]
     print(f"latents {lat.shape}")
 
-    # ---- pixel-space reference at the same spatial size ----
+    # Pixel-space reference at the same spatial size
     size = lat.shape[-1]
     pix = []
     for u in uu[:n]:
@@ -161,7 +163,7 @@ def run(args):
     lat_s = (lat - lat.mean()) / (lat.std() + 1e-8)
 
     print("=" * 70)
-    print("1) GAUSSIANITY  (diffusion assumes ~N(0,1); skew 0, excess kurtosis 0)")
+    print("1) Gaussianity  (diffusion assumes ~N(0,1); skew 0, excess kurtosis 0)")
     print("=" * 70)
     lrows = gaussianity_report("MedVAE latent (standardised)", lat_s)
     prows = gaussianity_report("PIXEL reference (standardised)", pix)
@@ -171,11 +173,11 @@ def run(args):
     ps = np.mean([abs(r["skew"]) for r in prows])
     print(f"\n    mean |excess kurtosis|: latent {lk:.3f}  vs  pixels {pk:.3f}")
     print(f"    mean |skew|           : latent {ls:.3f}  vs  pixels {ps:.3f}")
-    print(f"    -> latent is {'WORSE' if lk > pk else 'better'} on tails, "
-          f"{'WORSE' if ls > ps else 'better'} on skew")
+    print(f"    -> latent is {'worse' if lk > pk else 'better'} on tails, "
+          f"{'worse' if ls > ps else 'better'} on skew")
 
     print("\n" + "=" * 70)
-    print("2) SPATIAL CORRELATION  (diffusion adds i.i.d. noise)")
+    print("2) Spatial correlation  (diffusion adds i.i.d. noise)")
     print("=" * 70)
     la = spatial_autocorr(lat_s); pa = spatial_autocorr(pix)
     print(f"    lag:        " + "".join(f"{i+1:>8}" for i in range(len(la))))
@@ -184,7 +186,7 @@ def run(args):
     print(f"    -> lag-1 correlation {la[0]:.3f} (latent) vs {pa[0]:.3f} (pixels)")
 
     print("\n" + "=" * 70)
-    print("3) INTERPOLATION SMOOTHNESS  (the most important test)")
+    print("3) Interpolation smoothness  (the most important test)")
     print("=" * 70)
     mvae = MVAE(model_name=args.config, modality="xray").to(device).eval()
 
@@ -211,7 +213,7 @@ def run(args):
 
     # A smooth latent: decode(mix of latents) ~ mix of decode(latents).
     # Large deviation means the midpoint falls into a region the decoder does
-    # not map coherently — a "hole" the diffusion trajectory must cross.
+    # not map coherently: a "hole" the diffusion trajectory must cross.
     devs, sharp = [], []
     for i, j in pairs:
         za, zb = lat[i:i + 1], lat[j:j + 1]
@@ -229,11 +231,11 @@ def run(args):
     print(f"    gradient energy ratio, decoded-mid vs averaged: "
           f"median {np.median(sharp):.3f}")
     print("      (~1.0 = the midpoint decodes no sharper than a blurry average,")
-    print("       i.e. the latent midpoint is NOT a coherent new image;")
-    print("       >1.2 = the decoder produces genuine structure at the midpoint)")
+    print("       i.e. the latent midpoint is not a coherent new image;")
+    print("       >1.2 = the decoder produces new structure at the midpoint)")
 
     print("\n" + "=" * 70)
-    print("4) LOCAL CONTINUITY  (how far does the decode move for a small step?)")
+    print("4) Local continuity  (how far does the decode move for a small step?)")
     print("=" * 70)
     ratios = []
     for i in rng.choice(len(lat), size=min(16, len(lat)), replace=False):
@@ -253,7 +255,7 @@ def run(args):
     print("       image errors, which makes stable denoising harder)")
 
     print("\n" + "=" * 70)
-    print("5) EFFECTIVE DIMENSIONALITY")
+    print("5) Effective dimensionality")
     print("=" * 70)
     kl, prl, nl = effective_dim(lat_s)
     kp, prp, npx = effective_dim(pix)
@@ -263,7 +265,7 @@ def run(args):
           f"participation ratio {prp:.1f}")
 
     print("\n" + "=" * 70)
-    print("VERDICT")
+    print("Verdict")
     print("=" * 70)
     flags = []
     if lk > 2 * pk and lk > 1.0:
@@ -277,16 +279,16 @@ def run(args):
     if flags:
         for f in flags:
             print(f"  * {f}")
-        print("\n  These support the hypothesis that MedVAE's compressive latent is a")
-        print("  poor substrate for diffusion, and motivate a pixel-space comparison.")
+        print("\n  These results are consistent with the hypothesis that MedVAE's compressive")
+        print("  latent is a poor substrate for diffusion; a pixel-space comparison would test this further.")
     else:
-        print("  No strong pathology found relative to pixels. The latent is NOT")
-        print("  obviously the problem — the conditioning weakness likely lies in the")
+        print("  Result: no strong pathology found relative to pixels. The latent does not")
+        print("  appear to be the cause; the conditioning weakness likely lies in the")
         print("  architecture (concatenation vs cross-attention) instead.")
-        print("  Do not claim the latent is at fault without evidence.")
+        print("  On these measures, the latent is not shown to be at fault.")
 
 
-# ==========================================================================
+# --- Synthetic-data self-test ---
 def smoke():
     rng = np.random.default_rng(0)
     print("1) moments on known distributions")
@@ -326,7 +328,7 @@ def smoke():
     ok = (abs(moments(g)["kurtosis"]) < 0.2 and moments(t)["kurtosis"] > 2
           and moments(e)["skew"] > 1.5 and abs(aw[0]) < 0.1 and as_[0] > 0.5
           and prl < 10 and prf > 50)
-    print("\nSMOKE:", "PASS" if ok else "FAIL")
+    print("\nSelf-test:", "PASS" if ok else "FAIL")
 
 
 def main():
@@ -344,7 +346,7 @@ def main():
     elif args.latents_dir and args.img_dir:
         run(args)
     else:
-        raise SystemExit("need --latents-dir and --img-dir (or --smoke)")
+        raise SystemExit("--latents-dir and --img-dir are required (or --smoke for the synthetic-data self-test)")
 
 
 if __name__ == "__main__":

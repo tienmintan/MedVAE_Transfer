@@ -3,6 +3,22 @@
 No model fitting. Uses the original geometric definitions, restores pixel
 aspect ratio, verifies the annotation convention before reading model outputs,
 and names stored Cobb columns by their validated anatomical meanings.
+
+The geometry source is checked against the bundled audited reference
+(verify_protocol_source) before it is imported. Paired 4_1 vs 8_1 comparisons
+use image-level bootstrap resampling (--resamples, at least 10,000).
+
+Inputs:  --study-dir (manifest.json and completed ten-seed runs with
+         preds_{config}.npz), --img-dir (images, for pixel scaling) and
+         --geometry-source (default references/cobb_from_landmarks.py).
+Outputs: in <study-dir>/geometry (per variant where applicable):
+         geometric_readouts.csv, direct_per_angle.csv, geometry_per_image.csv,
+         annotation_geometry_validation.csv, image_dimensions.csv,
+         geometry_protocol.json and README.md; tables printed to stdout.
+
+Usage:
+  python analyse_projection_geometry.py --study-dir <study> --img-dir <images> \
+      [--variant raw_keep|projected_keep|both]
 """
 import argparse
 from pathlib import Path
@@ -72,12 +88,12 @@ def _analyse_variant(args, variant):
     result = g.discover_geometry(gt["landmarks"]*scale, gt["cobb"])
     require(result is not None, "Could not identify the annotation convention")
     grouping, perm, assignment, _ = result
-    require(tuple(assignment) == (1,0,2), "Annotation output identities differ from the report")
+    require(tuple(assignment) == (1,0,2), "Annotation output identities differ from the expected assignment (1, 0, 2)")
     theta = g.endplate_angles(g.to_vertebrae(gt["landmarks"]*scale, grouping), perm)
     derived = g.three_cobb(theta)[:, assignment]
     residual = np.abs(derived-gt["cobb"]).mean(0)
     require(residual[0] < .05 and residual[1] < .5,
-            f"Ground-truth geometry failed report calibration: MAEs {residual.tolist()}")
+            f"Ground-truth geometry calibration failed (thresholds 0.05 and 0.5 deg for outputs 0 and 1): MAEs {residual.tolist()}")
     calibration = [dict(output_index=j, angle=name, mae_degrees=float(residual[j]),
         correlation=float(np.corrcoef(derived[:,j], gt["cobb"][:,j])[0,1]))
         for j, name in enumerate(ANGLE_NAMES)]
@@ -119,15 +135,17 @@ def _analyse_variant(args, variant):
     (out/"README.md").write_text("""# Projected geometry follow-up
 
 These results use saved ten-seed predictions for projected 4_1 and 8_1. The five
-readouts reproduce the thesis definitions, including pixel-space angles and
-GT-selected end vertebrae. The regional Cobb readout concerns the **upper** curve
-and compares derived predictions with geometry from GT landmarks. Direct Cobb
-is instead the mean of three supplied angle targets. They are different targets.
+readouts use the definitions in the geometry source (by default
+references/cobb_from_landmarks.py), including pixel-space angles and end
+vertebrae selected from GT landmarks. The regional Cobb readout concerns the
+upper curve and compares derived predictions with geometry from GT landmarks.
+Direct Cobb is the mean absolute error over the three supplied angle targets.
+They are different targets.
 
 The per-angle table names stored outputs 0/1/2 as major/upper/lower. The lower
 geometric convention has a known residual against the supplied labels; it is not
 used as another derived-Cobb endpoint here. Raw angular differences match the
-original script; no new wrapping or clipping is introduced.
+geometry source; no new wrapping or clipping is introduced.
 
 Positive deltas indicate higher error for projected 8_1. Family-adjusted and
 all-eight adjusted p-values are supplied separately. Intervals resample images
@@ -157,7 +175,7 @@ def main():
     p.add_argument("--variant", choices=("raw_keep", "projected_keep", "both"),
                    help="Default: both for fresh paired studies, projected_keep for historical-cache studies")
     p.add_argument("--resamples", type=int, default=10000)
-    args = p.parse_args(); require(args.resamples >= 10000, "Use at least 10,000 draws")
+    args = p.parse_args(); require(args.resamples >= 10000, "--resamples must be at least 10,000")
     analyse(args)
 
 

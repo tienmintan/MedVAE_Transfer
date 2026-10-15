@@ -1,13 +1,17 @@
 """
-verify_models.py — confirm the four native MedVAE 2D checkpoints load, and
-report what latent each produces. Chiefly to confirm `medvae_8_4_2d` (inferred
-from the paper's f=64/C=4 row) actually exists before we extract it.
+verify_models.py: check that the four native MedVAE 2D checkpoints load, and report the latent each produces.
 
-Total compression ratio for a grayscale input = f / C, where f is the 2D-area
+The main purpose is to confirm that `medvae_8_4_2d` (inferred from the
+f=64/C=4 row of the MedVAE paper) exists before it is used for extraction.
+
+Total compression ratio for a greyscale input = f / C, where f is the 2D-area
 downsizing factor (16 for the '4x' models, 64 for the '8x' models) and C is the
 latent channel count.
 
-Run:
+Inputs:  one spine image (--img), used to probe the latent shape.
+Outputs: a table printed to stdout (OK/FAIL, latent shape, compression).
+
+Usage:
   python verify_models.py --img ./medvae/data/boostnet/<any_uuid>.jpg
 """
 import argparse
@@ -59,7 +63,7 @@ def main():
     device = "cuda" if torch.cuda.is_available() else "cpu"
     x = load_2d_finetune_aspect(str(args.img), merge_channels=True).unsqueeze(0).to(device)
 
-    print(f"{'config':<18}{'loads':<8}{'in→latent (C,H,W)':<22}{'total compression':<18}")
+    print(f"{'config':<18}{'loads':<8}{'in->latent (C,H,W)':<22}{'total compression':<18}")
     print("-" * 66)
     for cfg in CONFIGS:
         try:
@@ -72,7 +76,7 @@ def main():
             C, H, W = z.shape
             spatial = cfg.split("_")[1]                        # '4' or '8'
             ratio = F_AREA.get(spatial, float("nan")) / C
-            print(f"{cfg:<18}{'OK':<8}{f'{n_in}ch → {tuple(z.shape)}':<22}"
+            print(f"{cfg:<18}{'OK':<8}{f'{n_in}ch -> {tuple(z.shape)}':<22}"
                   f"{ratio:>6.1f}x  (f={F_AREA.get(spatial)}, C={C})")
             del mvae
             if device == "cuda":

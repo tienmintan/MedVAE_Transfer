@@ -1,24 +1,29 @@
 """
-bland_altman.py
+bland_altman.py: Bland-Altman plots of predicted against ground-truth Cobb angles on the test set.
 
-Generate Bland-Altman plots comparing the regressor's predicted Cobb angles
-against the ground-truth labels on the test set. Reads the .npz files
-produced by train_cobb_regressor.py.
+Reads the .npz files produced by train_cobb_regressor.py for a pretrained and
+a finetuned encoder, and draws one panel per angle column plus one panel with
+all angles combined.
 
 What a Bland-Altman plot shows:
-  * X-axis: mean of (prediction, ground truth) per image — the magnitude
+  * X-axis: mean of (prediction, ground truth) per image, i.e. the magnitude
     of the underlying angle.
-  * Y-axis: difference (prediction − ground truth) per image.
-  * Horizontal lines: bias (mean Δ) and limits of agreement (bias ± 1.96·SD).
+  * Y-axis: difference (prediction - ground truth) per image.
+  * Horizontal lines: bias (mean Δ) and limits of agreement (bias ± 1.96 * SD).
   * 95% of differences should fall within the limits of agreement if errors
     are roughly normal.
 
-What it tells you that MAE doesn't:
+What it shows in addition to MAE:
   * Whether errors are biased (systematic over/under-prediction).
-  * Whether bias varies with angle magnitude (e.g. underestimating severe
-    cases — a common failure mode for regression models trained on data
+  * Whether bias varies with angle magnitude (e.g. underestimation of severe
+    cases, a common failure mode for regression models trained on data
     skewed toward mild cases).
   * Where the outliers are.
+
+Inputs:  two .npz files containing test_preds and test_targets, one column
+         per angle.
+Outputs: the figure at --out; a summary of bias, SD and limits of agreement
+         per encoder and angle, printed to stdout.
 
 Usage:
   python bland_altman.py \\
@@ -52,10 +57,10 @@ def bland_altman_panel(ax, preds, targets, title: str, units: str = "°"):
     ax.axhline(loa_hi, color="C3", linestyle="--", linewidth=1.0,
                label=f"+1.96 SD = {loa_hi:+.2f}{units}")
     ax.axhline(loa_lo, color="C3", linestyle="--", linewidth=1.0,
-               label=f"−1.96 SD = {loa_lo:+.2f}{units}")
+               label=f"-1.96 SD = {loa_lo:+.2f}{units}")
     ax.axhline(0, color="grey", linestyle=":", linewidth=0.8)
     ax.set_xlabel(f"Mean of prediction and ground truth ({units})")
-    ax.set_ylabel(f"Prediction − ground truth ({units})")
+    ax.set_ylabel(f"Prediction - ground truth ({units})")
     ax.set_title(title, fontsize=10)
     ax.legend(loc="upper right", fontsize=7, framealpha=0.9)
     ax.grid(True, alpha=0.25)
@@ -79,8 +84,8 @@ def main() -> None:
 
     # Sanity check: the two runs should share the same test set in the same order.
     if not np.allclose(pre_targets, ft_targets):
-        raise RuntimeError("Test targets differ between the two runs — "
-                           "did you re-run with the same seed and CSV?")
+        raise RuntimeError("Test targets differ between the two runs; "
+                           "they may not have used the same seed and CSV.")
 
     # 4 columns x 2 rows: per-angle (3) + overall (1) for each encoder
     fig, axes = plt.subplots(2, 4, figsize=(20, 9))
@@ -94,12 +99,12 @@ def main() -> None:
         for j in range(3):
             stats = bland_altman_panel(
                 axes[row, j], preds[:, j], targets[:, j],
-                title=f"{name} — {ANGLE_NAMES[j]}")
+                title=f"{name}: {ANGLE_NAMES[j]}")
             summary_rows.append({"encoder": name, "angle": ANGLE_NAMES[j], **stats})
         # Overall panel: flatten all 3 angles together
         stats = bland_altman_panel(
             axes[row, 3], preds.flatten(), targets.flatten(),
-            title=f"{name} — All angles combined")
+            title=f"{name}: All angles combined")
         summary_rows.append({"encoder": name, "angle": "All", **stats})
 
     fig.suptitle(
@@ -110,7 +115,7 @@ def main() -> None:
     fig.savefig(args.out, dpi=140, bbox_inches="tight")
     print(f"Wrote {args.out}")
 
-    # Also print the numerical summary so you have it for the writeup
+    # Also print the numerical summary to stdout
     print("\n=== Bland-Altman summary ===")
     print(f"{'encoder':<20} {'angle':<22} {'bias':>8} {'SD':>8} "
           f"{'LoA lower':>11} {'LoA upper':>11}")

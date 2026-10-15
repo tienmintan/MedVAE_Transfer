@@ -1,17 +1,26 @@
 """
-fix_landmark_lookup.py — repair the uuid<->landmark-row mapping.
+fix_landmark_lookup.py: rebuild the mapping from pipeline image uuids to landmark rows.
 
-The visual alignment confirmed landmark ROWS map to the right IMAGES. But the
-landmark filenames ('sunhl-...-310 C AP.jpg', spaces + mixed case + extension)
-don't string-match the pipeline uuids ('sunhl-...-310_C_AP', underscores, no
-ext), so the naive cross-check gave 0/128 overlap.
+A visual alignment check showed that landmark rows map to the correct images.
+However, the landmark filenames ('sunhl-...-310 C AP.jpg', spaces + mixed case
++ extension) do not string-match the pipeline uuids ('sunhl-...-310_C_AP',
+underscores, no ext), so a direct string comparison does not pair them.
 
 This canonicalises both sides to a common key and rebuilds the lookup:
     canonical(s) = lowercase, spaces/dashes-in-id -> underscores handled,
                    extension stripped.
 
-We DON'T blindly trust it: we report the overlap after canonicalisation and
-print any residual mismatches so they can be eyeballed before Step 2.
+The overlap after canonicalisation is reported so the match rate can be
+checked, and any residual mismatches are printed for inspection before the
+lookup is used downstream.
+
+Inputs:  labels/<training|test>/filenames.csv and landmarks.csv under
+         LABELDATA; the pipeline CSV at PIPELINE_CSV (paths set in the module).
+Outputs: landmark_row_lookup_<split>_fixed.csv in the current directory, with
+         columns image_uuid, landmark_row, landmark_filename.
+
+Usage:
+    python fix_landmark_lookup.py --split test
 """
 
 import argparse
@@ -71,9 +80,9 @@ def main():
         for k in list(lm_canon)[:5]:
             print(f"    landmark canonical '{k}'")
     else:
-        print("  -> FULL match. Every pipeline image has a landmark row.")
+        print("  Result: full match. Every pipeline image has a landmark row.")
 
-    # Build lookup keyed by the ORIGINAL pipeline uuid (what Step 2 will query with)
+    # Build lookup keyed by the original pipeline uuid (the key used by downstream lookups)
     rows = []
     for canon, orig_uuid in pipe_canon.items():
         if canon in lm_canon:

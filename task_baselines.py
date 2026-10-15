@@ -1,27 +1,32 @@
 """
-task_baselines.py — what does each task score WITHOUT looking at the image?
+task_baselines.py: score each task with a trivial predictor that ignores the image.
 
-A low error only means something relative to the trivial predictor. This fits
-the simplest possible model to the TRAIN split and evaluates it on TEST, using
-exactly the metrics the frontier uses, so "% better than baseline" is directly
-comparable across all six tasks.
+An error is interpreted relative to the trivial predictor. This fits the
+simplest possible model to the train split and evaluates it on test, using the
+same metrics as the trained-model results (frontier_summary.csv), so "% better
+than baseline" is comparable across all six tasks.
 
     surgical / severity / curve_pattern : predict the majority class
     landmark                            : predict the mean shape
     cobb                                : predict the mean angle vector
     wedging                             : predict the per-vertebra mean wedge
 
-WHY THIS MATTERS RIGHT NOW. Wedging error is flat at 2.408-2.453 deg across all
-four configs with near-zero seed variation. That is equally consistent with
-"wedging is compression-insensitive" (a finding) and "the model predicts a
-constant and never learned wedging" (an artefact). Only the baseline
-distinguishes them. The same check flags curve_pattern, whose accuracy sits at
-or below its majority baseline.
+Comparing each task's error with the trivial predictor distinguishes a
+compression-insensitive task from a head that predicts a constant: an error
+that is flat across configurations is consistent with either, and only the
+baseline separates them. The same comparison shows whether a classification
+task performs better than its majority-class baseline.
 
-Run:
+Inputs:  --latents-dir (latents_{config}_{split}.npz, providing uuids, cobb and
+         landmarks), --labels-dir (task_labels_{split}.npz, joined by uuid) and
+         optionally --results (frontier_summary.csv) for the model comparison.
+Outputs: the baseline table and verdicts printed to stdout;
+         <out-dir>/task_baselines.csv.
+
+Usage:
   python task_baselines.py --labels-dir ./labels_tasks --latents-dir ./latents_aspect \
       --results ./outputs/ladder/frontier_summary.csv
-  python task_baselines.py --smoke
+  python task_baselines.py --smoke      # synthetic-data self-test
 """
 import argparse
 from pathlib import Path
@@ -37,7 +42,6 @@ UNITS = {"surgical": "err rate", "severity": "err rate", "curve_pattern": "err r
          "landmark": "norm", "cobb": "deg", "wedging": "deg"}
 
 
-# --------------------------------------------------------------------------
 def load(labels_dir, latents_dir, config, split):
     """Task labels joined to the latent split by uuid (never by row order)."""
     out = {}
@@ -78,7 +82,6 @@ def drop_implausible(d):
     return out
 
 
-# --------------------------------------------------------------------------
 def landmark_error(pred, true):
     dx = pred[:, :N_LM] - true[:, :N_LM]
     dy = pred[:, N_LM:] - true[:, N_LM:]
@@ -93,7 +96,7 @@ def boot_ci(v, seed=0, nb=10000):
 
 
 def baseline_for(task, train, test):
-    """Fit the trivial predictor on TRAIN, score it on TEST. Returns
+    """Fit the trivial predictor on train, score it on test. Returns
     (per-image error array, description of the predictor)."""
     if task in CLF_TASKS:
         if task not in train:
@@ -124,7 +127,6 @@ def baseline_for(task, train, test):
     return None, None
 
 
-# --------------------------------------------------------------------------
 def report(train, test, results_csv=None, config_label="4_1"):
     model = {}
     if results_csv and Path(results_csv).exists():
@@ -161,9 +163,9 @@ def report(train, test, results_csv=None, config_label="4_1"):
     for r in rows:
         print(f"   {r['task']:<15} {r['predictor']}")
 
-    # ---- verdicts ----
+    # Verdicts
     print("\n" + "=" * 62)
-    print("VERDICT — is the model actually learning the task?")
+    print("Verdict: does the model improve on the trivial predictor?")
     print("=" * 62)
     for r in rows:
         b = r["better_pct"]
@@ -179,13 +181,13 @@ def report(train, test, results_csv=None, config_label="4_1"):
         else:
             v = "learns well"
         print(f"  {r['task']:<15} {b:>6.1f}% better  ->  {v}")
-    print("\nA task that barely beats its baseline cannot support a compression-")
-    print("tolerance claim: flat error across configs would just mean the model")
-    print("predicts a constant regardless of the input.")
+    print("\nA task that barely beats its baseline gives little evidence of compression")
+    print("tolerance: flat error across configurations would then only mean that the")
+    print("model predicts a constant regardless of the input.")
     return pd.DataFrame(rows)
 
 
-# --------------------------------------------------------------------------
+# Synthetic-data self-test
 def smoke():
     rng = np.random.default_rng(0)
     ntr, nte = 300, 120
@@ -201,9 +203,9 @@ def smoke():
         return d
 
     train, test = make(ntr, True), make(nte, True)
-    # supply "model" results: wedging deliberately AT baseline, cobb clearly better
+    # no model results are supplied; only the baselines and the machinery checks are tested
     tab = report(train, test)
-    print("\n(smoke supplies no model results, so the 'better by' column is blank)")
+    print("\n(the self-test supplies no model results, so the 'better by' column is blank)")
 
     # explicit check of the baseline machinery itself
     err, desc = baseline_for("wedging", train, test)
@@ -215,7 +217,7 @@ def smoke():
     ok_clf = np.allclose(err_s, (test["surgical"] != maj).astype(float))
     print(f"\nwedging baseline matches manual computation: {ok_wedge}")
     print(f"majority-class baseline matches manual computation: {ok_clf}")
-    print("\nSMOKE:", "PASS" if (ok_wedge and ok_clf) else "FAIL")
+    print("\nSelf-test:", "PASS" if (ok_wedge and ok_clf) else "FAIL")
 
 
 def main():
@@ -234,7 +236,7 @@ def main():
         smoke()
         return
     if not (args.labels_dir and args.latents_dir):
-        raise SystemExit("need --labels-dir and --latents-dir (or --smoke)")
+        raise SystemExit("--labels-dir and --latents-dir are required (or --smoke for the synthetic-data self-test)")
     train = load(args.labels_dir, args.latents_dir, args.config, "train")
     test = load(args.labels_dir, args.latents_dir, args.config, "test")
     if args.exclude_implausible:
@@ -243,7 +245,7 @@ def main():
     tab = report(train, test, args.results, args.config_label)
     args.out_dir.mkdir(parents=True, exist_ok=True)
     tab.to_csv(args.out_dir / "task_baselines.csv", index=False)
-    print(f"\nwrote {args.out_dir}/task_baselines.csv")
+    print(f"\nWrote {args.out_dir}/task_baselines.csv")
 
 
 if __name__ == "__main__":

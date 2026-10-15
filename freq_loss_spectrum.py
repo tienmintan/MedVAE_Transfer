@@ -1,11 +1,14 @@
 """
-freq_loss_spectrum.py  —  Step 1 of the compression-frontier frequency analysis.
+freq_loss_spectrum.py: reconstruction-error power spectrum by spatial frequency for MedVAE compression configurations.
+
+First of the freq_loss_*.py frequency analyses (followed by
+freq_loss_edge_interior.py and freq_loss_endplate.py).
 
 Question: which spatial frequencies does MedVAE fail to preserve, and does
 that loss grow with compression?
 
 Method, per test image, per compression config:
-  1. Aspect-pad + resize to 384x384 and normalise to [-1, 1] using the SAME
+  1. Aspect-pad + resize to 384x384 and normalise to [-1, 1] using the same
      loader as evaluate_reconstruction.py (load_2d_finetune_aspect).
   2. Encode -> decode with MedVAE (the variant sets the compression).
   3. Residual r = original - reconstruction (both in [-1, 1]).
@@ -13,17 +16,24 @@ Method, per test image, per compression config:
      x > -0.8 mask), so neither the padding's low-frequency mass nor a
      zeroed-boundary's high-frequency artefact contaminates the spectrum.
   5. 2D FFT of the residual; radially average |FFT|^2 into frequency bins.
-  6. Resample each image's radial profile onto a common NORMALISED frequency
+  6. Resample each image's radial profile onto a common normalised frequency
      axis (0 = DC, 1 = Nyquist) so images with different crop sizes can be
      averaged.
 
-We report the residual power spectrum (absolute loss) AND the residual
-spectrum normalised by the original image's own spectrum (fraction of
-content lost at each frequency) — the latter controls for images simply
-having different amounts of high-frequency content to begin with.
+The script reports the residual power spectrum (absolute loss) and the
+residual spectrum normalised by the original image's own spectrum (fraction
+of content lost at each frequency); the latter controls for images having
+different amounts of high-frequency content to begin with.
 
-Prediction that VALIDATES the direction: residual power rises toward high
-frequency, and the 8x curve sits above the 4x curve at high frequencies.
+Interpretation:
+  residual power rising toward high frequency, with the 8x curve above the
+  4x curve at high frequencies -> compression preferentially discards
+  high-frequency detail, more so at 8x.
+
+Inputs:  --csv (image_uuid, split); JPEG images in --img-dir; MedVAE
+         configurations in --configs.
+Outputs: <out-dir>/freq_loss_spectrum.png and freq_loss_spectrum.csv; a
+         per-band summary printed to stdout.
 
 Usage:
   python freq_loss_spectrum.py \\
@@ -60,9 +70,7 @@ CONFIG_COLORS = {
 }
 
 
-# ---------------------------------------------------------------------------
-# Reconstruction (mirrors evaluate_reconstruction.py exactly)
-# ---------------------------------------------------------------------------
+# Reconstruction (mirrors evaluate_reconstruction.py)
 
 def transform_image(path: str) -> torch.Tensor:
     # (1, 1, 384, 384) in [-1, 1], padding at -1.0
@@ -86,9 +94,7 @@ def content_bbox(x, threshold=CONTENT_THRESHOLD):
             cols[0].item(), cols[-1].item() + 1)
 
 
-# ---------------------------------------------------------------------------
 # Radial power spectrum
-# ---------------------------------------------------------------------------
 
 def radial_power_spectrum(img2d: np.ndarray, n_bins: int = N_FREQ_BINS):
     """Return (norm_freq_bin_centres, radially-averaged power) for a 2D array.
@@ -125,9 +131,7 @@ def radial_power_spectrum(img2d: np.ndarray, n_bins: int = N_FREQ_BINS):
     return centres, prof
 
 
-# ---------------------------------------------------------------------------
 # Main
-# ---------------------------------------------------------------------------
 
 def main():
     p = argparse.ArgumentParser()
@@ -190,7 +194,7 @@ def main():
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
 
-    # ---- Aggregate ----
+    # Aggregate
     rows = []
     fig, axes = plt.subplots(1, 2, figsize=(13, 5))
 
@@ -240,10 +244,10 @@ def main():
     print(f"\nSaved {args.out_dir/'freq_loss_spectrum.png'}")
     print(f"Saved {args.out_dir/'freq_loss_spectrum.csv'}")
 
-    # ---- Quick verdict to stdout ----
-    # The claim lives in the FRACTION-LOST spectrum (residual power / original
-    # power), not the absolute residual spectrum, which is low-frequency
-    # dominated for every config and so hides the effect.
+    # Quick summary to stdout.
+    # The relevant quantity is the fraction-lost spectrum (residual power /
+    # original power), not the absolute residual spectrum, which is
+    # low-frequency dominated for every config and so hides the effect.
     print("\n--- Quick read (fraction of content power lost) ---")
     lo_band = freq_axis <= 0.33
     mid_band = (freq_axis > 0.33) & (freq_axis <= 0.66)
@@ -264,11 +268,11 @@ def main():
     if len(args.configs) >= 2:
         c4, c8 = args.configs[0], args.configs[1]
         hi_gap = frac_by_cfg[c8][hi_band].mean() - frac_by_cfg[c4][hi_band].mean()
-        print(f"\n  High-frequency gap ({CONFIG_LABELS.get(c8,c8)} − "
+        print(f"\n  High-frequency gap ({CONFIG_LABELS.get(c8,c8)} - "
               f"{CONFIG_LABELS.get(c4,c4)}): {hi_gap:+.2f}")
-        print("  Positive gap + rising-with-frequency fraction = compression")
+        print("  Interpretation: positive gap + rising-with-frequency fraction = compression")
         print("  preferentially discards high-frequency detail, more so at 8x.")
-    print("\n(Run the FULL test split, not --limit, before quoting numbers.)")
+    print("\n(Numbers from a --limit run cover only part of the test split.)")
 
 
 if __name__ == "__main__":

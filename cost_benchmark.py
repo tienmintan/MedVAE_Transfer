@@ -1,36 +1,40 @@
 """
-cost_benchmark.py — the COST axis of the compression-choice framework.
+cost_benchmark.py: storage, encode-time, memory and downstream-head cost per MedVAE configuration.
 
-Accuracy alone cannot recommend a compression config. This measures what each
-config actually costs, so the recommendation becomes "best accuracy per unit
-cost, for THIS task" rather than "lowest error".
+Accuracy alone cannot determine a compression configuration. This script
+measures what each configuration costs, so that the choice can be based on
+accuracy per unit cost for a given task rather than on lowest error alone.
 
-WHAT IS MEASURED
-  storage    latent bytes/image, and the real compression ratio against the
-             source image on disk (not just the nominal f/C figure)
+Measured:
+  storage    latent bytes/image, and the compression ratio against the source
+             image on disk (not only the nominal f/C figure)
   encode     per-image encode latency and throughput (images/sec)
   memory     peak GPU memory during encoding
   downstream training-step time and inference latency for the small head that
-             consumes the latent -- this is what actually scales in deployment
+             consumes the latent; this is the cost that scales in deployment
 
-TIMING METHOD (matters, or the numbers are noise)
+Timing method (needed for the timings to be meaningful):
   * warmup iterations before measuring, so cuDNN autotuning and lazy init are
     excluded;
   * torch.cuda.synchronize() around every timed region, since CUDA calls are
     asynchronous and wall-clock without sync measures queueing, not compute;
-  * repeated trials, reporting the MEDIAN (robust to scheduler hiccups) with
+  * repeated trials, reporting the median (robust to scheduler hiccups) with
     the interquartile range.
 
-HONEST SCOPE
-  These are single-GPU numbers on one machine and will not transfer verbatim to
-  other hardware. What transfers is the RATIO between configs, which is what a
-  recommendation needs.
+Scope: these are single-GPU numbers on one machine and will not transfer
+unchanged to other hardware. What transfers is the ratio between
+configurations, which is what a recommendation needs.
 
-Run:
+Inputs:  --img-dir and --csv (BoostNet); optionally --latents-dir for the
+         downstream-head benchmark.
+Outputs: <out-dir>/cost_benchmark.csv and compression_choice_table.csv; the
+         joint accuracy-vs-cost table printed to stdout.
+
+Usage:
   python cost_benchmark.py --img-dir ./medvae/data/boostnet \
       --csv ./medvae/data/boostnet_with_angles.csv \
       --latents-dir ./latents_aspect --out-dir ./outputs/cost
-  python cost_benchmark.py --smoke
+  python cost_benchmark.py --smoke      # synthetic-data self-test
 """
 import argparse
 import json
@@ -48,7 +52,7 @@ NOMINAL = {"medvae_4_3_2d": 16 / 3, "medvae_4_1_2d": 16.0,
 SPATIAL = {"medvae_4_3_2d": "4x", "medvae_4_1_2d": "4x",
            "medvae_8_4_2d": "8x", "medvae_8_1_2d": "8x"}
 
-# accuracy reference (from the frontier + fidelity runs) for the joint table
+# accuracy reference values for the joint table (hard-coded from train_frontier.py and reconstruction-fidelity runs)
 ACCURACY = {
     "medvae_4_3_2d": {"cobb_deg": 7.783, "landmark_norm": 0.04077, "psnr": 41.04, "ssim": 0.967},
     "medvae_4_1_2d": {"cobb_deg": 7.678, "landmark_norm": 0.04199, "psnr": 32.43, "ssim": 0.673},
@@ -57,13 +61,11 @@ ACCURACY = {
 }
 
 
-# ==========================================================================
-# timing helpers
-# ==========================================================================
+# --- Timing helpers ---
 def sync(device):
     """Block until queued GPU work finishes. CUDA calls are asynchronous, so
     timing without this measures queueing rather than compute. No-op on CPU
-    (and importantly, does not require torch there)."""
+    (and does not require torch there)."""
     if not str(device).startswith("cuda"):
         return
     import torch
@@ -72,7 +74,7 @@ def sync(device):
 
 def timed(fn, device, warmup=3, trials=10):
     """Median wall-clock seconds per call, with IQR. Warms up first and
-    synchronises around each trial so async CUDA work is actually captured."""
+    synchronises around each trial so async CUDA work is captured."""
     for _ in range(warmup):
         fn()
     sync(device)
@@ -101,12 +103,10 @@ def reset_memory(device):
     torch.cuda.reset_peak_memory_stats()
 
 
-# ==========================================================================
-# storage accounting
-# ==========================================================================
+# --- Storage accounting ---
 def latent_bytes(shape, dtype_bytes=4):
     """Bytes for one latent at the given (C,H,W). float32 by default; fp16
-    halves it, which is a legitimate deployment choice worth reporting."""
+    halves it, which is a valid deployment option."""
     return int(np.prod(shape)) * dtype_bytes
 
 
@@ -126,9 +126,7 @@ def storage_row(config, latent_shape, src_bytes_mean):
     }
 
 
-# ==========================================================================
-# main benchmark
-# ==========================================================================
+# --- Main benchmark ---
 def run(args):
     import torch
     import torch.nn as nn
@@ -172,7 +170,7 @@ def run(args):
         print(f"  latent {lat_shape}  ->  {row['latent_kb_fp32']:.1f} KB fp32 "
               f"({row['latent_kb_fp16']:.1f} KB fp16)")
 
-        # ---- encode latency / throughput ----
+        # --- Encode latency / throughput ---
         reset_memory(device)
 
         def _encode():
@@ -189,7 +187,7 @@ def run(args):
               f"({row['encode_imgs_per_s']:.1f} img/s), "
               f"peak mem {row['encode_peak_mem_mb']:.0f} MB")
 
-        # ---- batched encode (deployment-realistic throughput) ----
+        # --- Batched encode (deployment-realistic throughput) ---
         if args.batch > 1:
             xb = xin.repeat(args.batch, 1, 1, 1)
             reset_memory(device)
@@ -209,7 +207,7 @@ def run(args):
         if device == "cuda":
             torch.cuda.empty_cache()
 
-        # ---- downstream head cost (what actually scales in deployment) ----
+        # --- Downstream head cost (the cost that scales in deployment) ---
         if args.latents_dir:
             f = Path(args.latents_dir) / f"latents_{config}_train.npz"
             if f.exists():
@@ -256,8 +254,8 @@ def run(args):
 
 
 class SmallHead(object):
-    """Stand-in for the frontier's downstream head — same shape of computation,
-    so the relative cost across configs is representative."""
+    """Stand-in for train_frontier.py's downstream head, with the same shape of
+    computation, so the relative cost across configs is representative."""
     def __new__(cls, in_ch, out_dim):
         import torch.nn as nn
 
@@ -279,9 +277,7 @@ class SmallHead(object):
         return _H()
 
 
-# ==========================================================================
-# joint accuracy-vs-cost table + Pareto frontier
-# ==========================================================================
+# --- Joint accuracy-vs-cost table + Pareto front ---
 def pareto_front(points, minimise):
     """points: list of tuples; minimise: list of bools (True = lower better).
     Returns indices of non-dominated points."""
@@ -310,7 +306,7 @@ def pareto_front(points, minimise):
 
 def joint_table(cost, out_dir, configs):
     print("=" * 78)
-    print("COMPRESSION-CHOICE TABLE — accuracy vs cost")
+    print("Compression-choice table: accuracy vs cost")
     print("=" * 78)
     hdr = (f"{'config':<7}{'spatial':>8}{'KB':>8}{'ratio':>8}{'ms':>7}{'img/s':>8}"
            f"{'Cobb°':>8}{'landmk':>9}{'PSNR':>7}{'SSIM':>7}")
@@ -335,7 +331,7 @@ def joint_table(cost, out_dir, configs):
     rdf = pd.DataFrame(recs)
     rdf.to_csv(out_dir / "compression_choice_table.csv", index=False)
 
-    # ---- per-task recommendation ----
+    # --- Per-task recommendation ---
     print("\n--- Pareto-optimal configs (storage vs task error) ---")
     for task, col in [("Cobb angle", "cobb"), ("Landmark localisation", "landmark")]:
         sub = rdf.dropna(subset=[col])
@@ -356,14 +352,12 @@ def joint_table(cost, out_dir, configs):
         print(f"   cost of going smallest: {pen:+.1f}% error for "
               f"{best['kb']/cheap['kb']:.1f}x less storage")
 
-    print("\nNOTE: absolute timings are machine-specific; the RATIOS between")
-    print("configs are what a recommendation should rest on.")
-    print(f"\nwrote {out_dir}/cost_benchmark.csv and compression_choice_table.csv")
+    print("\nAbsolute timings are machine-specific; the ratios between")
+    print("configurations are the transferable quantity.")
+    print(f"\nWrote {out_dir}/cost_benchmark.csv and compression_choice_table.csv")
 
 
-# ==========================================================================
-# MedVAE I/O helpers (shared with the other scripts)
-# ==========================================================================
+# --- MedVAE I/O helpers (shared with the other scripts) ---
 def match_in_channels(x, n_in):
     if x.shape[1] == n_in:
         return x
@@ -397,9 +391,9 @@ def probe_in_channels(mvae, x1, device):
     raise RuntimeError("could not determine encoder input channels")
 
 
-# ==========================================================================
+# --- Synthetic-data self-test ---
 def smoke():
-    """Validates the cost logic that does NOT need MedVAE: byte accounting,
+    """Validates the cost logic that does not need MedVAE: byte accounting,
     timing behaviour, and Pareto selection."""
     # --- storage accounting against known values ---
     assert latent_bytes((1, 96, 96), 4) == 96 * 96 * 4
@@ -409,10 +403,10 @@ def smoke():
           f"(expect {96*96*4/1024:.1f}), fp16 {r['latent_kb_fp16']:.1f} KB")
     print(f"         vs 500 KB source -> {r['ratio_vs_src_fp32']:.1f}x")
 
-    # 8_4 has 4*48*48 = 9216 elems vs 4_1's 9216 -- identical, a nice check
+    # 8_4 has 4*48*48 = 9216 elems vs 4_1's 9216: identical (both are the 16x pair)
     e41 = latent_bytes((1, 96, 96)); e84 = latent_bytes((4, 48, 48))
     print(f"4_1 latent elems {e41//4} vs 8_4 {e84//4}  "
-          f"-> {'IDENTICAL (matched 16x pair)' if e41 == e84 else 'DIFFER'}")
+          f"-> {'identical (matched 16x pair)' if e41 == e84 else 'differ'}")
 
     # --- timing: a known-duration function should measure close to it ---
     med, q1, q3 = timed(lambda: time.sleep(0.01), "cpu", warmup=1, trials=5)
@@ -422,7 +416,7 @@ def smoke():
     # --- Pareto: plant a dominated point and check it is excluded ---
     pts = [(10.0, 5.0),    # cheap, accurate      -> keep
            (20.0, 4.0),    # dearer, more accurate -> keep
-           (30.0, 6.0)]    # dearer AND worse      -> dominated
+           (30.0, 6.0)]    # dearer and worse      -> dominated
     keep = pareto_front(pts, minimise=[True, True])
     print(f"pareto: kept {keep} of 3 (expect [0, 1]; point 2 is dominated)")
 
@@ -430,7 +424,7 @@ def smoke():
           and e41 == e84
           and 0.008 < med < 0.02
           and keep == [0, 1])
-    print("\nSMOKE:", "PASS" if ok else "FAIL")
+    print("\nSelf-test:", "PASS" if ok else "FAIL")
 
 
 def main():
@@ -454,7 +448,7 @@ def main():
     elif args.img_dir and args.csv:
         run(args)
     else:
-        raise SystemExit("need --img-dir and --csv (or --smoke)")
+        raise SystemExit("--img-dir and --csv are required (or --smoke for the synthetic-data self-test)")
 
 
 if __name__ == "__main__":

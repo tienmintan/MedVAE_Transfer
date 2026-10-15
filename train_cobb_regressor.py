@@ -1,20 +1,24 @@
 """
-train_cobb_regressor.py
+train_cobb_regressor.py: train a CNN regression head on frozen MedVAE latents to predict the three Cobb angles.
 
-Train a small CNN regression head on top of frozen MedVAE latents to predict
-the three Cobb angles. Run on each of latents_pretrained.npz and
-latents_finetuned.npz with identical hyperparameters; the only thing varying
-is the encoder.
+The script is run on each of latents_pretrained.npz and latents_finetuned.npz
+with identical hyperparameters, so that only the encoder varies.
 
 Key design notes:
-  * The head DOES NOT collapse spatial information early. Cobb angle prediction
-    depends on WHERE curvature is along the spine, so global average pooling
-    too early throws away exactly the signal we need.
+  * The head does not collapse spatial information early. Cobb angle
+    prediction depends on where the curvature lies along the spine, so global
+    average pooling too early discards the relevant signal.
   * Reports a "predict-the-train-mean" baseline as a sanity check. If the
-    regressor isn't beating this, the head is failing to extract signal from
-    the latents (the case in our first attempt).
+    regressor does not beat this, the head is failing to extract signal from
+    the latents.
   * Mild augmentation (small horizontal flip, since spinal curves are
     sometimes mirrored).
+
+Inputs:  --latents .npz with latents, angles, splits, uuids (e.g. from
+         extract_latents.py); optionally --baseline-results from an earlier
+         run of this script for a paired comparison.
+Outputs: --out .npz with test predictions, targets, uuids and per-image /
+         per-angle MAE; results printed to stdout.
 
 Usage:
   python train_cobb_regressor.py --latents ./latents_pretrained.npz \\
@@ -38,11 +42,9 @@ from torch.utils.data import DataLoader, TensorDataset
 class CobbRegressor(nn.Module):
     """Spatial-preserving head: conv stack downsamples 96x96 -> 6x6, then MLP.
 
-    ~600k params — bigger than the previous 12k version, but the previous one
-    couldn't see spatial structure at all (it average-pooled to 1x1 way too
-    early). With ~409 training images, 600k is still small enough that we're
-    not asking the head to do impossible amounts of work; if the latent is
-    informative, the head can learn from it.
+    About 1.76M params: 0.58M in the conv stack and 1.18M in the MLP head
+    (4608 -> 256 -> 3). The conv stack keeps a 6x6 spatial grid, because
+    average-pooling to 1x1 early would remove spatial structure.
     """
     def __init__(self, in_channels: int = 1):
         super().__init__()
@@ -63,12 +65,10 @@ class CobbRegressor(nn.Module):
             block(64, 128),
             block(128, 128),
             # Adaptive pool to (6, 6) so this architecture works for both
-            # 96×96 latents (4× model) — pool is identity, identical to the
-            # original Phase 1 architecture that produced 7.50° MAE — and
-            # 48×48 latents (8× model) — conv stack would naturally end at
-            # 3×3, pool nearest-neighbor-style pads to 6×6 so the Linear
-            # below has its expected 4608-input shape. Strict superset of
-            # the original behaviour.
+            # 96×96 latents (4× model), where the pool is the identity, and
+            # 48×48 latents (8× model), where the conv stack ends at 3×3 and
+            # the pool expands it nearest-neighbour-style to 6×6 so the
+            # Linear below has its expected 4608-input shape.
             nn.AdaptiveAvgPool2d((6, 6)),
         )
         self.head = nn.Sequential(
@@ -128,13 +128,13 @@ def main() -> None:
     z_test, y_test, uuid_test = take("test")
     print(f"  train: {len(z_train)} | val: {len(z_val)} | test: {len(z_test)}")
 
-    # Predict-the-train-mean diagnostic. If the regressor doesn't beat this on
-    # test set, the head can't extract signal from the latents.
+    # Predict-the-train-mean diagnostic. If the regressor does not beat this on
+    # the test set, the head cannot extract signal from the latents.
     train_mean = y_train.mean(0, keepdims=True)
     mean_baseline_test = float(np.abs(y_test - train_mean).mean())
     print(f"\n[diagnostic] Predict-the-train-mean baseline test MAE: "
           f"{mean_baseline_test:.2f}°")
-    print("            (regressor must beat this to demonstrate it's learning)")
+    print("            (the regressor needs to beat this to show that it is learning)")
 
     # Standardise targets using train stats
     y_mean = y_train.mean(0, keepdims=True)
@@ -167,8 +167,8 @@ def main() -> None:
         for z, y in train_loader:
             z, y = z.to(device), y.to(device)
             # Mild augmentation: horizontal flip the latent half the time.
-            # Cobb-angle sign flips with mirror, so we'd need to flip it too —
-            # but BoostNet reports magnitudes, so this is fine as-is.
+            # A mirror flip reverses the Cobb-angle sign, but BoostNet reports
+            # magnitudes, so the labels need no change.
             if torch.rand(()) < 0.5:
                 z = torch.flip(z, dims=[-1])
             loss = F.smooth_l1_loss(model(z), y)
@@ -199,15 +199,15 @@ def main() -> None:
     per_angle_mae = np.abs(test_preds - test_targets).mean(axis=0)
 
     print("\n=== Test set results ===")
-    print(f"  Mean-baseline MAE:     {mean_baseline_test:.2f}° (must beat this)")
+    print(f"  Mean-baseline MAE:     {mean_baseline_test:.2f}° (reference to beat)")
     print(f"  Overall MAE:           {per_image_mae.mean():.2f}° "
           f"(± {per_image_mae.std(ddof=1):.2f})")
-    print(f"  Proximal-thoracic MAE: {per_angle_mae[0]:.2f}°")
-    print(f"  Main-thoracic MAE:     {per_angle_mae[1]:.2f}°")
-    print(f"  Thoracolumbar MAE:     {per_angle_mae[2]:.2f}°")
+    print(f"  Major curve (col 0) MAE: {per_angle_mae[0]:.2f}°")
+    print(f"  Col 1 MAE:             {per_angle_mae[1]:.2f}°")
+    print(f"  Col 2 MAE:             {per_angle_mae[2]:.2f}°")
     if per_image_mae.mean() >= mean_baseline_test - 0.3:
-        print("  ⚠  Regressor barely beats predict-the-mean. Latents not "
-              "providing useful signal at this head capacity.")
+        print(f"  WARNING: test MAE ({per_image_mae.mean():.2f}°) is not more than 0.3° below the "
+              f"predict-the-mean baseline ({mean_baseline_test:.2f}°). The latents may carry little usable signal at this head capacity.")
 
     np.savez(args.out, test_preds=test_preds, test_targets=test_targets,
              test_uuids=uuid_test, per_image_mae=per_image_mae,
@@ -226,7 +226,7 @@ def main() -> None:
         print(f"\n=== Paired comparison vs {args.baseline_results.name} ===")
         print(f"  Baseline overall MAE: {b_per_image.mean():.2f}°")
         print(f"  This run overall MAE: {per_image_mae.mean():.2f}°")
-        print(f"  Δ (baseline − this):  {delta.mean():+.2f}° "
+        print(f"  Δ (baseline - this):  {delta.mean():+.2f}° "
               f"(this run wins on {wins}/{len(delta)} images)")
 
 

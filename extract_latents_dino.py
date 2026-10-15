@@ -1,48 +1,55 @@
 """
-extract_latents_dino.py — frozen DINOv2 / DINOv3 features as a SOTA baseline.
+extract_latents_dino.py: extract frozen DINOv2 / DINOv3 features as a foundation-model reference.
 
-WHY. Every examiner will ask how a compressive medical encoder compares against
-the current general-purpose vision foundation models. This extracts frozen DINO
-dense patch features in EXACTLY the same npz format as the MedVAE pipeline, so
-`train_frontier.py` runs the identical heads, splits, seeds and metrics on them.
+Extracts frozen DINO dense patch features in the same npz format as the MedVAE
+pipeline, so `train_frontier.py` runs the identical heads, splits, seeds and
+metrics on them. This compares a compressive medical encoder with a
+general-purpose vision foundation model.
 
-WHAT THE COMPARISON MEANS — read this before interpreting results.
-DINO features are NOT a compression baseline. ViT-B/14 at 448px gives a
-32x32 grid of 768-dim tokens = 3.1 MB/image in fp32, versus MedVAE's 36 KB.
-So this measures something different and more useful:
+What the comparison measures: DINO features are not a compression baseline.
+ViT-B/14 at 448px gives a 32x32 grid of 768-dim tokens = 3.1 MB/image in
+fp32, versus MedVAE's 36 KB. The comparison therefore addresses:
 
-    "What does COMPRESSION cost, relative to an uncompressed general-purpose
+    "What does compression cost, relative to an uncompressed general-purpose
      representation of the same image?"
 
-It bounds how much of the ~7.7 deg Cobb error is the compression versus the
-task simply being hard. Either outcome is reportable:
-  * MedVAE close to DINO  -> compression is nearly free for these tasks;
-  * DINO much better      -> compression costs real, quantified performance.
+It bounds how much of the Cobb error is due to compression rather than to the
+difficulty of the task.
 
-For a storage-MATCHED comparison, use `--pca-dim`, which projects the token
-features down until the latent occupies a comparable number of bytes to the
-MedVAE latent. That arm answers a second question: at equal storage, is a
+Interpretation:
+  * MedVAE close to DINO  -> compression is nearly free for these tasks;
+  * DINO much better      -> compression has a measurable performance cost.
+
+For a storage-matched comparison, `--pca-dim` projects the token features down
+until the latent occupies a comparable number of bytes to the MedVAE latent.
+That configuration addresses a second question: at equal storage, is a
 general-purpose encoder better than a medical compressive one?
 
-MODEL CHOICE. DINOv3 is newer, but a recent correspondence benchmark found
+Model choice: DINOv3 is newer, but a recent correspondence benchmark found
 DINOv2 outperforms it on correspondence-style tasks, and landmark localisation
-is correspondence-like. Run BOTH; the comparison is itself reportable.
+is correspondence-like. Both DINOv2 and DINOv3 are supported (--model).
 
-Run:
+Inputs:  --csv (image_uuid, split and angle_* columns), --img-dir ({uuid}.jpg),
+         --landmarks-dir (training/ and test/ landmarks.csv) and the
+         --train-lookup / --test-lookup row-lookup CSVs.
+Outputs: <out-dir>/latents_{config}_{split}.npz (latents, uuids, cobb,
+         landmarks).
+
+Usage:
   python extract_latents_dino.py \
       --csv ./medvae/data/boostnet_with_angles.csv \
       --img-dir ./medvae/data/boostnet \
-      --landmarks-dir ~/MedVAE/data/boostnet_labeldata/labels \
+      --landmarks-dir ./data/boostnet_labeldata/labels \
       --train-lookup ./landmark_row_lookup_train_fixed.csv \
       --test-lookup ./landmark_row_lookup_test_fixed.csv \
       --model facebook/dinov2-base --size 448 --out-dir ./latents_dino
 
-  # storage-matched arm (~36 KB/image, like medvae_4_1_2d)
+  # storage-matched configuration (~36 KB/image, like medvae_4_1_2d)
   python extract_latents_dino.py ... --pca-dim 9 --out-dir ./latents_dino_pca
 
-  python extract_latents_dino.py --smoke
+  python extract_latents_dino.py --smoke      # synthetic-data self-test
 
-Then:
+Next:
   python train_frontier.py --latents-dir ./latents_dino \
       --configs dinov2_base --tasks cobb landmark --seeds 0 1 2 3 4 5 6 7 8 9
 """
@@ -54,9 +61,9 @@ import numpy as np
 N_LM = 68
 SPLIT_TO_LMK_SUBDIR = {"train": "training", "val": "training", "test": "test"}
 
-# Reuse the augmentation machinery so the DINO arm can be compared FAIRLY
-# against the augmented MedVAE arm. Without this the comparison is biased in
-# MedVAE's favour, since only MedVAE saw the extra data.
+# Reuse the augmentation machinery so the DINO condition can be compared on
+# equal terms with the augmented MedVAE condition. Without it the comparison
+# is biased in MedVAE's favour, since only MedVAE would see the extra data.
 try:
     from augment_and_extract import (PRESETS, augment_once, landmarks_to_points,
                                      points_to_landmarks, max_cobb)
@@ -64,8 +71,8 @@ try:
 except Exception as _e:                      # augmentation optional
     PRESETS, _AUG_OK = {}, False
 
-# Candidate HuggingFace ids. Verify availability before relying on any of them —
-# DINOv3 repo names in particular have changed since release.
+# Candidate HuggingFace ids. Availability may vary; DINOv3 repo names in
+# particular have changed since release.
 KNOWN_MODELS = {
     "dinov2-small": "facebook/dinov2-small",     # 384-dim, patch 14
     "dinov2-base": "facebook/dinov2-base",       # 768-dim, patch 14
@@ -75,13 +82,11 @@ KNOWN_MODELS = {
 }
 
 
-# ==========================================================================
-# geometry — matched to the MedVAE pipeline so the arms are comparable
-# ==========================================================================
+# --- Geometry (matched to the MedVAE pipeline so the conditions are comparable) ---
 def aspect_pad_square(img, size):
     """PIL image -> (size,size) float array in [0,1], aspect-preserving, padded
     top-left. Mirrors the MedVAE preprocessing so landmark coordinates keep the
-    same meaning across arms."""
+    same meaning across conditions."""
     import PIL.Image as Image
     w, h = img.size
     s = size / max(w, h)
@@ -96,7 +101,7 @@ def tokens_to_grid(tokens, n_patch_side, n_extra):
     """(1, n_tokens, D) -> (D, g, g).
 
     ViTs prepend a CLS token, and DINOv3 also prepends register tokens. Rather
-    than assume how many, we take the LAST g*g tokens, which are always the
+    than assuming how many, the last g*g tokens are taken, which are always the
     patch tokens in raster order."""
     t = tokens[0]                                   # (n_tokens, D)
     need = n_patch_side * n_patch_side
@@ -107,8 +112,8 @@ def tokens_to_grid(tokens, n_patch_side, n_extra):
 
 
 def fit_pca(feats, dim, seed=0):
-    """Fit PCA on a sample of TRAIN token vectors only (never val/test), so the
-    storage-matched arm carries no test-set information."""
+    """Fit PCA on a sample of train token vectors only (never val/test), so the
+    storage-matched configuration carries no test-set information."""
     x = feats.reshape(-1, feats.shape[-1])
     rng = np.random.default_rng(seed)
     if len(x) > 200_000:
@@ -136,7 +141,7 @@ def bytes_per_image(shape, fp16=False):
     return int(np.prod(shape)) * (2 if fp16 else 4)
 
 
-# ==========================================================================
+# --- Extraction ---
 def run(args):
     import pandas as pd
     import torch
@@ -145,15 +150,15 @@ def run(args):
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model_id = KNOWN_MODELS.get(args.model, args.model)
-    print(f"loading {model_id} on {device}")
+    print(f"Loading {model_id} on {device}")
     try:
         model = AutoModel.from_pretrained(model_id).to(device).eval()
     except Exception as e:
         raise SystemExit(
             f"could not load '{model_id}': {e}\n"
             f"Known shortcuts: {', '.join(KNOWN_MODELS)}\n"
-            "DINOv3 repo names have changed since release — check the exact id "
-            "on HuggingFace and pass it directly with --model."
+            "DINOv3 repo names have changed since release; the exact id "
+            "on HuggingFace can be passed directly with --model."
         )
 
     patch = getattr(model.config, "patch_size", 14)
@@ -166,9 +171,9 @@ def run(args):
     print(f"  patch {patch}, input {args.size}px -> {g}x{g} grid, {dim}-dim tokens")
     raw_bytes = bytes_per_image((dim, g, g))
     print(f"  raw feature size: {raw_bytes/1024:.0f} KB/image fp32 "
-          f"(MedVAE 4_1 is 36 KB) — NOT a compression baseline\n")
+          f"(MedVAE 4_1 is 36 KB); not a compression baseline\n")
 
-    # ImageNet normalisation, applied to replicated grayscale
+    # ImageNet normalisation, applied to replicated greyscale
     mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)[:, None, None]
     std = np.array([0.229, 0.224, 0.225], dtype=np.float32)[:, None, None]
 
@@ -205,8 +210,8 @@ def run(args):
     if args.n_aug:
         if not _AUG_OK:
             raise SystemExit("augmentation requested but augment_and_extract.py "
-                             "could not be imported — keep it alongside this script")
-        print(f"  augmenting TRAIN only: {args.n_aug} copies/image, "
+                             "could not be imported; it needs to be in the same directory as this script")
+        print(f"  Augmenting train only: {args.n_aug} copies/image, "
               f"preset '{args.preset}' {pset}\n")
 
     out_dir = Path(args.out_dir)
@@ -220,18 +225,18 @@ def run(args):
             continue
         u2r = uuid_map(split)
         all_lmk = lmk_rows(split)
-        n_aug = args.n_aug if split == "train" else 0     # ONLY augment train
+        n_aug = args.n_aug if split == "train" else 0     # augment train only
         feats, uu, cobb, lmk = [], [], [], []
         for _, r in sub.iterrows():
             u = str(r["image_uuid"])
             if u not in u2r:
-                print(f"  WARN no landmark row for {u}"); continue
+                print(f"  WARNING: no landmark row for {u}; this image is skipped."); continue
             p = Path(args.img_dir) / f"{u}.jpg"
             if not p.exists():
-                print(f"  WARN missing image {u}"); continue
+                print(f"  WARNING: image {u} not found; this image is skipped."); continue
             with Image.open(p) as im:
                 gray = aspect_pad_square(im.convert("L"), args.size)
-            x3 = np.repeat(gray[None], 3, 0)             # grayscale -> 3ch
+            x3 = np.repeat(gray[None], 3, 0)             # greyscale -> 3ch
             x3 = (x3 - mean) / std
             t = torch.tensor(x3[None], dtype=torch.float32, device=device)
             feats.append(tokens_to_grid(encode(t), g, 0))
@@ -241,7 +246,7 @@ def run(args):
             cobb.append(cobb_row)
             lmk.append(base_lm)
 
-            # ---- augmented copies (TRAIN only) ----
+            # Augmented copies (train only)
             if n_aug:
                 with Image.open(p) as im0:
                     im0 = im0.convert("L")
@@ -270,9 +275,9 @@ def run(args):
                       "cobb": np.stack(cobb), "landmarks": np.stack(lmk)}
         print(f"  [{split}] {raw[split]['latents'].shape}")
 
-    # ---- optional PCA for a storage-matched arm (fitted on TRAIN only) ----
+    # Optional PCA for a storage-matched configuration (fitted on train only)
     if args.pca_dim:
-        print(f"\nfitting PCA to {args.pca_dim} dims on TRAIN tokens only…")
+        print(f"\nFitting PCA to {args.pca_dim} dims on train tokens only...")
         mu, comps, evr = fit_pca(raw["train"]["latents"].transpose(0, 2, 3, 1),
                                  args.pca_dim)
         print(f"  explained variance retained: {100*evr:.1f}%")
@@ -289,18 +294,18 @@ def run(args):
         np.savez_compressed(dst, latents=d["latents"].astype(dtype),
                             uuids=d["uuids"], cobb=d["cobb"],
                             landmarks=d["landmarks"])
-        print(f"wrote {dst.name}")
+        print(f"Wrote {dst.name}")
 
-    print(f"\nNow run the same heads on these features:\n"
+    print(f"\nNext:\n"
           f"  python train_frontier.py --latents-dir {out_dir} "
           f"--configs {cfg_name} --tasks cobb landmark --seeds 0 1 2 3 4 5 6 7 8 9")
-    print("\nNOTE: train_frontier.py needs `{}` added to its CONFIG_LABELS / "
-          "COMPRESSION dicts before it will run.".format(cfg_name))
-    print("REMINDER: this is a REPRESENTATION-QUALITY baseline, not a compression\n"
-          "baseline — the raw features are far larger than the MedVAE latent.")
+    print("\nNote: train_frontier.py requires `{}` in its CONFIG_LABELS / "
+          "COMPRESSION dicts.".format(cfg_name))
+    print("Note: this is a representation-quality reference, not a compression\n"
+          "baseline; the raw features are far larger than the MedVAE latent.")
 
 
-# ==========================================================================
+# --- Synthetic-data self-test ---
 def smoke():
     import PIL.Image as Image
 
@@ -338,13 +343,13 @@ def smoke():
           f"(MedVAE 4_1 = 36.0 KB)")
 
     # PCA should retain far more variance than the same number of random
-    # directions would (9/768 = 1.2%), which is the meaningful check.
+    # directions would (9/768 = 1.2%), which is the relevant check.
     chance = 9 / D
     ok_all = (a.shape == (448, 448) and grid.shape == (D, g, g)
               and red.shape == (20, 9, 8, 8) and evr > 5 * chance)
     print(f"\n(PCA retains {100*evr:.1f}% in 9 of {D} dims; chance would be "
           f"{100*chance:.1f}%)")
-    print("SMOKE:", "PASS" if ok_all else "FAIL")
+    print("Self-test:", "PASS" if ok_all else "FAIL")
 
 
 def main():
@@ -361,11 +366,11 @@ def main():
     ap.add_argument("--size", type=int, default=448,
                     help="input square size; larger = finer patch grid")
     ap.add_argument("--pca-dim", type=int, default=0,
-                    help="project tokens to this many dims for a storage-matched arm")
+                    help="project tokens to this many dims for a storage-matched configuration")
     ap.add_argument("--fp16", action="store_true", help="halve stored feature size")
     ap.add_argument("--n-aug", type=int, default=0,
-                    help="augmented copies per TRAIN image (0 = none). Use the same "
-                         "value as the MedVAE run for a fair comparison.")
+                    help="augmented copies per train image (0 = none). The same "
+                         "value as the MedVAE run gives a matched comparison.")
     ap.add_argument("--preset", default="aggressive",
                     help="augmentation preset (see augment_and_extract.py)")
     ap.add_argument("--seed", type=int, default=0)
@@ -377,7 +382,7 @@ def main():
     elif args.csv and args.img_dir and args.landmarks_dir:
         run(args)
     else:
-        raise SystemExit("need --csv --img-dir --landmarks-dir (or --smoke)")
+        raise SystemExit("--csv, --img-dir and --landmarks-dir are required (or --smoke for the synthetic-data self-test)")
 
 
 if __name__ == "__main__":

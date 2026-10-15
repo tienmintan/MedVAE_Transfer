@@ -1,13 +1,17 @@
 """
-verify_landmarks.py — confirm the BoostNet landmark format before we rely on it.
+verify_landmarks.py: check the BoostNet landmark format (value range, column count, coordinate ordering).
 
 Read-only. Loads a couple of rows from landmarks.csv, reports the value range
-(to infer normalised vs pixel coords) and the column count, then tries BOTH
-plausible orderings and overlays them on the actual image so we can SEE which
-ordering is correct. Saves one diagnostic PNG.
+(to infer normalised vs pixel coords) and the column count, then tries both
+plausible orderings and overlays them on the image so the correct ordering
+can be identified visually. Saves one diagnostic PNG.
 
-Run:  python verify_landmarks.py
-Then look at landmark_format_check.png and paste the console output back.
+Inputs:  landmarks.csv under LABELS_DIR and the matching image under IMG_DIRS
+         (paths set in the module).
+Outputs: landmark_format_check.png in the current directory; the format
+         report printed to stdout.
+
+Usage:  python verify_landmarks.py
 """
 
 from pathlib import Path
@@ -23,7 +27,7 @@ LABELS_DIR = HOME / "MedVAE" / "data" / "boostnet_labeldata" / "labels"
 TRAIN_CSV = LABELS_DIR / "training" / "landmarks.csv"
 TEST_CSV  = LABELS_DIR / "test" / "landmarks.csv"
 
-# Image dir — adjust if the diagnostic can't find images
+# Image dirs; adjust if the diagnostic cannot find images
 IMG_DIRS = [
     HOME / "MedVAE" / "data" / "boostnet_labeldata" / "data" / "training",
     HOME / "MedVAE" / "data" / "boostnet_labeldata" / "data" / "test",
@@ -48,19 +52,19 @@ def find_image(stem):
 
 def main():
     print("=" * 64)
-    print("LANDMARK FORMAT VERIFICATION")
+    print("Landmark format verification")
     print("=" * 64)
 
     csv_path = TRAIN_CSV if TRAIN_CSV.exists() else TEST_CSV
     print(f"Reading: {csv_path}")
     if not csv_path.exists():
-        print("ERROR: landmarks.csv not found at expected path.")
+        print("Error: landmarks.csv not found at expected path.")
         print("Listing the labels dir to help locate it:")
         for p in LABELS_DIR.rglob("*"):
             print("  ", p)
         return 1
 
-    # Try reading with and without a header — BoostNet's file classically has NO header
+    # Try reading with and without a header; BoostNet's file normally has no header
     raw = pd.read_csv(csv_path, header=None)
     print(f"\nShape (no-header read): {raw.shape}")
     print(f"First row, first 6 values: {raw.iloc[0, :6].tolist()}")
@@ -81,10 +85,10 @@ def main():
     print(f"\nNumeric values per row: {n_vals}  (expect 136 = 68 landmarks x 2)")
     vmin, vmax = np.nanmin(coords), np.nanmax(coords)
     print(f"Value range: [{vmin:.3f}, {vmax:.3f}]  -> "
-          f"{'NORMALISED [0,1]' if vmax <= 1.5 else 'PIXEL coordinates'}")
+          f"{'normalised [0,1]' if vmax <= 1.5 else 'pixel coordinates'}")
 
     if n_vals != 136:
-        print(f"  WARNING: expected 136 values, got {n_vals}. Inspect manually.")
+        print(f"  WARNING: value-count check failed (expected 136 values, got {n_vals}). The ordering overlays below may be invalid.")
 
     # Two candidate orderings for row 0:
     row = coords[0]
@@ -94,12 +98,12 @@ def main():
     # Ordering B: interleaved (x0,y0,x1,y1,...)
     xs_B, ys_B = row[0::2], row[1::2]
 
-    # Overlay both on the actual image, if we can find it
+    # Overlay both on the image, if it can be found
     stem = ids[0] if ids is not None else None
     img_path = find_image(stem) if stem else None
     if img_path is None and stem is not None:
         print(f"\nCould not auto-find image for id '{stem}'. "
-              f"Set IMG_DIRS correctly to enable the visual check.")
+              f"The visual check needs IMG_DIRS to point at the images.")
 
     fig, axes = plt.subplots(1, 2, figsize=(9, 7))
     for ax, (xs, ys, name) in zip(
@@ -122,9 +126,9 @@ def main():
     out = Path.cwd() / "landmark_format_check.png"
     fig.savefig(out, dpi=130, bbox_inches="tight")
     print(f"\nSaved visual check to {out}")
-    print("\n-> Open that PNG. The CORRECT ordering is the one whose red dots")
-    print("   land on vertebral corners. Tell me which (A or B), plus the")
-    print("   console output above.")
+    print("\nVisual check: the correct ordering is the one whose red dots")
+    print("   land on vertebral corners (panel A or B in")
+    print("   landmark_format_check.png).")
     return 0
 
 

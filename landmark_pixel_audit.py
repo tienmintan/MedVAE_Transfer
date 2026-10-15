@@ -1,25 +1,32 @@
 """
-landmark_pixel_audit.py — report landmark error in PIXELS (and mm), and audit
-the detector's quality.  Addresses two review notes:
+landmark_pixel_audit.py: landmark error in pixels (and mm where spacing is known), plus a quality audit of the landmark detector.
+
+Reports:
   (1) pixel error instead of percent/normalised error;
-  (2) verify landmark-detector quality.
+  (2) landmark-detector quality (worst cases, per-region error, coordinate
+      correlation, mean-shape baseline).
 
 Works on any saved prediction file in the shared format (uuids, pred_landmarks,
-gt_landmarks, all (N,136) ordering A normalised [0,1]) — so it audits BOTH the
-direct-regressor preds (preds_{config}.npz) and the heatmap-detector preds
-(preds_heatmap_{config}.npz).
+gt_landmarks, all (N,136) ordering A normalised [0,1]); it can therefore audit
+both the direct-regressor preds (preds_{config}.npz) and the heatmap-detector
+preds (preds_heatmap_{config}.npz).
 
-Image size is AUTO-DETECTED from --img-dir:
-  * WxH per image via PIL (jpg/png/…);
+Image size is auto-detected from --img-dir:
+  * WxH per image via PIL (jpg/png/...);
   * mm pixel-spacing via pydicom if DICOMs are present;
-  * if no img-dir, falls back to normalised-only with a loud caveat.
-Landmarks are normalised to the ORIGINAL image, so original-pixel error is
-just (Δx·W, Δy·H) per point — no padding/bbox involved.
+  * if no img-dir, falls back to normalised-only error with a printed warning.
+Landmarks are normalised to the original image, not a padded canvas, so the
+original-pixel error is (Δx*W, Δy*H) per point, with no padding or bbox
+involved.
 
-Run:
+Inputs:  --preds (.npz in the shared format); optionally --img-dir.
+Outputs: <out-dir>/<preds stem>_per_image.csv, _per_landmark.csv and, with
+         --img-dir, _overlays.png; the audit printed to stdout.
+
+Usage:
   python landmark_pixel_audit.py --preds ./outputs/frontier/preds_medvae_4_1_2d.npz \
       --img-dir ./medvae/data/boostnet --out-dir ./outputs/landmark_audit
-  python landmark_pixel_audit.py --smoke
+  python landmark_pixel_audit.py --smoke      # synthetic-data self-test
 """
 import argparse
 from pathlib import Path
@@ -40,9 +47,7 @@ REGIONS = {"upper-thoracic (T1-5)": range(0, 5),
            "lumbar (L1-5)": range(12, 17)}
 
 
-# --------------------------------------------------------------------------
-# image size / spacing auto-detect
-# --------------------------------------------------------------------------
+# Image size / spacing auto-detection
 def find_image(img_dir, uuid):
     for ext in (".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff", ".dcm"):
         p = Path(img_dir) / f"{uuid}{ext}"
@@ -52,7 +57,7 @@ def find_image(img_dir, uuid):
 
 
 def image_geometry(path):
-    """Return (W, H, sx_mm, sy_mm) — spacing None if unknown."""
+    """Return (W, H, sx_mm, sy_mm); spacing is None if unknown."""
     if path.suffix.lower() == ".dcm":
         try:
             import pydicom
@@ -72,9 +77,7 @@ def image_geometry(path):
         return None
 
 
-# --------------------------------------------------------------------------
-# error helpers
-# --------------------------------------------------------------------------
+# Error helpers
 def per_landmark_px(pred, gt, W, H):
     """(136,),(136,) normalised -> (68,) per-landmark pixel error."""
     dx = (pred[:N_LM] - gt[:N_LM]) * W
@@ -85,15 +88,15 @@ def per_landmark_px(pred, gt, W, H):
 def spine_extent_px(gt, W, H):
     """Vertical span of the ground-truth spine (T1 -> L5) in pixels.
 
-    Normalising by SPINE size rather than IMAGE size makes patients comparable
-    regardless of how much of the frame the spine occupies (the review's
-    'normalisation' point: spines are of differing heights)."""
+    Normalising by spine size rather than image size makes patients comparable
+    regardless of how much of the frame the spine occupies (spines differ in
+    height)."""
     ys = gt[N_LM:] * H
     return float(ys.max() - ys.min())
 
 
 def spine_length_px(gt, W, H):
-    """Path length along the vertebra centroids (T1->L5) in pixels — a
+    """Path length along the vertebra centroids (T1->L5) in pixels; a
     curvature-aware alternative to the vertical span."""
     xs = gt[:N_LM] * W
     ys = gt[N_LM:] * H
@@ -112,9 +115,7 @@ def boot_ci(v, seed=0, nb=10000):
     return float(v.mean()), float(np.percentile(b, 2.5)), float(np.percentile(b, 97.5))
 
 
-# --------------------------------------------------------------------------
-# audit
-# --------------------------------------------------------------------------
+# Audit
 def audit(preds_path, img_dir, out_dir):
     out_dir.mkdir(parents=True, exist_ok=True)
     d = np.load(preds_path, allow_pickle=True)
@@ -122,7 +123,7 @@ def audit(preds_path, img_dir, out_dir):
     N = len(pred)
     tag = Path(preds_path).stem
 
-    # ---- geometry per image ----
+    # Geometry per image
     geoms, have_px, have_mm = [], 0, 0
     for u in uuids:
         g = None
@@ -139,10 +140,10 @@ def audit(preds_path, img_dir, out_dir):
     print(f"image geometry found: {have_px}/{N} sized"
           + (f", {have_mm}/{N} with mm spacing" if have_mm else " (no mm spacing)"))
     if have_px == 0:
-        print("  !! no image sizes available — reporting NORMALISED error only. "
-              "Pass --img-dir for pixels.\n")
+        print(f"  WARNING: no image sizes available (0/{N} images sized), so only normalised error is reported. "
+              "Pixel error requires --img-dir.\n")
 
-    # ---- per-image errors ----
+    # Per-image errors
     rows, pl_px_all, pl_norm_all = [], [], []
     px_img, mm_img, norm_img, spine_img = [], [], [], []
     for i in range(N):
@@ -167,24 +168,24 @@ def audit(preds_path, img_dir, out_dir):
                      "err_pct_spine": spine_pct})
     norm_img = np.array(norm_img)
 
-    # ---- headline ----
+    # Summary
     m, lo, hi = boot_ci(norm_img)
     print(f"\nlandmark error (mean over 68 pts, per image):")
     print(f"  normalised (image) : {m:.4f}  CI[{lo:.4f},{hi:.4f}]")
     if px_img:
         m, lo, hi = boot_ci(np.array(px_img))
-        print(f"  PIXELS             : {m:.1f}px  CI[{lo:.1f},{hi:.1f}]  "
+        print(f"  pixels             : {m:.1f}px  CI[{lo:.1f},{hi:.1f}]  "
               f"(median {np.median(px_img):.1f}, 90th pct {np.percentile(px_img,90):.1f}, "
               f"worst {np.max(px_img):.1f})")
     if spine_img:
         m, lo, hi = boot_ci(np.array(spine_img))
-        print(f"  % of SPINE extent  : {m:.2f}%  CI[{lo:.2f},{hi:.2f}]  "
+        print(f"  % of spine extent  : {m:.2f}%  CI[{lo:.2f},{hi:.2f}]  "
               f"(median {np.median(spine_img):.2f}%)   <- patient-comparable")
     if mm_img:
         m, lo, hi = boot_ci(np.array(mm_img))
-        print(f"  MILLIMETRES        : {m:.2f}mm CI[{lo:.2f},{hi:.2f}]")
+        print(f"  millimetres        : {m:.2f}mm CI[{lo:.2f},{hi:.2f}]")
 
-    # ---- worst-case images ----
+    # Worst-case images
     metric_img = np.array(px_img) if px_img else norm_img
     unit = "px" if px_img else "norm"
     order = np.argsort(metric_img)[::-1]
@@ -193,7 +194,7 @@ def audit(preds_path, img_dir, out_dir):
     for j in order[:5]:
         print(f"  {str(uuids[j]):<38} " + fmt.format(metric_img[j]))
 
-    # ---- per-region ----
+    # Per-region
     pl = np.array(pl_px_all) if pl_px_all else np.array(pl_norm_all)   # (N,68)
     ru = "px" if pl_px_all else "norm"
     print(f"\nper-region error ({ru}):")
@@ -201,13 +202,13 @@ def audit(preds_path, img_dir, out_dir):
         idx = [v * 4 + c for v in verts for c in range(4)]
         print(f"  {name:<24} {pl[:, idx].mean():.2f}")
 
-    # ---- coordinate correlation (predicted vs true) ----
+    # Coordinate correlation (predicted vs true)
     px_all = pred[:, :N_LM].ravel(); gx_all = gt[:, :N_LM].ravel()
     py_all = pred[:, N_LM:].ravel(); gy_all = gt[:, N_LM:].ravel()
     rx = np.corrcoef(px_all, gx_all)[0, 1]; ry = np.corrcoef(py_all, gy_all)[0, 1]
     print(f"\npredicted-vs-true coordinate correlation: x r={rx:.3f}, y r={ry:.3f}")
 
-    # ---- mean-shape baseline (context) ----
+    # Mean-shape baseline (context)
     base = gt.mean(0, keepdims=True)
     base_norm = np.array([per_landmark_norm(base[0], gt[i]).mean() for i in range(N)]).mean()
     print(f"mean-shape baseline (norm): {base_norm:.4f}  -> detector is "
@@ -223,9 +224,9 @@ def audit(preds_path, img_dir, out_dir):
     if img_dir and have_px:
         overlay_figure(preds_path, img_dir, geoms, metric_img, uuids, pred, gt,
                        out_dir / f"{tag}_overlays.png")
-        print(f"\nwrote overlays + CSVs to {out_dir}")
+        print(f"\nWrote overlays + CSVs to {out_dir}")
     else:
-        print(f"\nwrote CSVs to {out_dir} (overlays need --img-dir)")
+        print(f"\nWrote CSVs to {out_dir} (overlays need --img-dir)")
 
 
 def overlay_figure(preds_path, img_dir, geoms, metric, uuids, pred, gt, path):
@@ -257,7 +258,7 @@ def overlay_figure(preds_path, img_dir, geoms, metric, uuids, pred, gt, path):
     fig.savefig(path, dpi=130, bbox_inches="tight"); plt.close(fig)
 
 
-# --------------------------------------------------------------------------
+# Synthetic-data self-test
 def smoke():
     rng = np.random.default_rng(0); N = 20
     gt = np.clip(0.5 + 0.15 * rng.standard_normal((N, 136)), 0.02, 0.98).astype(np.float32)
@@ -265,7 +266,7 @@ def smoke():
     np.savez("/tmp/preds_smoke.npz", pred_landmarks=pred, gt_landmarks=gt,
              uuids=np.array([f"img{i}" for i in range(N)]))
     audit(Path("/tmp/preds_smoke.npz"), None, Path("/tmp/lm_audit"))
-    print("\nSMOKE: PASS (no img-dir -> normalised-only path)")
+    print("\nSelf-test: PASS (no img-dir -> normalised-only path)")
 
 
 def main():
@@ -280,7 +281,7 @@ def main():
     elif args.preds:
         audit(args.preds, args.img_dir, args.out_dir)
     else:
-        raise SystemExit("--preds required (or --smoke)")
+        raise SystemExit("--preds is required (or --smoke for the synthetic-data self-test)")
 
 
 if __name__ == "__main__":

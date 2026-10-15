@@ -1,11 +1,12 @@
 """
-compare_cobb_tiled.py
+compare_cobb_tiled.py: paired per-image comparison of Cobb predictions from two regressors.
 
-Phase 3 step 3 — paired comparison of Cobb predictions from two regressors:
-the new patch-encoder-on-tiled-latents regressor vs the previous baseline
-(pretrained encoder + 384x384 spatial regressor, 7.50° test MAE).
+Compares the patch-encoder regressor on tiled latents with the baseline
+regressor (pretrained encoder + 384x384 spatial regressor). Test images are
+paired by UUID, and the per-image MAE difference is tested with a paired
+t-test and a Wilcoxon signed-rank test.
 
-Both inputs are .npz files with the schema:
+Inputs: two .npz files with the schema:
     test_preds        (N, 3) float32   predicted Cobb angles
     test_targets      (N, 3) float32   ground-truth Cobb angles
     test_uuids        (N,)   <U32      image UUIDs (for paired alignment)
@@ -13,6 +14,9 @@ Both inputs are .npz files with the schema:
     per_angle_mae     (3,)   float32   precomputed per-angle MAE
     best_val_mae      ()     float64   best val MAE seen during training
     mean_baseline_mae ()     float64   predict-train-mean baseline MAE
+
+Outputs: a figure at --out-plot (histogram of per-image Δ MAE; paired
+         per-image MAE scatter); summary statistics printed to stdout.
 
 Usage:
     python compare_cobb_tiled.py \\
@@ -60,32 +64,32 @@ def main() -> None:
           f"(mean-baseline MAE = {tiled_baseline:.2f}°)")
     print(f"Baseline regressor: {len(baseline_df)} test predictions "
           f"(mean-baseline MAE = {base_baseline_mae:.2f}°)")
-    # Sanity: mean-baseline MAEs should match (same test set)
+    # Sanity check: mean-baseline MAEs should match (same test set)
     if abs(tiled_baseline - base_baseline_mae) > 0.05:
-        print(f"  WARN: mean-baseline MAEs differ by {abs(tiled_baseline-base_baseline_mae):.3f}°. "
-              "Check that both runs used the same train/test split.")
+        print(f"  WARNING: mean-baseline MAEs differ by {abs(tiled_baseline-base_baseline_mae):.3f}° (tolerance 0.05°). "
+              "The runs may not share the same train/test split, so the paired comparison may be unreliable.")
 
     # Pair by image_uuid
     merged = tiled_df.merge(baseline_df, on="image_uuid",
                             suffixes=("_tiled", "_base"))
     print(f"Joined on uuid:     {len(merged)} paired predictions")
     if len(merged) < len(tiled_df) or len(merged) < len(baseline_df):
-        print(f"  WARN: lost predictions in the join "
-              f"({len(tiled_df)} + {len(baseline_df)} → {len(merged)}). "
-              "Some UUIDs don't match.")
+        print(f"  WARNING: the UUID join dropped predictions "
+              f"({len(tiled_df)} + {len(baseline_df)} -> {len(merged)}). "
+              "Some UUIDs do not match; the comparison covers only the paired images.")
 
     tiled_mae    = merged["per_image_mae_tiled"].values
     baseline_mae = merged["per_image_mae_base"].values
     diff = tiled_mae - baseline_mae   # negative = tiled is better
 
     print("\n" + "=" * 60)
-    print(f"RESULTS (n = {len(merged)} test images)")
+    print(f"Results (n = {len(merged)} test images)")
     print("=" * 60)
     print(f"Baseline (pretrained encoder + 384x384 regressor):  "
           f"{baseline_mae.mean():.3f}° ± {baseline_mae.std():.3f}°")
     print(f"Tiled    (patch encoder + 1D-along-spine):          "
           f"{tiled_mae.mean():.3f}° ± {tiled_mae.std():.3f}°")
-    print(f"\nPaired Δ MAE (tiled − baseline):  "
+    print(f"\nPaired Δ MAE (tiled - baseline):  "
           f"{diff.mean():+.3f}° ± {diff.std():.3f}°")
     n_wins = int((diff < 0).sum())
     print(f"Tiled wins (lower MAE):           "
@@ -101,7 +105,7 @@ def main() -> None:
     axes[0].axvline(0, color="red", linestyle="--", lw=1, label="no diff")
     axes[0].axvline(diff.mean(), color="green", linestyle="--", lw=1,
                     label=f"mean = {diff.mean():+.2f}°")
-    axes[0].set_xlabel("Δ MAE per image (tiled − baseline, °)")
+    axes[0].set_xlabel("Δ MAE per image (tiled - baseline, °)")
     axes[0].set_ylabel("count")
     axes[0].set_title(f"Per-image Δ distribution (n={len(diff)})")
     axes[0].legend()
@@ -112,7 +116,7 @@ def main() -> None:
     axes[1].plot([lo, hi], [lo, hi], "k--", lw=1, label="y = x")
     axes[1].set_xlabel("Baseline per-image MAE (°)")
     axes[1].set_ylabel("Tiled per-image MAE (°)")
-    axes[1].set_title("Paired per-image MAE\n(below y=x ⇒ tiled is better)")
+    axes[1].set_title("Paired per-image MAE\n(below y=x -> tiled is better)")
     axes[1].legend()
     axes[1].set_aspect("equal")
 

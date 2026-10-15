@@ -1,19 +1,23 @@
 """
-decode_samples.py
+decode_samples.py: decode synthetic latents to pixel-space spine X-rays for visual inspection.
 
-Decode synthetic latents back to pixel-space spine X-rays via MedVAE's
-decoder, for visual inspection of diffusion model outputs. Reads a .npz
-file produced by either sample_diffusion.py (synthetic latents) or
-train_diffusion.py's periodic sample save, and writes a grid PNG.
+Uses the pretrained MedVAE 4_1 decoder to inspect diffusion model outputs.
+All images share one global display window (percentile, min-max or fixed
+[0, 1]) computed across the displayed pixels.
+
+Inputs:  a .npz file from sample_diffusion.py (synthetic latents) or from
+         train_diffusion.py's periodic sample save, containing 'latents'
+         (N, 1, H, W) and optionally 'angles' or 'target_angles'.
+Outputs: a grid PNG at --out, titled with the target Cobb angles where present.
 
 Usage:
-    # Visualize a few mid-training samples
+    # Visualise a few mid-training samples
     python decode_samples.py \\
         --latents-npz   ./diffusion_ckpt/samples_epoch_0200.npz \\
         --out           ./samples_epoch_0200.png \\
         --window-mode   percentile
 
-    # Visualize first 16 latents from a full sample run
+    # Visualise the first 16 latents from a full sample run
     python decode_samples.py \\
         --latents-npz   ./synthetic_latents_500.npz \\
         --out           ./synthetic_grid.png \\
@@ -48,8 +52,8 @@ def decode_latents(model, latents: torch.Tensor, device, dtype):
     """Decode (N, 1, H, W) latents to (N, H*4, W*4) reconstructions.
 
     Decodes one latent at a time because MedVAE's bottleneck self-attention
-    is over H*W positions per sample, and batching multiple together blows
-    up the attention matrix memory (16 x 24576^2 = 18 GB at our latent shape).
+    is over H*W positions per sample, and batching several together inflates
+    the attention matrix memory (16 x 24576^2 = 18 GB at this latent shape).
     """
     out = []
     for i in range(latents.shape[0]):

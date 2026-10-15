@@ -1,21 +1,21 @@
 """
-train_cobb_regressor_matched.py
+train_cobb_regressor_matched.py: Cobb regressor with receptive field matched to train_cobb_regressor.py, for any latent shape.
 
-Receptive-field-matched version of train_cobb_regressor.py. Architecture
-mirrors the original CobbRegressor exactly except that conv-block depth
-and pool strides are scaled to handle non-square latent shapes.
+The architecture mirrors CobbRegressor in train_cobb_regressor.py except that
+conv-block depth and pool strides are scaled to handle non-square latent
+shapes.
 
-Key design decisions preserved from the original:
+Design decisions shared with train_cobb_regressor.py:
   * Paired conv blocks (Conv->GN->GELU->Conv->GN->GELU->MaxPool(2)) per
-    downsample level, NOT single stride-2 convs.
-  * Channel schedule (32, 64, 128, 128). Extra blocks beyond original 4
-    keep the 128 width — strict superset of the original.
+    downsample level, not single stride-2 convs.
+  * Channel schedule (32, 64, 128, 128). Extra blocks beyond the first 4
+    keep the 128 width, so for 96x96 input the network equals CobbRegressor.
   * Final AdaptiveAvgPool2d((6, 6)) normalises output to (6, 6) regardless
-    of input shape. We don't need to bring everything to 3x3 — AAP handles
+    of input shape. Inputs do not need to be reduced to 3x3; the AAP handles
     spatial normalisation.
   * FC head preserves spatial structure: Flatten of 128x6x6 -> Linear(4608, 256)
     -> GELU -> Dropout(0.3) -> Linear(256, 3). Global average pooling
-    before the FC throws away the WHERE-along-the-spine signal that Cobb
+    before the FC would discard the where-along-the-spine signal that Cobb
     regression needs.
   * Horizontal flip augmentation, dropout=0.3, lr=3e-4, weight_decay=1e-4,
     batch_size=32, no early stopping (200 epochs).
@@ -24,6 +24,12 @@ The only deviation for non-square latents: when one dimension is larger
 than the other, MaxPool2d gets asymmetric stride/kernel like (2, 1) so
 only the larger axis halves at that block. This keeps the feature map
 proportional going into the AAP.
+
+Inputs:  --latents .npz with latents, angles, splits, uuids; optionally
+         --baseline-results from an earlier regressor run for a paired
+         comparison.
+Outputs: --out .npz with test predictions, targets, uuids and per-image /
+         per-angle MAE; results printed to stdout.
 
 Usage:
     python train_cobb_regressor_matched.py \\
@@ -54,7 +60,7 @@ def compute_pool_schedule(H: int, W: int,
     target. Once a dimension reaches it, use stride-1 on that axis. Continue
     until both are at or below target_pre_aap.
 
-    Returns: list of (pool_h, pool_w) tuples — kernel/stride for each
+    Returns: list of (pool_h, pool_w) tuples, the kernel/stride for each
     block's MaxPool2d.
     """
     pools = []
@@ -72,8 +78,8 @@ def compute_pool_schedule(H: int, W: int,
 class PairedConvBlock(nn.Module):
     """Two conv-GN-GELU pairs followed by a configurable MaxPool.
 
-    Exactly mirrors the original CobbRegressor block structure except
-    that MaxPool2d takes a tuple kernel/stride instead of fixed 2.
+    Mirrors the block structure of CobbRegressor in train_cobb_regressor.py,
+    except that MaxPool2d takes a tuple kernel/stride instead of fixed 2.
     """
     def __init__(self, c_in: int, c_out: int, pool: tuple):
         super().__init__()
@@ -94,12 +100,12 @@ class PairedConvBlock(nn.Module):
 class CobbRegressorMatched(nn.Module):
     """Spatial-preserving Cobb regressor with conv depth scaled to input.
 
-    For 96x96 input: pool_schedule = [(2,2)]*4 → feature map 6x6 going
-    into the AAP. Identical to the original CobbRegressor.
+    For 96x96 input: pool_schedule = [(2,2)]*4 -> feature map 6x6 going
+    into the AAP. Identical to CobbRegressor in train_cobb_regressor.py.
 
     For non-square inputs: extra asymmetric pools reduce the longer axis
     until both dims reach ~6 before the AAP. Channel widths reuse 128 for
-    any blocks beyond the original 4.
+    any blocks beyond the first 4.
     """
     def __init__(self, in_channels: int, in_h: int, in_w: int,
                  target_pre_aap: int = 6):
@@ -121,7 +127,7 @@ class CobbRegressorMatched(nn.Module):
         layers.append(nn.AdaptiveAvgPool2d((6, 6)))
         self.conv = nn.Sequential(*layers)
 
-        # FC head — preserves spatial structure (matches original exactly)
+        # FC head; preserves spatial structure (matches CobbRegressor)
         self.head = nn.Sequential(
             nn.Flatten(),
             nn.Linear(prev_ch * 6 * 6, 256),
@@ -189,7 +195,7 @@ def main() -> None:
     mean_baseline_test = float(np.abs(y_test - train_mean).mean())
     print(f"\n[diagnostic] Predict-the-train-mean baseline test MAE: "
           f"{mean_baseline_test:.2f}°")
-    print("            (regressor must beat this to demonstrate it's learning)")
+    print("            (the regressor needs to beat this to show that it is learning)")
 
     # Standardise targets using train stats
     y_mean = y_train.mean(0, keepdims=True)
@@ -208,7 +214,7 @@ def main() -> None:
     in_c, in_h, in_w = latents.shape[1:]
     model = CobbRegressorMatched(in_channels=in_c, in_h=in_h, in_w=in_w).to(device)
     n_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-    print(f"\nRegressor architecture (receptive-field matched, original-style):")
+    print(f"\nRegressor architecture (receptive-field matched, CobbRegressor-style):")
     print(f"  Input shape:         ({in_c}, {in_h}, {in_w})")
     print(f"  Pool schedule:       {model.pool_schedule}")
     print(f"  Channel schedule:    {model.channels}")
@@ -257,15 +263,15 @@ def main() -> None:
     per_angle_mae = np.abs(test_preds - test_targets).mean(axis=0)
 
     print("\n=== Test set results ===")
-    print(f"  Mean-baseline MAE:     {mean_baseline_test:.2f}° (must beat this)")
+    print(f"  Mean-baseline MAE:     {mean_baseline_test:.2f}° (reference to beat)")
     print(f"  Overall MAE:           {per_image_mae.mean():.2f}° "
           f"(± {per_image_mae.std(ddof=1):.2f})")
-    print(f"  Proximal-thoracic MAE: {per_angle_mae[0]:.2f}°")
-    print(f"  Main-thoracic MAE:     {per_angle_mae[1]:.2f}°")
-    print(f"  Thoracolumbar MAE:     {per_angle_mae[2]:.2f}°")
+    print(f"  Major curve (col 0) MAE: {per_angle_mae[0]:.2f}°")
+    print(f"  Col 1 MAE:             {per_angle_mae[1]:.2f}°")
+    print(f"  Col 2 MAE:             {per_angle_mae[2]:.2f}°")
     if per_image_mae.mean() >= mean_baseline_test - 0.3:
-        print("  ⚠  Regressor barely beats predict-the-mean. Latents not "
-              "providing useful signal at this head capacity.")
+        print(f"  WARNING: test MAE ({per_image_mae.mean():.2f}°) is not more than 0.3° below the "
+              f"predict-the-mean baseline ({mean_baseline_test:.2f}°). The latents may carry little usable signal at this head capacity.")
 
     np.savez(args.out, test_preds=test_preds, test_targets=test_targets,
              test_uuids=uuid_test, per_image_mae=per_image_mae,
@@ -284,7 +290,7 @@ def main() -> None:
         print(f"\n=== Paired comparison vs {args.baseline_results.name} ===")
         print(f"  Baseline overall MAE: {b_per_image.mean():.2f}°")
         print(f"  This run overall MAE: {per_image_mae.mean():.2f}°")
-        print(f"  Δ (baseline − this):  {delta.mean():+.2f}° "
+        print(f"  Δ (baseline - this):  {delta.mean():+.2f}° "
               f"(this run wins on {wins}/{len(delta)} images)")
 
 

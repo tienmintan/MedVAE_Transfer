@@ -1,7 +1,11 @@
 """Separate historical cache consistency from same-input projection correctness.
 
 Historical cache reproducibility and correctness of the projection formula are
-different checks. The latter must compare computations on the SAME latent.
+different checks. The latter must compare computations on the same latent.
+
+Helper module imported by prepare_projection_study.py,
+prepare_fresh_projection_study.py, diagnose_projection_mismatch.py,
+run_projection_study.py and the unit tests; it has no command-line interface.
 """
 from contextlib import contextmanager
 import hashlib
@@ -23,7 +27,7 @@ class NumericalMismatch(ValueError):
             f"max_abs={report.get('max_abs')}, rms={report.get('rms')}, "
             f"failing_elements={report.get('failing_elements')}/{report.get('elements')}. "
             "The detailed record is saved in the study's numerical_failure.json. "
-            "Inspect that record and CACHE_MISMATCH_RECOVERY.md before retrying.")
+            "Recovery options are described in CACHE_MISMATCH_RECOVERY.md.")
 
 
 def comparison_report(actual, expected, atol=1e-3, rtol=1e-3):
@@ -63,14 +67,14 @@ def enforce(report, context):
 
 
 def historical_cache_decision(report, policy="strict"):
-    """Engineering consistency screen, NOT downstream or clinical equivalence.
+    """Engineering consistency screen, not downstream or clinical equivalence.
 
     Strict retains the original elementwise rule. Fixed deliberately anchors the
     experiment to saved raw features; fresh encoding is a consistency check.
     Its additional limits are RMS <= 0.1% and maximum <= 1% of the cached tensor
     SD. Both must pass; a small average cannot hide a large local discrepancy.
     These are reviewed engineering limits, not measured machine-error bounds or
-    a claim that we recovered the historical execution environment.
+    evidence that the historical execution environment was recovered.
     """
     require(policy in ("strict", "fixed"), "Unknown raw-cache policy")
     result = dict(policy=policy, elementwise_passed=bool(report["passed"]),
@@ -92,7 +96,7 @@ def historical_cache_decision(report, policy="strict"):
 
 
 def projected_reuse_decision(records, mode="auto"):
-    """Reuse a configuration only if ALL three aligned caches remain compatible.
+    """Reuse a configuration only if all three aligned caches remain compatible.
 
     Otherwise all its projected splits are rebuilt, and both retained-channel
     tasks are refitted. This avoids a mixture of old/new splits under old scores.

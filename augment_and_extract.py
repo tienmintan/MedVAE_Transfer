@@ -1,44 +1,52 @@
 """
-augment_and_extract.py — geometric augmentation for the data-limited tasks.
+augment_and_extract.py: augment training images in image space and re-encode them through the frozen MedVAE encoder.
 
-WHY. Two independent results say the landmark task is starved of data, not of
-representation:
-  * train error ~0.006 vs test ~0.039 in BOTH the full-res and latent arms;
-  * at matched storage, a much stronger encoder (DINOv2+PCA) buys nothing on
-    landmarks (-4.4%, p = 0.10, only 48% of images improved).
-Augmentation attacks exactly that bottleneck. It is also the necessary CONTROL
-for any later synthetic-generation experiment: without it, "generation helped"
-cannot be distinguished from "any extra data would have helped".
+Tests whether the landmark task is limited by training data rather than by
+the representation (a large train/test error gap, and little gain from a
+stronger encoder at matched storage, would indicate this). Augmentation
+targets that limitation. It is also the control for any later
+synthetic-generation experiment: without it, "generation helped" cannot be
+distinguished from "any extra data would have helped".
 
-WHY IT MUST BE DONE IN IMAGE SPACE. Latents cannot be augmented directly — a
-rotation in image space is not a rotation in latent space. So we transform the
-image, transform the landmarks with the SAME affine, then re-encode through the
-frozen encoder.
+Presets (--preset): conservative (default; intensity only), moderate
+(+ uniform scale), aggressive (+ small rotation and translation). Individual
+parameters can be overridden on the command line.
 
-WHY THE COBB LABELS STAY VALID. Rotation, uniform scale and translation are
-similarity transforms: they preserve angles between lines. A Cobb angle is the
-angle between two endplate lines, so it is unchanged. (Shear and non-uniform
-scale would NOT preserve it and are deliberately excluded.) The script asserts
-this numerically per image rather than trusting the argument.
+Augmentation is applied in image space because latents cannot be augmented
+directly: a rotation in image space is not a rotation in latent space. The
+image is transformed, the landmarks are transformed with the same affine, and
+the result is re-encoded through the frozen encoder.
 
-WHY NO HORIZONTAL FLIP. Flipping mirrors curve laterality — a right-convex
-thoracic curve becomes left-convex — and puts the heart and stomach bubble on
-the wrong side. The result is anatomically implausible and out of distribution.
+Label validity: rotation, uniform scale and translation are similarity
+transforms, so they preserve angles between lines. A Cobb angle is the angle
+between two endplate lines, so it is unchanged. (Shear and non-uniform scale
+would not preserve it and are excluded.) The script checks this numerically
+per augmented image and rejects copies whose major-curve angle moves by more
+than --angle-tol.
 
-Only the TRAIN split is augmented. Val and test are left untouched, so the
-evaluation is unchanged and comparable to every previous run.
+No horizontal flip: flipping mirrors curve laterality (a right-convex thoracic
+curve becomes left-convex) and puts the heart and stomach bubble on the wrong
+side. The result is anatomically implausible and out of distribution.
 
-Run:
+Only the train split is augmented. Val and test are left untouched, so the
+evaluation is unchanged and comparable with the unaugmented runs.
+
+Inputs:  --csv (image_uuid, split, angle_* columns); JPEG images in
+         --img-dir; --landmarks-dir; --train-lookup / --test-lookup.
+Outputs: <out-dir>/latents_<config>_{train,val,test}.npz (train split
+         includes the augmented copies).
+
+Usage:
   python augment_and_extract.py \
       --csv ./medvae/data/boostnet_with_angles.csv \
       --img-dir ./medvae/data/boostnet \
-      --landmarks-dir ~/MedVAE/data/boostnet_labeldata/labels \
+      --landmarks-dir ./data/boostnet_labeldata/labels \
       --train-lookup ./landmark_row_lookup_train_fixed.csv \
       --test-lookup ./landmark_row_lookup_test_fixed.csv \
       --configs medvae_4_1_2d medvae_8_1_2d \
       --n-aug 5 --out-dir ./latents_aug
 
-  python augment_and_extract.py --smoke
+  python augment_and_extract.py --smoke      # synthetic-data self-test
 """
 import argparse
 from pathlib import Path
@@ -52,9 +60,7 @@ CONFIG_LABELS = {"medvae_4_3_2d": "4_3", "medvae_4_1_2d": "4_1",
                  "medvae_8_4_2d": "8_4", "medvae_8_1_2d": "8_1"}
 
 
-# ==========================================================================
-# affine geometry
-# ==========================================================================
+# --- Affine geometry ---
 def affine_matrix(deg, scale, tx, ty, cx, cy):
     """Similarity transform about (cx, cy): rotate by `deg`, scale uniformly,
     then translate. Returns a 2x3 matrix mapping (x, y, 1) -> (x', y')."""
@@ -82,7 +88,7 @@ def points_to_landmarks(pts, W, H):
 
 def endplate_tilts_px(pts):
     """(68,2) pixel points -> (17,) mean endplate tilt per vertebra, degrees.
-    Computed in PIXEL space (project convention: angles are meaningless in the
+    Computed in pixel space (project convention: angles are meaningless in the
     anisotropically-normalised space)."""
     V = pts.reshape(N_VERT, 4, 2)
     top = V[:, 1, :] - V[:, 0, :]
@@ -92,28 +98,28 @@ def endplate_tilts_px(pts):
 
 
 def max_cobb(pts):
-    """Largest pairwise endplate-tilt difference — the major curve."""
+    """Largest pairwise endplate-tilt difference, i.e. the major curve."""
     t = endplate_tilts_px(pts)
     return float(np.abs(t[:, None] - t[None, :]).max())
 
 
-# ==========================================================================
+# --- Augmentation presets ---
 PRESETS = {
-    # Intensity-only. Everything here genuinely varies between real
+    # Intensity-only. Everything here varies between real
     # acquisitions (kVp, mAs, patient habitus, detector calibration, dose).
     # No geometric change at all, so no fill artefacts and no deviation from
     # the acquisition protocol. This is the clinically conservative setting.
     "conservative": dict(max_deg=0.0, max_scale=0.0, max_shift=0.0,
                          jitter=0.10, gamma=0.15, noise=0.01, blur=0.0),
-    # Adds SCALE only. Patient size and source-to-detector distance genuinely
+    # Adds scale only. Patient size and source-to-detector distance
     # vary, so scale variation is present in real data; rotation and
     # translation are not, because radiographers align and centre the patient.
     "moderate": dict(max_deg=0.0, max_scale=0.08, max_shift=0.0,
                      jitter=0.12, gamma=0.18, noise=0.015, blur=0.5),
-    # Adds small rotation and translation. NOT clinically motivated — these
+    # Adds small rotation and translation. Not clinically motivated: these
     # deviate from the acquisition protocol and introduce fill corners that
-    # never appear in real radiographs. Use only as a deliberate contrast to
-    # show what conservative augmentation gives up.
+    # never appear in real radiographs. Intended as a contrast condition for
+    # the conservative preset.
     "aggressive": dict(max_deg=10.0, max_scale=0.10, max_shift=0.05,
                        jitter=0.10, gamma=0.15, noise=0.01, blur=0.5),
 }
@@ -145,7 +151,7 @@ def intensity_augment(img, rng, jitter, gamma_rng, noise, blur):
     return out
 
 
-# ==========================================================================
+# --- Single augmentation ---
 def augment_once(img, pts, rng, max_deg, max_scale, max_shift, jitter,
                  gamma=0.0, noise=0.0, blur=0.0):
     """Return (augmented PIL image, transformed points) or (None, None) if the
@@ -173,14 +179,14 @@ def augment_once(img, pts, rng, max_deg, max_scale, max_shift, jitter,
             or new_pts[:, 1].min() < margin or new_pts[:, 1].max() > H - margin):
         return None, None                    # spine would leave the frame
 
-    # PIL's affine takes the INVERSE map (output -> input)
+    # PIL's affine takes the inverse map (output -> input)
     Minv = np.linalg.inv(np.vstack([M, [0, 0, 1]]))[:2]
     out = img.transform((W, H), Image.AFFINE, data=Minv.flatten(),
                         resample=Image.BILINEAR, fillcolor=0)
     return intensity_augment(out, rng, jitter, gamma, noise, blur), new_pts
 
 
-# ==========================================================================
+# --- Extraction run ---
 def run(args):
     import pandas as pd
     import torch
@@ -250,7 +256,7 @@ def run(args):
                 continue
             u2r = uuid_map(split)
             all_lmk = lmk_rows(split)
-            n_aug = args.n_aug if split == "train" else 0    # ONLY augment train
+            n_aug = args.n_aug if split == "train" else 0    # only the train split is augmented
 
             lat, uu, cobb, lmk = [], [], [], []
             probe = load_2d_finetune_aspect(
@@ -261,7 +267,7 @@ def run(args):
             for _, r in sub.iterrows():
                 u = str(r["image_uuid"])
                 if u not in u2r:
-                    print(f"  WARN no landmark row for {u}"); continue
+                    print(f"  WARNING: no landmark row for {u}; this image is skipped."); continue
                 p = Path(args.img_dir) / f"{u}.jpg"
                 if not p.exists():
                     continue
@@ -291,7 +297,7 @@ def run(args):
                                 gamma=args.gamma, noise=args.noise, blur=args.blur)
                             if aug is None:
                                 continue
-                            # VERIFY the similarity transform preserved the angle
+                            # Check that the similarity transform preserved the angle
                             resid = abs(max_cobb(pts) - c0)
                             angle_resid.append(resid)
                             if resid > args.angle_tol:
@@ -312,7 +318,7 @@ def run(args):
             np.savez_compressed(dst, latents=np.stack(lat).astype(np.float32),
                                 uuids=np.array(uu), cobb=np.stack(cobb),
                                 landmarks=np.stack(lmk))
-            print(f"  wrote {dst.name}  latents={np.stack(lat).shape}  n={len(uu)}"
+            print(f"  Wrote {dst.name}  latents={np.stack(lat).shape}  n={len(uu)}"
                   + (f"  ({n_aug} aug/image)" if n_aug else "  (unaugmented)"))
         del mvae
         if device == "cuda":
@@ -325,7 +331,7 @@ def run(args):
         print("  (similarity transforms preserve Cobb angles, so the stored angle")
         print("   labels remain valid for the augmented copies)")
 
-    print(f"\nTrain on the augmented set and compare against the original:\n"
+    print(f"\nNext: train on the augmented set and compare with the original:\n"
           f"  python train_frontier.py --latents-dir {out_dir} --out-dir ./outputs/aug \\\n"
           f"      --configs {' '.join(args.configs)} --tasks cobb landmark "
           f"--seeds 0 1 2 3 4 5 6 7 8 9 --progress 25\n"
@@ -333,7 +339,7 @@ def run(args):
           f"      --label-a original --label-b augmented")
 
 
-# ==========================================================================
+# --- Synthetic-data self-test ---
 def smoke():
     rng = np.random.default_rng(0)
     W, H = 400, 800
@@ -361,11 +367,11 @@ def smoke():
         print(f"  rot {deg:>4}deg scale {sc:.2f} shift ({tx:>4},{ty:>4}) "
               f"-> {c1:.4f} deg  (residual {abs(c1-c0):.2e})")
 
-    # --- 2. a SHEAR must change it (showing the check has teeth) ---
+    # --- 2. a shear must change it (shows that the check can fail) ---
     Sh = np.array([[1.0, 0.3, 0.0], [0.0, 1.0, 0.0]])
     c_sh = max_cobb(apply_affine_points(pts, Sh))
     print(f"\n  shear (excluded by design) -> {c_sh:.4f} deg "
-          f"(residual {abs(c_sh-c0):.3f} — correctly NOT preserved)")
+          f"(residual {abs(c_sh-c0):.3f}; not preserved, as expected)")
 
     # --- 3. landmark round-trip through normalised coords ---
     lm = points_to_landmarks(pts, W, H)
@@ -380,7 +386,7 @@ def smoke():
                    for _ in range(40))
     print(f"aggressive transforms rejected (spine leaves frame): {rejected}/40")
 
-    # --- 5. conservative preset must leave landmarks EXACTLY unchanged ---
+    # --- 5. conservative preset must leave landmarks unchanged ---
     print("\nconservative preset (intensity only):")
     cons = PRESETS["conservative"]
     img2 = Image.fromarray((np.linspace(0, 255, W * H).reshape(H, W) % 256).astype(np.uint8))
@@ -401,7 +407,7 @@ def smoke():
     # precision (~1e-4 px on a 800px image), not by the transform maths
     ok = (worst < 1e-6 and abs(c_sh - c0) > 1.0 and rt < 1e-3 and rejected > 0
           and unchanged and changed_pixels == 10)
-    print("\nSMOKE:", "PASS" if ok else "FAIL")
+    print("\nSelf-test:", "PASS" if ok else "FAIL")
 
 
 def main():
@@ -415,9 +421,9 @@ def main():
     ap.add_argument("--out-dir", type=Path, default=Path("./latents_aug"))
     ap.add_argument("--n-aug", type=int, default=5, help="augmented copies per train image")
     ap.add_argument("--preset", choices=list(PRESETS), default="conservative",
-                    help="conservative = intensity only (clinically safest); "
+                    help="conservative = intensity only (clinically conservative); "
                          "moderate = + scale; aggressive = + rotation/translation "
-                         "(NOT clinically motivated)")
+                         "(not clinically motivated)")
     ap.add_argument("--max-deg", type=float, default=None)
     ap.add_argument("--max-scale", type=float, default=None)
     ap.add_argument("--max-shift", type=float, default=None, help="fraction of W/H")
@@ -445,7 +451,7 @@ def main():
             print("  (intensity-only geometry: landmarks unchanged, no fill artefacts)")
         run(args)
     else:
-        raise SystemExit("need --csv --img-dir --landmarks-dir (or --smoke)")
+        raise SystemExit("--csv, --img-dir and --landmarks-dir are required (or --smoke for the synthetic-data self-test)")
 
 
 if __name__ == "__main__":

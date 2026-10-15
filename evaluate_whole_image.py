@@ -1,29 +1,36 @@
 """
-evaluate_whole_image.py
+evaluate_whole_image.py: whole-image reconstruction metrics for MedVAE models, including the patch-trained one.
 
-Test whether the patch-trained MedVAE encoder generalizes to whole-image
-inference, despite never having seen whole images during training.
+Tests whether the patch-trained MedVAE encoder generalises to whole-image
+inference, although it saw only patches during training.
 
 The patch model was trained on 384x384 native-resolution crops. At inference,
-we encode + decode entire images in a single forward pass — no tiling, no
-stitching. This tests whether the convolutional features generalize to
-larger spatial extents (CNNs would, by translation equivariance) and
-whether the bottleneck self-attention layer can handle the much larger
-spatial grid it never saw at training time.
+entire images are encoded and decoded in a single forward pass, without tiling
+or stitching. This tests whether the convolutional features generalise to
+larger spatial extents (CNNs would, by translation equivariance) and whether
+the bottleneck self-attention layer can handle a much larger spatial grid
+than it saw in training.
 
-Two things make this a real test, not a foregone conclusion:
-  1. MedVAE has bottleneck self-attention (not fully convolutional). The
-     attention matrix at 384 input is 96x96 = 9k positions. At 768x2304
-     input it's 192x576 = 110k positions, ~12x more. Attention weights
-     learned on small grids may not transfer cleanly.
-  2. Per-image normalization replaces per-tile normalization. Each image
-     gets its own min-max applied once globally, which is a different
-     normalization scheme than training saw.
+Two differences from training could affect the result:
+  1. MedVAE has bottleneck self-attention (it is not fully convolutional).
+     The attention matrix at 384 input is 96x96 = 9k positions. At 768x2304
+     input it is 192x576 = 110k positions, ~12x more. Attention weights
+     learned on small grids may not transfer well.
+  2. Per-image normalisation replaces per-tile normalisation. Each image
+     gets its own min-max applied once globally, which differs from the
+     normalisation used in training.
 
 The script evaluates all three models (pretrained / aspect-ft / patch-ft)
-through the same whole-image pipeline so the comparison is apples-to-apples,
-and produces metrics comparable to the existing tile-and-stitch numbers in
-tiled_metrics_per_image.csv.
+through the same whole-image pipeline so that the comparison is
+like-for-like, and produces metrics comparable to the tile-and-stitch metrics
+in tiled_metrics_per_image.csv.
+
+Inputs:  --csv with split and bbox_x0/y0/x1/y1 columns (from
+         prepare_spine_bboxes.py); test images in --img-dir; the aspect and
+         patch fine-tuned checkpoints; optionally --tiled-csv from
+         evaluate_reconstruction_tiled.py.
+Outputs: per-image PSNR and MS-SSIM (unmasked and bbox-masked) at --out-csv;
+         a comparison figure at --out-vis; a summary printed to stdout.
 
 Usage:
     python evaluate_whole_image.py \\
@@ -79,8 +86,8 @@ def encode_decode_whole(
 
     Returns reconstructed image (1, H, W) in [0, 1].
     """
-    # Per-image min-max normalize to [-1, 1] (matches the per-patch
-    # normalization used at training, just applied at whole-image scale)
+    # Per-image min-max normalise to [-1, 1] (matches the per-patch
+    # normalisation used in training, applied at whole-image scale)
     imin, imax = image_tensor.min(), image_tensor.max()
     if imax > imin:
         norm = (image_tensor - imin) / (imax - imin)
@@ -93,7 +100,7 @@ def encode_decode_whole(
         recon, _, _ = model(inp)
     recon = recon.squeeze(0).float()             # (1, H, W) in [-1, 1] (ish)
 
-    # De-normalize back to original intensity range
+    # De-normalise back to original intensity range
     recon = (recon * 0.5) + 0.5
     recon = recon.clamp(0.0, 1.0)
     if imax > imin:
@@ -174,13 +181,13 @@ def evaluate_model(
             )
 
     if fails:
-        print(f"  {name}: {fails}/{len(test_df)} images OOM'd")
+        print(f"  {name}: {fails}/{len(test_df)} images ran out of GPU memory (metrics recorded as NaN)")
     return pd.DataFrame(rows), sample_images
 
 
 def summarise(df: pd.DataFrame, tiled_csv: Path = None) -> None:
     print("\n" + "=" * 78)
-    print("WHOLE-IMAGE RECONSTRUCTION METRICS (n test images per model shown)")
+    print("Whole-image reconstruction metrics (n test images per model shown)")
     print("=" * 78)
 
     n_oom = df.groupby("model")["oom"].sum()
@@ -190,11 +197,11 @@ def summarise(df: pd.DataFrame, tiled_csv: Path = None) -> None:
     print(summary.round(4).to_string())
     for m, n in n_oom.items():
         if n > 0:
-            print(f"  {m}: {n} images OOM'd, excluded from summary")
+            print(f"  {m}: {n} images ran out of GPU memory and are excluded from the summary")
 
     if tiled_csv and Path(tiled_csv).exists():
         print("\n" + "=" * 78)
-        print("WHOLE-IMAGE vs TILE-AND-STITCH (paired, masked metrics)")
+        print("Whole-image vs tile-and-stitch (paired, masked metrics)")
         print("=" * 78)
         tiled = pd.read_csv(tiled_csv)
         for model_name in valid["model"].unique():
@@ -209,7 +216,7 @@ def summarise(df: pd.DataFrame, tiled_csv: Path = None) -> None:
             wins_psnr = (d_psnr > 0).sum()
             wins_msssim = (d_msssim > 0).sum()
             n = len(merged)
-            print(f"\n  {model_name}  (whole − tiled):")
+            print(f"\n  {model_name}  (whole - tiled):")
             print(f"    PSNR (masked):    Δ = {d_psnr.mean():+.3f} ± {d_psnr.std():.3f} dB  "
                   f"(whole wins {wins_psnr}/{n})")
             print(f"    MS-SSIM (masked): Δ = {d_msssim.mean():+.4f} ± {d_msssim.std():.4f}  "
@@ -225,7 +232,7 @@ def make_visualization(samples_by_model: dict, out_path: Path, target_size: tupl
     first_model = next(iter(samples_by_model))
     uuids = list(samples_by_model[first_model].keys())[:3]
     if not uuids:
-        print("No samples to visualize.")
+        print("No samples to visualise.")
         return
 
     model_names = list(samples_by_model.keys())
@@ -244,11 +251,11 @@ def make_visualization(samples_by_model: dict, out_path: Path, target_size: tupl
     flat = np.concatenate([a.ravel() for a in all_pixels])
     vmin = float(np.percentile(flat, window_low))
     vmax = float(np.percentile(flat, window_high))
-    print(f"Visualization windowing: [{vmin:.3f}, {vmax:.3f}]")
+    print(f"Visualisation windowing: [{vmin:.3f}, {vmax:.3f}]")
 
     last_handle = None
     for i, u in enumerate(uuids):
-        # Original (from any model — they all see the same input)
+        # Original (from any model; they all see the same input)
         orig, _ = samples_by_model[first_model][u]
         last_handle = axes[i, 0].imshow(orig, cmap="gray", vmin=vmin, vmax=vmax)
         axes[i, 0].axis("off")
@@ -270,7 +277,7 @@ def make_visualization(samples_by_model: dict, out_path: Path, target_size: tupl
     cb.set_label("Normalised pixel intensity", rotation=270, labelpad=15, fontsize=10)
     fig.text(0.5, 0.02,
              f"Whole-image encoding at {target_size[0]}x{target_size[1]}. "
-             f"Display window: {window_low:.0f}–{window_high:.0f}th percentile.",
+             f"Display window: {window_low:.0f}-{window_high:.0f}th percentile.",
              ha="center", va="bottom", fontsize=9, style="italic")
     out_path.parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(out_path, dpi=130, bbox_inches="tight")
@@ -303,7 +310,7 @@ def main() -> None:
     test_df = df[df["split"] == "test"].reset_index(drop=True)
     for col in ["bbox_x0", "bbox_y0", "bbox_x1", "bbox_y1"]:
         if col not in test_df.columns:
-            raise ValueError(f"Missing bbox column {col!r} — run prepare_spine_bboxes.py")
+            raise ValueError(f"Missing bbox column {col!r}. The bbox columns come from prepare_spine_bboxes.py.")
     print(f"Loaded {len(test_df)} test images.")
 
     all_results = []

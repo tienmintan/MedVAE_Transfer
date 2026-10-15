@@ -1,7 +1,5 @@
 """
-run_multiseed_matched.py
-
-Multi-seed reproducibility runner for train_cobb_regressor_matched.py.
+run_multiseed_matched.py: multi-seed reproducibility runner for train_cobb_regressor_matched.py.
 
 For each (latent-source, seed) pair, runs the matched regressor and
 collects the resulting test MAE. At the end, reports:
@@ -9,6 +7,11 @@ collects the resulting test MAE. At the end, reports:
   2. Per-condition mean ± std across seeds
   3. Pairwise comparisons of each condition against the chosen baseline
      condition, with a sign-test count of how many seeds favour which side
+
+Inputs:  the latent .npz files named in CONDITIONS; the training script
+         (--training-script).
+Outputs: <out-dir>/<condition_key>_seed<seed>.npz per job and
+         <out-dir>/multiseed_summary.csv; the summary is printed to stdout.
 
 Usage:
     python run_multiseed_matched.py \\
@@ -35,9 +38,7 @@ from typing import Optional
 import numpy as np
 
 
-# ---------------------------------------------------------------------------
-# Conditions to evaluate
-# ---------------------------------------------------------------------------
+# --- Conditions to evaluate ---
 
 CONDITIONS = [
     {
@@ -78,9 +79,7 @@ CONDITIONS = [
 ]
 
 
-# ---------------------------------------------------------------------------
-# Per-(condition, seed) execution
-# ---------------------------------------------------------------------------
+# --- Per-(condition, seed) execution ---
 
 def run_single(condition: dict, seed: int, out_dir: Path,
                 training_script: str = "train_cobb_regressor_matched.py",
@@ -115,11 +114,11 @@ def run_single(condition: dict, seed: int, out_dir: Path,
             cmd, capture_output=True, text=True, timeout=1200,
         )
     except subprocess.TimeoutExpired:
-        print(f"    [TIMEOUT after 20 minutes]")
+        print(f"    [timed out after 20 minutes]")
         return None
 
     if result.returncode != 0:
-        print(f"    [FAIL with code {result.returncode}]")
+        print(f"    [failed with exit code {result.returncode}]")
         # Print last 20 lines of stderr for diagnosis
         err_lines = result.stderr.strip().splitlines()[-20:]
         for line in err_lines:
@@ -137,9 +136,7 @@ def run_single(condition: dict, seed: int, out_dir: Path,
         return None
 
 
-# ---------------------------------------------------------------------------
-# Aggregation and reporting
-# ---------------------------------------------------------------------------
+# --- Aggregation and reporting ---
 
 def per_condition_summary(results: dict) -> dict:
     """results: {condition_key: {seed: mae_or_None}}.
@@ -192,10 +189,10 @@ def print_summary(results: dict, conditions: list, seeds: list,
     cond_lookup = {c["key"]: c for c in conditions}
 
     print("\n" + "=" * 90)
-    print("MULTI-SEED MATCHED-REGRESSOR REPRODUCIBILITY SUMMARY")
+    print("Multi-seed matched-regressor reproducibility summary")
     print("=" * 90)
 
-    # ---- Per-(condition, seed) raw table ----
+    # --- Per-(condition, seed) raw table ---
     print(f"\nPer-seed test MAE (degrees):")
     header_seeds = "  ".join(f"seed={s:<4}" for s in seeds)
     print(f"  {'condition':<40}  {header_seeds}")
@@ -209,7 +206,7 @@ def print_summary(results: dict, conditions: list, seeds: list,
         )
         print(f"  {cond['label']:<40}  {row}")
 
-    # ---- Per-condition aggregated ----
+    # --- Per-condition aggregated ---
     print(f"\nAggregated (mean ± std, n=seeds with valid result):")
     print(f"  {'condition':<40}  {'mean ± std':<18}  {'n':<3}  {'min':<7}  {'max':<7}")
     print(f"  {'-' * 40}  {'-' * 18}  {'-' * 3}  {'-' * 7}  {'-' * 7}")
@@ -226,10 +223,10 @@ def print_summary(results: dict, conditions: list, seeds: list,
         print(f"  {cond['label']:<40}  {mae_str:<18}  {s['n']:<3}  "
               f"{min_v:<7.3f}  {max_v:<7.3f}")
 
-    # ---- Pairwise comparisons against baseline ----
+    # --- Pairwise comparisons against baseline ---
     if baseline_key not in cond_lookup:
-        print(f"\n⚠ baseline_key={baseline_key} not in conditions; "
-              f"skipping pairwise comparisons.")
+        print(f"\nWARNING: baseline_key={baseline_key} is not among the conditions; "
+              f"pairwise comparisons are skipped.")
         return summary
 
     print(f"\nPairwise vs baseline ({cond_lookup[baseline_key]['label']}):")
@@ -250,8 +247,8 @@ def print_summary(results: dict, conditions: list, seeds: list,
             print(f"  {cond['label']:<40}  {'(no data)':<12}")
             continue
 
-        # Mean delta (positive = condition better than baseline,
-        # since lower MAE is better, so we use baseline - condition)
+        # Mean delta (positive = condition better than baseline;
+        # lower MAE is better, so the delta is baseline - condition)
         mean_delta = b_summary["mean"] - c_summary["mean"]
         wins, n_paired = sign_test_count(c_results, b_results, seeds)
 
@@ -293,9 +290,7 @@ def write_csv(results: dict, conditions: list, seeds: list, csv_path: Path):
     print(f"\nWrote per-(condition, seed) results to {csv_path}")
 
 
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
+# --- Main ---
 
 def main():
     p = argparse.ArgumentParser()
@@ -326,8 +321,8 @@ def main():
         print(f"\n--- {cond['label']} ({cond['key']}) ---")
         # Verify latents file exists before running any seeds for this condition
         if not Path(cond["latents"]).exists():
-            print(f"  ⚠ Latents file {cond['latents']} not found; "
-                  f"skipping condition.")
+            print(f"  WARNING: latents file {cond['latents']} not found; "
+                  f"this condition is skipped and reported as FAIL in the summary.")
             continue
         for seed in args.seeds:
             mae = run_single(cond, seed, args.out_dir,

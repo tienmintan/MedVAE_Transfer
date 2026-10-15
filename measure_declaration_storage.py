@@ -2,9 +2,18 @@
 """Read-only inventory of likely caches and checkpoint state under one repository.
 
 Uses file metadata only: no PyTorch, NumPy, GPU work or checkpoint loading.
-Prints JSON to stdout; redirect it to a file if required. Totals are logical
-regular-file byte counts, not physical allocated disk blocks. Classification
-uses directory names/extensions and is explicitly a candidate inventory.
+Totals are logical regular-file byte counts, not physical allocated disk
+blocks. Classification uses directory names and extensions, so the result is
+a candidate inventory. Directories in SKIP_DIRS and symbolic links are not
+followed; the historical_encoder_calls and historical_GPU_hours fields are
+always null, since file metadata cannot provide them.
+
+Inputs:  --root (default: the current directory).
+Outputs: JSON printed to stdout (per-category totals, per-directory totals,
+         errors and skipped links); it can be redirected to a file.
+
+Usage:
+  python measure_declaration_storage.py --root . > storage.json
 """
 
 import argparse
@@ -109,7 +118,7 @@ def main():
         "root": str(root),
         "measurement": "Logical sizes of regular files; no content deserialisation.",
         "scope": "Current files under this root, excluding the listed directories and symbolic links.",
-        "classification": "Candidates based on names and extensions. Review categories and directories before citing totals.",
+        "classification": "Candidates based on names and extensions; categories and directories are not verified, so totals may include unrelated files.",
         "excluded_directory_names": sorted(SKIP_DIRS),
         "totals": {key: with_units(value) for key, value in sorted(totals.items())},
         "directories": [{"category": category, "directory": owner, **with_units(value)}

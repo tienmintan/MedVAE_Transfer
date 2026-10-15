@@ -1,14 +1,18 @@
 """
-inspect_label_distribution.py
+inspect_label_distribution.py: summarise the distribution of Cobb angle labels in BoostNet.
 
-Look at the distribution of Cobb angle labels in BoostNet:
-  - Per-angle histograms (proximal-thoracic, main-thoracic, thoracolumbar)
+Reports:
+  - Per-angle histograms (one per angle column)
   - Per-split breakdown (train, val, test)
-  - Clinical severity classification (none / mild / moderate / severe)
+  - Clinical severity classification (none / mild / moderate / severe),
+    using the largest of the three angles per image
   - Correlations between the three angles
 
-Useful for understanding why a regressor performs the way it does — class
-imbalance, range coverage, joint dependencies.
+These summaries help explain regressor behaviour: class imbalance, range
+coverage and joint dependencies between angles.
+
+Inputs:  --csv with split and the three angle columns.
+Outputs: a multi-panel figure at --out; numerical summaries printed to stdout.
 
 Usage:
   python inspect_label_distribution.py \\
@@ -28,7 +32,7 @@ ANGLE_COLS = ["angle_proximal_thoracic", "angle_main_thoracic", "angle_thoracolu
 ANGLE_NAMES = ["Proximal-thoracic", "Main-thoracic", "Thoracolumbar"]
 # Standard Cobb angle severity bins
 SEVERITY_BINS = [-0.01, 10, 25, 40, 999]
-SEVERITY_LABELS = ["normal (<10°)", "mild (10–25°)", "moderate (25–40°)", "severe (>40°)"]
+SEVERITY_LABELS = ["normal (<10°)", "mild (10-25°)", "moderate (25-40°)", "severe (>40°)"]
 
 
 def main() -> None:
@@ -41,7 +45,7 @@ def main() -> None:
     print(f"Loaded {len(df)} labelled images "
           f"(splits: {df['split'].value_counts().to_dict()})\n")
 
-    # === Numerical summary ===
+    # Numerical summary
     print("Per-angle summary (all splits):")
     print(df[ANGLE_COLS].describe().round(2).to_string())
     print()
@@ -53,7 +57,7 @@ def main() -> None:
         print(sub[ANGLE_COLS].describe().round(2).to_string())
     print()
 
-    # === Severity classification (using the largest of the three angles per image) ===
+    # Severity classification (using the largest of the three angles per image)
     df["max_angle"] = df[ANGLE_COLS].max(axis=1)
     df["severity"] = pd.cut(df["max_angle"], bins=SEVERITY_BINS,
                             labels=SEVERITY_LABELS, include_lowest=True)
@@ -67,11 +71,11 @@ def main() -> None:
     print(sev_pct.round(1).to_string())
     print()
 
-    # === Inter-angle correlation ===
+    # Inter-angle correlation
     print("Correlation between angles (all splits):")
     print(df[ANGLE_COLS].corr().round(2).to_string())
 
-    # === Plots ===
+    # Plots
     fig = plt.figure(figsize=(16, 10))
     gs = fig.add_gridspec(3, 4, hspace=0.45, wspace=0.35)
 
@@ -100,7 +104,7 @@ def main() -> None:
     ax.legend(fontsize=7, loc="upper right")
     ax.set_xticklabels(ax.get_xticklabels(), rotation=0)
 
-    # Row 2: pairwise scatter of angles (just train, to keep clean)
+    # Row 2: pairwise scatter of angles (train split only, to limit clutter)
     train = df[df["split"] == "train"]
     pairs = [(0, 1), (0, 2), (1, 2)]
     for j, (a, b) in enumerate(pairs):

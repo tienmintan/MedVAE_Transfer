@@ -1,15 +1,15 @@
 """
-verify_corner_ordering.py — determine how the 68 landmarks group into vertebrae.
+verify_corner_ordering.py: determine how the 68 landmarks group into vertebrae.
 
-68 = 17 vertebrae x 4 corners. We need to know:
+68 = 17 vertebrae x 4 corners. Two properties are determined:
   (a) grouping: by-vertebra [v0c0 v0c1 v0c2 v0c3 v1c0 ...] vs
                 by-corner-type [all 17 TL, all 17 TR, all 17 BL, all 17 BR]
-  (b) within-vertebra order: which two corners are the SUPERIOR endplate and
-      which two are the INFERIOR endplate.
+  (b) within-vertebra order: which two corners form the superior endplate and
+      which two form the inferior endplate.
 
 This draws several candidate interpretations on a real image. For each, it
 connects each vertebra's 4 corners into a quadrilateral and draws the inferred
-superior (red) and inferior (blue) endplate lines. The CORRECT interpretation
+superior (red) and inferior (blue) endplate lines. The correct interpretation
 is the one where:
   - quadrilaterals look like vertebrae (compact, non-self-intersecting boxes),
   - endplates are near-horizontal and stack down the spine,
@@ -17,7 +17,11 @@ is the one where:
 
 Read-only except the diagnostic PNG.
 
-Run:  python verify_corner_ordering.py
+Inputs:  labels/test/landmarks.csv and filenames.csv, and the matching image,
+         under LABELDATA (path set in the module).
+Outputs: corner_ordering_check.png in the current directory.
+
+Usage:  python verify_corner_ordering.py
 """
 
 from pathlib import Path
@@ -45,7 +49,7 @@ def find_image(stem):
 
 
 def parse_AB(row):
-    """Ordering A confirmed earlier: all-68 x then all-68 y."""
+    """Ordering A: all 68 x values, then all 68 y values."""
     return np.stack([row[:68], row[68:]], axis=1)   # (68,2) normalised
 
 
@@ -83,7 +87,6 @@ def main():
     landmarks = pd.read_csv(LM_CSV, header=None).values.astype(float)
     filenames = pd.read_csv(FN_CSV, header=None).iloc[:, 0].astype(str).tolist()
 
-    # pick one clear image
     idx = 0
     pts = parse_AB(landmarks[idx])
     stem = Path(filenames[idx]).stem
@@ -117,9 +120,9 @@ def main():
     out = Path.cwd() / "corner_ordering_check.png"
     fig.savefig(out, dpi=140, bbox_inches="tight")
     print(f"Saved {out}")
-    print("\nThe CORRECT panel has: compact non-crossing green boxes, red lines")
+    print("\nThe correct panel has: compact non-crossing green boxes, red lines")
     print("above blue within each box, and endplates roughly horizontal,")
-    print("stacking down the spine. Tell me which panel (1-4) is correct.")
+    print("stacking down the spine. Panels are numbered 1-4 from left to right.")
 
 
 if __name__ == "__main__":

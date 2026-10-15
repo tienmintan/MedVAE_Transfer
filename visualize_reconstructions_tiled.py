@@ -1,21 +1,25 @@
 """
-visualize_reconstructions_tiled.py
+visualize_reconstructions_tiled.py: side-by-side tile-and-stitch reconstructions from three MedVAE checkpoints.
 
-Phase 2 qualitative comparison: side-by-side figures of full-image
-reconstructions from three MedVAE checkpoints, with zoomed crops centred on
-a vertebra-sized region to make high-frequency differences visible.
+Qualitative comparison of full-image reconstructions from three MedVAE
+checkpoints, with zoomed crops centred on a vertebra-sized region to make
+high-frequency differences visible.
 
-For each selected image we produce two rows:
-    Row 1: full image — original, pretrained, aspect-ft, patch-ft
+For each selected image two rows are produced:
+    Row 1: full image: original, pretrained, aspect-ft, patch-ft
     Row 2: zoomed ~256x256 crop centred at the bbox centre
 
 All panels (full images and zoom crops, every row, every column) share the
-SAME intensity windowing — vmin/vmax computed globally across every pixel
-we display. This is the standard convention in medical-image viewing
+same intensity windowing: vmin/vmax are computed globally across every
+displayed pixel. This is the standard convention in medical-image viewing
 (window/level): radiologists fix the intensity bounds deliberately, never
 letting the display auto-scale per image, so visual differences reflect
 real differences in the data rather than display artefacts. A colorbar on
 the right shows the active scale.
+
+Inputs:  --csv (image_uuid, split, bbox_x0/y0/x1/y1); JPEG images in
+         --img-dir; the aspect- and patch-finetuned checkpoints.
+Outputs: the figure at --out.
 
 Usage:
     python visualize_reconstructions_tiled.py \\
@@ -59,13 +63,14 @@ def compute_global_bounds(pixels_iter, mode: str, low_pct: float, high_pct: floa
       - 'percentile': use low_pct/high_pct percentiles (default 1/99).
         Robust to bright outliers (e.g. text overlays) that would otherwise
         wash out everything else.
-      - 'minmax': use the raw global min and max. Honest but sensitive to
-        outliers — one bright image compresses everyone else's dynamic range.
+      - 'minmax': use the raw global min and max. Reflects the full range
+        but is sensitive to outliers: one bright image compresses the
+        dynamic range of all the others.
       - 'fixed': always return (0, 1). Useful when the data is already
-        clipped to that range and you don't want any clipping.
+        clipped to that range and no further clipping is wanted.
 
-    pixels_iter is an iterable of numpy arrays; we sample a flattened
-    concatenation to avoid loading all pixels at once for huge image sets.
+    pixels_iter is an iterable of numpy arrays; a flattened concatenation is
+    sampled to avoid loading all pixels at once for large image sets.
     """
     if mode == "fixed":
         return 0.0, 1.0
@@ -99,7 +104,7 @@ def main() -> None:
     p.add_argument("--aspect-ckpt", required=True, type=str)
     p.add_argument("--patch-ckpt", required=True, type=str)
     p.add_argument("--n-images", type=int, default=6,
-                   help="How many test images to visualize.")
+                   help="How many test images to visualise.")
     p.add_argument("--tile-size", type=int, default=384)
     p.add_argument("--stride", type=int, default=192)
     p.add_argument("--zoom-size", type=int, default=256,
@@ -136,9 +141,7 @@ def main() -> None:
     print("Loading patch-finetuned MedVAE...")
     m_pat = load_finetuned_medvae(args.patch_ckpt, device, dtype)
 
-    # =========================================================================
-    # PASS 1: compute everything, store in memory
-    # =========================================================================
+    # Pass 1: compute everything, store in memory
     print("\nPass 1: computing reconstructions and zoom regions...")
     records = []
     for i, row in selected.iterrows():
@@ -167,9 +170,7 @@ def main() -> None:
             "zoom_box": (x0, y0, x1 - x0, y1 - y0),
         })
 
-    # =========================================================================
-    # PASS 2: compute global intensity bounds across everything
-    # =========================================================================
+    # Pass 2: compute global intensity bounds across everything
     def iter_all_pixels():
         for r in records:
             for im in r["full"]:
@@ -183,9 +184,7 @@ def main() -> None:
     print(f"\nGlobal intensity window ({args.window_mode}): "
           f"[{vmin:.4f}, {vmax:.4f}]")
 
-    # =========================================================================
-    # PASS 3: render with fixed bounds + colorbar
-    # =========================================================================
+    # Pass 3: render with fixed bounds + colorbar
     fig, axes = plt.subplots(
         nrows=args.n_images * 2, ncols=4,
         figsize=(16, 4 * args.n_images),
@@ -233,9 +232,9 @@ def main() -> None:
     cbar.set_label("Normalised pixel intensity", rotation=270,
                    labelpad=15, fontsize=10)
 
-    # Caption explaining the windowing — readable evidence the comparison is fair
+    # Caption stating the windowing, so the shared display scale is recorded in the figure
     if args.window_mode == "percentile":
-        caption = (f"Display windowing: {args.window_low:.0f}th–"
+        caption = (f"Display windowing: {args.window_low:.0f}th-"
                    f"{args.window_high:.0f}th percentile of all panel pixels "
                    f"(vmin={vmin:.3f}, vmax={vmax:.3f}). Same scale for "
                    f"every panel.")

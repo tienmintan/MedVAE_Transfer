@@ -1,15 +1,13 @@
 """
-verify_padding_fractions.py
+verify_padding_fractions.py: measure padding fractions at each stage of the original and cropped preprocessing pipelines.
 
-Empirical verification of padding fractions at each stage of the
-content-aware preprocessing pipeline. Settles the question of what
-the actual padding looks like in the tensors fed to SD-VAE under both
-the original and cropped pipelines.
+Measures, image by image, how much padding the tensors fed to SD-VAE contain
+under the original (aspect-padded) and the content-aware (cropped) pipelines.
 
 Stages measured (per image):
 
     A. Original pipeline: aspect-pad image into a 512x512 square.
-       This is what the diffusion model saw in iterations 1-4.
+       This is the input of the original (aspect-padded) diffusion training data.
 
     B. Content-bbox crop: crop image to its content bounding box.
        (No padding added; just isolates the non-padding region.)
@@ -18,22 +16,26 @@ Stages measured (per image):
        (Step 2 of crop_and_repad_to_aspect.)
 
     D. Final 512x512 (new pipeline): full output of
-       crop_and_repad_to_aspect. This is what the diffusion model
-       saw in iteration 5.
+       crop_and_repad_to_aspect. This is the input of the cropped-pipeline
+       diffusion training data.
 
-For each stage we compute "near-zero pixel fraction" — the fraction
-of pixels below a small threshold, used as a proxy for padding. We
-also compute the bbox content fraction (what fraction of the array
-is the content rectangle, ignoring whether content pixels are
-themselves bright) for stages where that's meaningful.
+For each stage the script computes the "near-zero pixel fraction": the
+fraction of pixels below a small threshold, used as a proxy for padding. It
+also records the content bounding box (coordinates, height, width and
+aspect ratio) of each input image.
+
+Inputs:  the BoostNet CSV and JPEG directory; optionally a bbox CSV; the
+         VinDr-SpineXR DICOM directory (unless --skip-vindr).
+Outputs: --out-csv (per-image measurements), --out-fig (stage A vs stage D
+         examples); a per-corpus summary printed to stdout.
 
 Usage:
-    cd ~/MedVAE/MedVAE
+    # run from the repository root
     python verify_padding_fractions.py \\
         --boostnet-csv      ./medvae/data/boostnet_with_angles.csv \\
         --boostnet-img-dir  ./medvae/data/boostnet \\
         --boostnet-bbox-csv ./medvae/data/boostnet.csv \\
-        --vindr-dicom-dir   ~/MedVAE/vindr-spinexr \\
+        --vindr-dicom-dir   ./vindr-spinexr \\
         --n-samples         30 \\
         --out-csv           verify_padding_fractions.csv \\
         --out-fig           verify_padding_fractions.png
@@ -50,13 +52,11 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 
-# Import from the project's existing module
+# Import from the project's content-detection module
 from detect_content_bbox import detect_content_bbox
 
 
-# ---------------------------------------------------------------------------
-# Configuration
-# ---------------------------------------------------------------------------
+# --- Configuration ---
 
 TARGET_ASPECT = 1.5     # height:width for the intermediate stage
 TARGET_SIZE   = 512     # final output side length
@@ -65,9 +65,7 @@ NEAR_ZERO_THRESHOLD = 1e-3   # pixels below this are "padding"
 SAMPLE_RNG_SEED = 20260606
 
 
-# ---------------------------------------------------------------------------
-# Helpers: image loading (match extract_latents_*_cropped.py exactly)
-# ---------------------------------------------------------------------------
+# --- Helpers: image loading (matching extract_latents_*_cropped.py) ---
 
 def load_boostnet_image(path: Path) -> np.ndarray:
     """Load a BoostNet JPEG and normalise to [0, 1]."""
@@ -98,15 +96,13 @@ def load_vindr_dicom(path: Path) -> np.ndarray:
     return img
 
 
-# ---------------------------------------------------------------------------
-# Pipeline stages (instrumented versions)
-# ---------------------------------------------------------------------------
+# --- Pipeline stages (instrumented versions) ---
 
 def stage_a_original_pipeline(img: np.ndarray, target_size: int = TARGET_SIZE) -> np.ndarray:
-    """The ORIGINAL pre-cropping pipeline: aspect-pad to a square then resize.
+    """The original pre-cropping pipeline: aspect-pad to a square then resize.
 
-    Equivalent to the per-image preprocessing used for the diffusion
-    training corpora in iterations 1-4.
+    Equivalent to the per-image preprocessing used for the original
+    (aspect-padded) diffusion training corpora.
     """
     H, W = img.shape
     # Resize so longer side = target_size, preserving aspect
@@ -137,7 +133,7 @@ def stage_b_cropped(img: np.ndarray, bbox: Tuple[int, int, int, int]) -> np.ndar
 def stage_c_padded_to_1p5(content: np.ndarray, target_aspect: float = TARGET_ASPECT) -> np.ndarray:
     """Stage C: pad the short side of content to reach target_aspect.
 
-    This is exactly step 2 of crop_and_repad_to_aspect. Returns an image
+    This is step 2 of crop_and_repad_to_aspect. Returns an image
     whose aspect ratio is target_aspect.
     """
     ch, cw = content.shape
@@ -179,9 +175,7 @@ def stage_d_final_512(padded: np.ndarray, target_aspect: float = TARGET_ASPECT,
     return out
 
 
-# ---------------------------------------------------------------------------
-# Measurement
-# ---------------------------------------------------------------------------
+# --- Measurement ---
 
 def near_zero_fraction(arr: np.ndarray, threshold: float = NEAR_ZERO_THRESHOLD) -> float:
     """Fraction of pixels at or below the threshold (treated as 'padding')."""
@@ -201,7 +195,7 @@ def process_image(
     bbox_h, bbox_w = y1 - y0, x1 - x0
     if bbox_h <= 0 or bbox_w <= 0:
         raise ValueError(
-            f"Degenerate bbox (h={bbox_h}, w={bbox_w}) — "
+            f"Degenerate bbox (h={bbox_h}, w={bbox_w}); "
             f"input ({H}x{W}), bbox ({y0},{x0},{y1},{x1})."
         )
 
@@ -234,24 +228,22 @@ def process_image(
     }
 
 
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
+# --- Main ---
 
 def gather_boostnet_samples(args, rng: np.random.Generator) -> List[Dict]:
     """Sample BoostNet images and process them through all stages.
 
     By default uses content detection (matching what
     extract_latents_boostnet_cropped.py does in practice). If a bbox CSV
-    is explicitly provided, attempts to use it — auto-detecting between
+    is explicitly provided, attempts to use it, auto-detecting between
     pixel and [0, 1]-normalised coordinate conventions.
     """
     df = pd.read_csv(args.boostnet_csv)
     print(f"BoostNet: {len(df)} total images")
 
     # If bbox CSV provided AND its values are usable, join it.
-    # Otherwise we use detect_content_bbox() for every image, which is what
-    # the production cropped-extraction pipeline did in practice.
+    # Otherwise detect_content_bbox() is used for every image, which is what
+    # the cropped-extraction pipeline did in practice.
     use_csv_bboxes = False
     if args.boostnet_bbox_csv is not None and args.boostnet_bbox_csv.is_file():
         bdf = pd.read_csv(args.boostnet_bbox_csv)
@@ -265,7 +257,7 @@ def gather_boostnet_samples(args, rng: np.random.Generator) -> List[Dict]:
             rename_map = {"bbox_x0": "xmin", "bbox_y0": "ymin",
                           "bbox_x1": "xmax", "bbox_y1": "ymax"}
         else:
-            print(f"BoostNet: bbox CSV columns are {bdf.columns.tolist()} — "
+            print(f"BoostNet: bbox CSV columns are {bdf.columns.tolist()}; "
                   "no recognised convention, using content detection.")
             keep_cols = None
 
@@ -289,7 +281,7 @@ def gather_boostnet_samples(args, rng: np.random.Generator) -> List[Dict]:
 
     if not use_csv_bboxes:
         print("BoostNet: using detect_content_bbox() for all images "
-              "(matches production cropped pipeline).")
+              "(matches the cropped extraction pipeline).")
 
     sample_idx = rng.choice(len(df), size=min(args.n_samples, len(df)),
                               replace=False)
@@ -433,7 +425,7 @@ def make_figure(results: List[Dict], out_path: Path,
 
         ax_a.imshow(r["stage_a_array"], cmap="gray", vmin=0, vmax=1)
         ax_a.set_title(
-            f"{r['corpus']} — Stage A (original)\n"
+            f"{r['corpus']}: Stage A (original)\n"
             f"padding = {r['stage_a_near_zero_frac']*100:.1f}%",
             fontsize=9,
         )
@@ -441,7 +433,7 @@ def make_figure(results: List[Dict], out_path: Path,
 
         ax_d.imshow(r["stage_d_array"], cmap="gray", vmin=0, vmax=1)
         ax_d.set_title(
-            f"{r['corpus']} — Stage D (final cropped)\n"
+            f"{r['corpus']}: Stage D (final cropped)\n"
             f"padding = {r['stage_d_near_zero_frac']*100:.1f}%",
             fontsize=9,
         )
@@ -464,7 +456,7 @@ def main() -> int:
                     default=None,
                     help="Optional bbox CSV. If absent, content detection is "
                          "used (this matches what extract_latents_boostnet_cropped.py "
-                         "does in practice — its bbox CSV code path requires "
+                         "does in practice: its bbox CSV code path requires "
                          "columns named xmin/ymin/xmax/ymax, which "
                          "medvae/data/boostnet.csv does not have, so it falls "
                          "back to detection anyway).")
@@ -484,14 +476,14 @@ def main() -> int:
 
     if not args.skip_boostnet:
         if not args.boostnet_csv.is_file():
-            print(f"ERROR: BoostNet CSV not found at {args.boostnet_csv}",
+            print(f"Error: BoostNet CSV not found at {args.boostnet_csv}",
                   file=sys.stderr)
             return 1
         all_results.extend(gather_boostnet_samples(args, rng))
 
     if not args.skip_vindr:
         if not args.vindr_dicom_dir.is_dir():
-            print(f"WARNING: VinDr dir not found at {args.vindr_dicom_dir}, skipping",
+            print(f"WARNING: VinDr directory not found at {args.vindr_dicom_dir}. VinDr samples are skipped, so inter-corpus gaps cannot be computed.",
                   file=sys.stderr)
         else:
             all_results.extend(gather_vindr_samples(args, rng))

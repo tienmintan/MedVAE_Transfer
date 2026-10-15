@@ -1,24 +1,27 @@
 """
-Phase A.1: Bootstrap CIs on multi-seed encoder-direction predictions.
+phase_a_bootstrap.py: bootstrap CIs on the multi-seed matched-regressor Cobb predictions.
 
-Loads all 25 .npz files in outputs/multiseed/, validates their structure,
+Loads one .npz file per configuration and seed (CONFIGS x SEEDS) from
+outputs/multiseed/, validates their structure,
 computes per-image MAE, then computes:
-  - Per-configuration multi-seed mean MAE (matches the interim report table)
+  - Per-configuration multi-seed mean MAE
   - Bootstrap 95% CIs (image-level resampling across 128 test images)
   - Paired comparisons against the aspect-padded baseline
   - Sign-test counts at both the per-seed and per-image level
   - LaTeX-ready summary table
 
-This script is intentionally chatty: it prints what it finds in each .npz
-file so we can confirm the structure is what we expect.
+The script prints what it finds in each .npz file so that the structure can
+be checked.
+
+Inputs:  outputs/multiseed/<prefix>_seed<N>.npz for each configuration in
+         CONFIGS and each seed in SEEDS (from run_multiseed_matched.py).
 
 Usage:
-    cd ~/MedVAE/MedVAE
-    python phase_a_bootstrap.py
+    python phase_a_bootstrap.py      # run from the repository root
 
-Output files:
+Outputs:
     phase_a_bootstrap_results.csv          - raw bootstrap numbers
-    phase_a_bootstrap_table.tex            - LaTeX table ready to drop in
+    phase_a_bootstrap_table.tex            - LaTeX table
     phase_a_per_image_mae.csv              - per-image MAE for downstream use
 """
 
@@ -31,15 +34,13 @@ from typing import Dict, List, Tuple
 import numpy as np
 import pandas as pd
 
-# ---------------------------------------------------------------------------
-# Configuration: edit if file paths differ
-# ---------------------------------------------------------------------------
+# --- Configuration: edit if file paths differ ---
 
 MULTISEED_DIR = Path("outputs/multiseed")
 LABELS_CSV = Path("medvae/data/boostnet_with_angles.csv")
 OUT_DIR = Path(".")
 
-# (display_name, file_prefix) — file_prefix is the base of the filename
+# (display_name, file_prefix); file_prefix is the base of the filename
 # before _seed{N}.npz
 CONFIGS = [
     ("Pretrained 4x aspect-padded (baseline)", "matched_4x"),
@@ -58,11 +59,9 @@ N_BOOTSTRAP = 10_000
 ALPHA = 0.05                      # for 95% CI
 RNG_SEED = 20260606               # deterministic bootstrap
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
+# --- Helpers ---
 
-# Plausible key names — we'll detect which one the .npz file actually uses
+# Plausible key names; the one each .npz file uses is detected
 PRED_KEY_CANDIDATES   = ["preds", "predictions", "y_pred", "pred", "test_preds"]
 TARGET_KEY_CANDIDATES = ["targets", "labels", "y_true", "true", "test_targets",
                          "y", "gt", "ground_truth"]
@@ -169,22 +168,20 @@ def bootstrap_paired_diff(
     return point, lo, hi
 
 
-# ---------------------------------------------------------------------------
-# Main analysis
-# ---------------------------------------------------------------------------
+# --- Main analysis ---
 
 def main() -> int:
     print("=" * 70)
-    print("Phase A.1: Bootstrap CIs on multi-seed encoder predictions")
+    print("Bootstrap CIs on multi-seed encoder predictions")
     print("=" * 70)
     print()
 
     if not MULTISEED_DIR.is_dir():
-        print(f"ERROR: {MULTISEED_DIR} does not exist. Are you running from "
-              f"~/MedVAE/MedVAE?", file=sys.stderr)
+        print(f"Error: {MULTISEED_DIR} does not exist. The script expects to be "
+              f"run from the repository root.", file=sys.stderr)
         return 1
 
-    # ---- Load all 25 prediction files and validate structure ----
+    # --- Load all prediction files and validate structure ---
     print(f"[1/4] Loading predictions from {MULTISEED_DIR}/")
     print()
 
@@ -200,7 +197,7 @@ def main() -> int:
         for seed in SEEDS:
             path = MULTISEED_DIR / f"{prefix}_seed{seed}.npz"
             if not path.is_file():
-                print(f"    MISSING: {path}", file=sys.stderr)
+                print(f"    Missing file: {path}", file=sys.stderr)
                 return 1
 
             preds, targets, ids = load_predictions(path)
@@ -226,18 +223,18 @@ def main() -> int:
                 print()
             else:
                 if len(targets) != reference_n:
-                    print(f"    WARN: {path} has {len(targets)} images, "
-                          f"expected {reference_n}", file=sys.stderr)
+                    print(f"    WARNING: {path} has {len(targets)} images, "
+                          f"expected {reference_n}. Comparisons across files may be invalid.", file=sys.stderr)
                 # Targets should match exactly across configs and seeds
                 if not np.allclose(targets, reference_targets):
-                    print(f"    WARN: {path} targets do not match reference. "
-                          f"Different test set?", file=sys.stderr)
+                    print(f"    WARNING: {path} targets do not match the reference targets. "
+                          f"The files may use different test sets; paired comparisons are likely invalid.", file=sys.stderr)
 
     print(f"    Loaded all {len(CONFIGS)} configs * {len(SEEDS)} seeds = "
           f"{len(CONFIGS) * len(SEEDS)} prediction files.")
     print()
 
-    # ---- Compute summary stats per configuration ----
+    # --- Compute summary stats per configuration ---
     print("[2/4] Computing summary statistics")
     print()
 
@@ -322,7 +319,7 @@ def main() -> int:
     print(f"    Saved raw results to {out_csv}")
     print()
 
-    # ---- Pretty-print table to stdout ----
+    # --- Print table to stdout ---
     print("[3/4] Summary table")
     print()
     header = (
@@ -355,11 +352,11 @@ def main() -> int:
         )
     print()
 
-    # ---- LaTeX table ----
+    # --- LaTeX table ---
     print("[4/4] Writing LaTeX table")
     tex_path = OUT_DIR / "phase_a_bootstrap_table.tex"
     with open(tex_path, "w") as f:
-        f.write("% Auto-generated by phase_a_bootstrap.py — Phase A.1\n")
+        f.write("% Auto-generated by phase_a_bootstrap.py\n")
         f.write("\\begin{table}[ht]\n")
         f.write("\\centering\n")
         f.write("\\caption{Multi-seed Cobb regression MAE under the "
@@ -384,7 +381,7 @@ def main() -> int:
                 dlo = r["diff_vs_baseline_ci_lo"]
                 dhi = r["diff_vs_baseline_ci_hi"]
                 diff_cell = f"${d:+.2f}~[{dlo:+.2f}, {dhi:+.2f}]$"
-            # Replace "Nx " (compression ratios) with "N$\times$ " — only digits
+            # Replace "Nx " (compression ratios) with "N$\times$ " (digits only)
             import re
             display = re.sub(r"(\d)x ", r"\1$\\times$ ", r["display_name"])
             highlight = r["prefix"] == "matched_tiled"
@@ -405,20 +402,20 @@ def main() -> int:
     print(f"    Saved LaTeX table to {tex_path}")
     print()
 
-    # ---- Save per-image MAE for downstream breakdowns ----
+    # --- Save per-image MAE for downstream breakdowns ---
     # Include image IDs (if available) and per-curve absolute errors,
-    # so Phase A.2 (per-curve and per-cohort breakdowns) can join with
+    # so phase_a_breakdowns.py (per-curve and per-cohort breakdowns) can join with
     # boostnet_with_angles.csv without reloading the .npz files.
     rows = []
     for display_name, prefix in CONFIGS:
         pooled_mae = cfg_pooled[prefix]
-        # Average per-curve absolute errors across seeds — shape (n_test, 3)
+        # Average per-curve absolute errors across seeds; shape (n_test, 3)
         per_curve_stack = np.stack([
             results[prefix][s]["per_image_abs_err"] for s in SEEDS
         ], axis=0)
         pooled_per_curve = per_curve_stack.mean(axis=0)   # (n_test, 3)
 
-        # Image IDs (if any seed has them — they should all match)
+        # Image IDs (if any seed has them; they should all match)
         ids = None
         for s in SEEDS:
             if results[prefix][s]["ids"] is not None:
@@ -444,7 +441,7 @@ def main() -> int:
           f"{reference_n} images)")
     print()
 
-    print("Phase A.1 complete.")
+    print("Bootstrap analysis complete.")
     return 0
 
 

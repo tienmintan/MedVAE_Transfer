@@ -1,12 +1,17 @@
 """
-extract_latents.py
+extract_latents.py: encode BoostNet images to MedVAE latents for Cobb regressor training.
 
-Encode every image in boostnet_with_angles.csv to its MedVAE latent and save
-all (latent, label) pairs to a single .npz file for fast loading during
-regressor training.
+Encodes every image in boostnet_with_angles.csv that has angle labels to its
+deterministic MedVAE latent (posterior mode) and saves all (latent, label)
+pairs to a single .npz file for fast loading during regressor training.
 
-Run this TWICE — once for the pretrained MedVAE, once for your finetuned
-checkpoint. The downstream regressor script then trains on each in turn.
+The script is run twice: once for the pretrained MedVAE and once for the
+finetuned checkpoint. The downstream regressor script then trains on each in
+turn.
+
+Inputs:  --csv (image_uuid, split, three angle columns); JPEG images in
+         --img-dir; optionally --finetuned-ckpt.
+Outputs: --out .npz with latents (N, C, H, W), angles (N, 3), splits, uuids.
 
 Usage:
   # Pretrained baseline:
@@ -90,7 +95,7 @@ def main() -> None:
     latents = np.stack(latents).astype(np.float32)
     angles = np.array(angles, dtype=np.float32)
     print(f"\nLatents shape: {latents.shape}  "
-          f"(N, C, H, W) — flat dim per image = {np.prod(latents.shape[1:])}")
+          f"(N, C, H, W); flat dim per image = {np.prod(latents.shape[1:])}")
     print(f"Angles shape:  {angles.shape}")
 
     args.out.parent.mkdir(parents=True, exist_ok=True)

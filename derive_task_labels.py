@@ -1,47 +1,51 @@
 """
-derive_task_labels.py — build the extra downstream tasks for the
-compression-choice framework, from the ground truth we already have.
+derive_task_labels.py: derive additional downstream task labels from the existing ground truth.
 
-WHY THESE TASKS. The central finding is that compression removes fine ANGULAR
-detail while preserving coarse POSITION. So the tasks worth adding are ones
-that sit at different points on that granularity axis, giving a dose-response
-curve rather than a single contrast:
+The tasks sit at different points on a granularity axis, from coarse position
+to fine angular detail, so that results across them form a dose-response curve
+rather than a single contrast. This tests whether compression removes fine
+angular detail while preserving coarse position:
 
     coarse ......................................................... fine
     surgical threshold -> severity -> curve pattern -> landmarks -> Cobb -> wedging
 
-Prediction: compression tolerance should DECREASE monotonically along it.
+Expected: compression tolerance should decrease monotonically along it.
 
-The clinically interesting case is the threshold tasks. A 0.5 deg rise in Cobb
-MAE rarely flips a patient across the 45 deg surgical boundary, so severity
-classification may be compression-ROBUST even while the underlying regression
-degrades -- which would mean you can compress harder than the MAE implies,
-because the clinical DECISION survives.
+The threshold tasks are of clinical interest. A 0.5 deg rise in Cobb MAE
+rarely moves a patient across the 45 deg surgical boundary, so severity
+classification may be robust to compression even while the underlying
+regression degrades; in that case the clinical decision would tolerate more
+compression than the MAE implies.
 
-HONEST CAVEAT (state this in the write-up). All of these derive from the same
-68 landmarks, so they are not statistically independent tasks -- they are
-different READOUTS of one annotation. What makes the ladder legitimate is that
-they demand different information and are scored with different metric families
-(accuracy/AUC vs degrees/pixels). Reconstruction-fidelity metrics (PSNR/SSIM)
-are the genuinely independent axis and should be added alongside.
+Caveat: all of these derive from the same 68 landmarks, so they are not
+statistically independent tasks; they are different readouts of one
+annotation. They do demand different information and are scored with
+different metric families (accuracy/AUC vs degrees/pixels).
+Reconstruction-fidelity metrics (PSNR/SSIM) are an independent axis that
+complements them.
 
-TASKS PRODUCED
-    severity        3-class  : <25 / 25-45 / >=45 deg on the MAJOR curve
+Tasks produced:
+    severity        3-class  : <25 / 25-45 / >=45 deg on the major curve
     surgical        binary   : major curve >= SURGICAL_DEG (45 deg)
     curve_pattern   binary   : region holding the major-curve apex
                                (0 thoracic, 1 thoracolumbar / lumbar)
     wedging         17 x reg : per-vertebra |superior - inferior| endplate angle
 
-CONVENTIONS OBSERVED
-    * Column 0 of the stored Cobb array is the MAJOR curve (rank slot, 100% of
-      images) -- NOT the proximal thoracic, despite its name.
-    * Angles are computed in PIXEL space (x*W, y*H). Computing them in the
-      anisotropically-normalised space flattens every tilt by ~2x.
+Conventions:
+    * Column 0 of the stored Cobb array is the major curve (rank slot), not
+      the proximal thoracic curve, despite its name.
+    * Angles are computed in pixel space (x*W, y*H). Computing them in the
+      anisotropically normalised space flattens every tilt by ~2x.
 
-Run:
+Inputs:  --latents-dir (latents_{config}_{split}.npz, providing landmarks,
+         cobb and uuids) and --img-dir (images, for pixel-space rescaling).
+Outputs: <out-dir>/task_labels_{train,val,test}.npz with the task labels and
+         an `implausible` mask; a per-split summary printed to stdout.
+
+Usage:
     python derive_task_labels.py --latents-dir ./latents_aspect \
         --img-dir ./medvae/data/boostnet --out-dir ./labels_tasks
-    python derive_task_labels.py --smoke
+    python derive_task_labels.py --smoke      # synthetic-data self-test
 """
 import argparse
 from pathlib import Path
@@ -52,26 +56,22 @@ N_LM = 68
 N_VERT = 17
 MAJOR = 0                 # stored column holding the major curve (established)
 SURGICAL_DEG = 45.0       # standard surgical-consideration threshold
-SEVERITY_EDGES = [25.0, 45.0]            # -> 3 classes (the <10 bin was near-empty)
+SEVERITY_EDGES = [25.0, 45.0]            # -> 3 classes (a separate <10 bin is near-empty)
 SEVERITY_NAMES = ["<25 (mild)", "25-45 (moderate)", ">=45 (severe)"]
-# plausibility limits — beyond these the annotation is almost certainly corrupt
+# plausibility limits: beyond these the annotation is almost certainly corrupt
 MAX_PLAUSIBLE_WEDGE = 30.0     # a single vertebra's sup-vs-inf endplate angle
 MAX_PLAUSIBLE_COBB = 100.0     # major curve
 # vertebra index ranges by region (0..11 = T1..T12, 12..16 = L1..L5)
-# BINARY curve pattern. The 3-class version (proximal / main / thoracolumbar)
-# was not viable: once the apex definition was corrected, the proximal-thoracic
-# class held only 22 train / 3 val / 7 test cases, so it could neither be
-# learned nor measured. Collapsed to thoracic vs thoracolumbar-lumbar, which is
-# ~67/33 and is a real clinical distinction (thoracic and lumbar curves differ
-# in bracing and surgical approach).
+# Binary curve pattern. A 3-class version (proximal / main / thoracolumbar)
+# leaves too few proximal-thoracic cases to learn or measure, so the classes
+# are thoracic vs thoracolumbar-lumbar, which is a clinical distinction
+# (thoracic and lumbar curves differ in bracing and surgical approach).
 PATTERN_REGIONS = [("thoracic (proximal + main)", 0, 10),
                    ("thoracolumbar / lumbar", 11, 16)]
 VERT_NAMES = [f"T{i+1}" for i in range(12)] + [f"L{i+1}" for i in range(5)]
 
 
-# --------------------------------------------------------------------------
-# geometry (pixel space)
-# --------------------------------------------------------------------------
+# --- Geometry (pixel space) ---
 def find_image(img_dir, uuid):
     for ext in (".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff"):
         p = Path(img_dir) / f"{uuid}{ext}"
@@ -107,8 +107,7 @@ def to_vertebrae(rows):
 
 
 def endplate_tilts(V):
-    """Mean tilt per vertebra — the construction the dataset itself used
-    (reproduces the stored angles at residual 0.00 deg)."""
+    """Mean tilt per vertebra: the construction the dataset itself used."""
     top = V[:, :, 1, :] - V[:, :, 0, :]
     bot = V[:, :, 3, :] - V[:, :, 2, :]
     edge = 0.5 * (top + bot)
@@ -126,13 +125,12 @@ def wedging(V):
 
 
 def major_apex(theta):
-    """Apex of the major curve = midpoint of the vertebra PAIR whose endplate
+    """Apex of the major curve = midpoint of the vertebra pair whose endplate
     tilt difference is largest (i.e. the pair that defines the Cobb angle).
 
-    This matches the definition used in verify_angle_semantics.py. An earlier
-    version used 'vertebra whose tilt deviates most from the spine mean', which
-    is biased toward the ends of the spine (where tilts are extreme) and gave
-    an apex distribution inconsistent with the measured median of T9."""
+    This matches the definition used in verify_angle_semantics.py. The
+    alternative definition ('vertebra whose tilt deviates most from the spine
+    mean') is biased toward the ends of the spine, where tilts are extreme."""
     n = theta.shape[0]
     apex = np.zeros(n, dtype=np.int64)
     for k in range(n):
@@ -143,18 +141,17 @@ def major_apex(theta):
 
 
 def flag_outliers(labels):
-    """Anatomically implausible geometry => almost certainly corrupt landmarks.
+    """Anatomically implausible geometry -> almost certainly corrupt landmarks.
     A single vertebra cannot be wedged by 150 deg; a Cobb angle cannot exceed
-    ~100 deg in this cohort. Flagged rows should be inspected and excluded."""
+    ~100 deg in this cohort. Flagged rows are saved in the `implausible` mask
+    so that they can be excluded."""
     wedge_max = labels["wedging"].max(1)
     bad_wedge = wedge_max > MAX_PLAUSIBLE_WEDGE
     bad_cobb = labels["major_angle"] > MAX_PLAUSIBLE_COBB
     return bad_wedge | bad_cobb, wedge_max
 
 
-# --------------------------------------------------------------------------
-# label derivation
-# --------------------------------------------------------------------------
+# --- Label derivation ---
 def derive(cobb, lm_px):
     major = cobb[:, MAJOR]
     severity = np.digitize(major, SEVERITY_EDGES)                       # 0..3
@@ -175,28 +172,26 @@ def derive(cobb, lm_px):
             "apex_index": apex.astype(np.int64)}
 
 
-# --------------------------------------------------------------------------
-# reporting
-# --------------------------------------------------------------------------
+# --- Reporting ---
 def report(name, labels, n, uuids=None):
     print(f"\n--- {name} (n={n}) ---")
     maj = labels["major_angle"]
     print(f"  major curve: mean {maj.mean():.1f} deg, median {np.median(maj):.1f}, "
           f"range {maj.min():.1f}-{maj.max():.1f}")
 
-    # ---- plausibility check first: bad rows distort everything below ----
+    # Plausibility check first: implausible rows distort the statistics below
     bad, wedge_max = flag_outliers(labels)
     nbad = int(bad.sum())
     if nbad:
-        print(f"  !! {nbad} IMPLAUSIBLE row(s) — likely corrupt landmark annotation:")
+        print(f"  WARNING: plausibility check flagged {nbad} row(s) outside the limits below. The landmark annotation is likely corrupt:")
         for i in np.where(bad)[0]:
             uid = str(uuids[i]) if uuids is not None else f"index {i}"
             print(f"       {uid:<40} major={maj[i]:7.1f} deg  max wedge={wedge_max[i]:7.1f} deg")
         print(f"     (limits: wedge <= {MAX_PLAUSIBLE_WEDGE:.0f} deg, "
               f"Cobb <= {MAX_PLAUSIBLE_COBB:.0f} deg)")
-        print("     -> inspect the overlays for these, then exclude them from training.")
+        print("     These rows are saved with implausible=True so they can be excluded from training.")
     else:
-        print(f"  plausibility: OK (max wedge {wedge_max.max():.1f} deg, "
+        print(f"  Check passed: plausibility (max wedge {wedge_max.max():.1f} deg, "
               f"max Cobb {maj.max():.1f} deg)")
 
     print("  severity (3-class):")
@@ -208,8 +203,8 @@ def report(name, labels, n, uuids=None):
     print(f"  surgical (>= {SURGICAL_DEG:.0f} deg): {pos} positive / {n-pos} negative "
           f"({100*pos/n:.1f}% positive)")
     if pos < 15 or (n - pos) < 15:
-        print("     !! severe class imbalance — this task may not be viable; "
-              "consider a lower threshold or drop it")
+        print("     WARNING: class balance check found fewer than 15 cases in one class. "
+              "This task may not be viable; a lower threshold or dropping the task may help.")
 
     print("  curve pattern (region of major-curve apex):")
     for k, (nm, _, _) in enumerate(PATTERN_REGIONS):
@@ -217,7 +212,7 @@ def report(name, labels, n, uuids=None):
         print(f"     {k} {nm:<24} {c:>4}  ({100*c/n:5.1f}%)")
     ap = labels["apex_index"]
     print(f"     median apex vertebra: {VERT_NAMES[int(np.median(ap))]} "
-          f"(expect ~T9 if consistent with the semantics check)")
+          f"(compare with the median apex reported by verify_angle_semantics.py)")
 
     w = labels["wedging"]
     keep = ~bad
@@ -229,32 +224,32 @@ def report(name, labels, n, uuids=None):
 
 def run(latents_dir, img_dir, out_dir, config):
     out_dir.mkdir(parents=True, exist_ok=True)
-    print(f"deriving task labels from {config} splits "
+    print(f"Deriving task labels from {config} splits "
           f"(labels are config-independent; using this one for uuids/GT)\n")
     for split in ("train", "val", "test"):
         f = Path(latents_dir) / f"latents_{config}_{split}.npz"
         if not f.exists():
-            print(f"skip {split}: {f.name} not found")
+            print(f"Skipping {split}: {f.name} not found")
             continue
         d = np.load(f, allow_pickle=True)
         lm, cobb, uuids = d["landmarks"], d["cobb"], d["uuids"]
         lm_px, found = to_pixels(lm, uuids, img_dir)
         if found < len(lm):
-            print(f"  WARNING [{split}]: only {found}/{len(lm)} images found — "
-                  "angles for the rest are in distorted units")
+            print(f"  WARNING [{split}]: image lookup found {found}/{len(lm)} images. "
+                  "Angles for the rest are in distorted units and are likely invalid.")
         labels = derive(cobb, lm_px)
         report(split, labels, len(lm), uuids=uuids)
         bad, _ = flag_outliers(labels)
         np.savez_compressed(out_dir / f"task_labels_{split}.npz",
                             uuids=uuids, implausible=bad, **labels)
-    print(f"\nwrote task_labels_*.npz to {out_dir}")
-    print("  (each file carries an `implausible` boolean mask — exclude those rows)")
-    print("\nNOTE: these all derive from the same 68 landmarks — different readouts,\n"
-          "not independent tasks. Pair them with reconstruction-fidelity metrics\n"
-          "(PSNR/SSIM), which are the genuinely landmark-independent axis.")
+    print(f"\nWrote task_labels_*.npz to {out_dir}")
+    print("  (each file carries an `implausible` boolean mask marking rows to exclude)")
+    print("\nNote: these all derive from the same 68 landmarks; they are different readouts,\n"
+          "not independent tasks. Reconstruction-fidelity metrics (PSNR/SSIM) provide\n"
+          "a landmark-independent axis that complements them.")
 
 
-# --------------------------------------------------------------------------
+# --- Synthetic-data self-test ---
 def smoke():
     rng = np.random.default_rng(0)
     n = 60
@@ -285,13 +280,13 @@ def smoke():
           and labels["wedging"].shape == (n, N_VERT)
           and set(np.unique(labels["severity"])).issubset({0, 1, 2})
           and set(np.unique(labels["curve_pattern"])).issubset({0, 1}))
-    print("\nSMOKE:", "PASS" if ok else "FAIL")
+    print("\nSelf-test:", "PASS" if ok else "FAIL")
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--latents-dir", type=Path)
-    ap.add_argument("--img-dir", type=Path, help="REQUIRED for pixel-space angles")
+    ap.add_argument("--img-dir", type=Path, help="needed for pixel-space angles")
     ap.add_argument("--out-dir", type=Path, default=Path("./labels_tasks"))
     ap.add_argument("--config", default="medvae_4_1_2d",
                     help="which split files to read uuids/GT from (labels are the same for all)")
@@ -302,7 +297,7 @@ def main():
     elif args.latents_dir and args.img_dir:
         run(args.latents_dir, args.img_dir, args.out_dir, args.config)
     else:
-        raise SystemExit("need --latents-dir and --img-dir (or --smoke)")
+        raise SystemExit("--latents-dir and --img-dir are required (or --smoke for the synthetic-data self-test)")
 
 
 if __name__ == "__main__":

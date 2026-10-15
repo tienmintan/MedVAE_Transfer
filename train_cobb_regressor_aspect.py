@@ -1,38 +1,44 @@
 """
-train_cobb_regressor_aspect.py
+train_cobb_regressor_aspect.py: Cobb regressor on aspect-padded latents from extract_latents_aspect.py.
 
-Cobb regressor on aspect-padded latents (produced by extract_latents_aspect.py).
-Used to compare MedVAE variants at different compression ratios while holding
-the inference pipeline constant (the original Phase 1 setup that produced
-the 7.50° baseline).
+Used to compare MedVAE configurations at different compression ratios while
+holding the inference pipeline constant (the aspect-padded setup of the
+baseline regressor).
 
-Architecture mirrors the Phase 1 baseline regressor — same conv-block design,
-same depth, just adapts to whatever spatial extent the latent has:
+The architecture follows the depth and channel schedule of the baseline
+regressor (CobbRegressor in train_cobb_regressor.py: 4 blocks, 32-64-128-128),
+but uses single stride-2 conv + BatchNorm blocks rather than paired conv +
+GroupNorm blocks with MaxPool. It adapts to the spatial extent of the latent:
 
     Input: (B, Cz, H, W)
-        Cz=1 H=W=96 for medvae_4_1_2d  (the 7.50° baseline)
-        Cz=1 H=W=48 for medvae_8_1_2d  (the new experiment)
-        Cz=3 H=W=96 for medvae_4_3_2d  (a possible follow-up)
-        Cz=4 H=W=48 for medvae_8_4_2d  (a possible follow-up)
+        Cz=1 H=W=96 for medvae_4_1_2d
+        Cz=1 H=W=48 for medvae_8_1_2d
+        Cz=3 H=W=96 for medvae_4_3_2d
+        Cz=4 H=W=48 for medvae_8_4_2d
     Conv stack: 4 stride-2 blocks with channels {32, 64, 128, 128}.
     Adaptive avg pool to (3, 3) regardless of input shape.
-    MLP head: Linear(128*9, 128) → Linear(128, 3).
+    MLP head: Linear(128*9, 128) -> Linear(128, 3).
 
-This keeps the regressor architecturally constant across encoder variants,
-with the adaptive pool absorbing the spatial-extent differences. Total
-params: ~250k-300k depending on Cz. Smaller than the Phase 1 regressor's
-600k because we're using adaptive pooling more aggressively; if we wanted
-exact param-match we could add a fifth conv block, but the adaptive design
-is more honest to the comparison.
+This keeps the regressor architecturally constant across encoder
+configurations, with the adaptive pool absorbing the spatial-extent
+differences. Total params: about 389k-390k depending on Cz, fewer than the
+baseline regressor's ~1.76M mainly because pooling to 3x3 shrinks the MLP
+head. The adaptive design is used so that the architecture is identical
+across configurations.
+
+Inputs:  --latents-dir with latents_{train,val,test}.npz (latents, uuids);
+         --labels-csv with image_uuid, split and the angle columns.
+Outputs: in --out-dir: best.pt, test_predictions.csv, cobb_aspect.npz,
+         history.csv, config.json.
 
 Usage:
-    # Match the Phase 1 baseline run
+    # 4_1 configuration (baseline setting)
     python train_cobb_regressor_aspect.py \\
         --latents-dir ./latents_aspect_4_1 \\
         --labels-csv  ./medvae/data/boostnet_with_angles.csv \\
         --out-dir     ./cobb_regressor_aspect_4_1
 
-    # Run the new 8x experiment
+    # 8_1 configuration
     python train_cobb_regressor_aspect.py \\
         --latents-dir ./latents_aspect_8_1 \\
         --labels-csv  ./medvae/data/boostnet_with_angles.csv \\
@@ -50,12 +56,10 @@ import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 
 
-# ----------------------------------------------------------------------------
 # Model
-# ----------------------------------------------------------------------------
 
 class CobbRegressorAspect(nn.Module):
-    """Architecturally fixed regressor — adapts to input shape via the pool."""
+    """Architecturally fixed regressor; adapts to input shape via the pool."""
     def __init__(self, in_channels: int = 1, dropout: float = 0.3):
         super().__init__()
         def block(cin, cout):
@@ -85,9 +89,7 @@ class CobbRegressorAspect(nn.Module):
         return self.head(x)
 
 
-# ----------------------------------------------------------------------------
 # Data
-# ----------------------------------------------------------------------------
 
 class CobbLatentDataset(Dataset):
     def __init__(self, latents_npz: Path, labels_df: pd.DataFrame,
@@ -115,9 +117,7 @@ class CobbLatentDataset(Dataset):
         return z, torch.from_numpy(y_std).float(), torch.from_numpy(y).float()
 
 
-# ----------------------------------------------------------------------------
 # Train/eval loop (same as the other Cobb scripts)
-# ----------------------------------------------------------------------------
 
 def run_epoch(model, loader, optimizer, criterion, device,
               label_mean, label_std, train: bool):
@@ -255,7 +255,6 @@ def main() -> None:
     print(f"  MAE all angles:       {test_mae:.3f}°")
     print(f"  Per-angle MAE:        {test_per.round(3)}")
     print(f"  Mean-baseline MAE:    {mean_baseline_mae:.2f}°")
-    print(f"  Phase 1 baseline (pretrained 4x/1ch, 384x384):   7.50°")
 
     pred_df = pd.DataFrame({
         "image_uuid":  test_ds.uuids,

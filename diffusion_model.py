@@ -1,5 +1,5 @@
 """
-diffusion_model.py
+diffusion_model.py: Cobb-conditioned latent diffusion model (U-Net, Gaussian diffusion, EMA).
 
 Conditional latent diffusion model for spine X-ray synthesis in MedVAE's
 latent space, conditioned on three Cobb angles via FiLM modulation.
@@ -24,9 +24,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-# ----------------------------------------------------------------------------
-# Embeddings
-# ----------------------------------------------------------------------------
+# --- Embeddings ---
 
 def sinusoidal_embedding(t: torch.Tensor, dim: int) -> torch.Tensor:
     """Standard sinusoidal positional embedding for diffusion timesteps."""
@@ -66,7 +64,7 @@ class CobbConditioning(nn.Module):
             nn.SiLU(),
             nn.Linear(embed_dim, embed_dim),
         )
-        # Learned null embedding (initialized to zero, learned through CFG dropout)
+        # Learned null embedding (initialised to zero, learned through CFG dropout)
         self.null_embed = nn.Parameter(torch.zeros(embed_dim))
 
     def forward(self, cobb: torch.Tensor,
@@ -88,9 +86,7 @@ class CobbConditioning(nn.Module):
         return emb
 
 
-# ----------------------------------------------------------------------------
-# Building blocks
-# ----------------------------------------------------------------------------
+# --- Building blocks ---
 
 class ResBlock(nn.Module):
     """ResNet block with FiLM conditioning.
@@ -129,7 +125,7 @@ class ResBlock(nn.Module):
 class SelfAttention(nn.Module):
     """Multi-head self-attention block, applied at the bottleneck only.
 
-    For the bottleneck latent at 32x12, attention is over 384 positions —
+    For the bottleneck latent at 32x12, attention is over 384 positions,
     well within memory budget for a small batch.
     """
     def __init__(self, channels: int, num_heads: int = 4, groups: int = 8):
@@ -178,15 +174,13 @@ class Upsample(nn.Module):
         return self.conv(x)
 
 
-# ----------------------------------------------------------------------------
-# Main U-Net
-# ----------------------------------------------------------------------------
+# --- Main U-Net ---
 
 class UNet(nn.Module):
     """Conditional U-Net for diffusion in MedVAE's 1-channel latent space.
 
     Default channel widths (64, 128, 256, 256) and embed_dim=256 give about
-    30-40M parameters — appropriate for ~500 training samples.
+    30-40M parameters, appropriate for ~500 training samples.
     """
     def __init__(self,
                  in_channels: int = 1,
@@ -273,9 +267,7 @@ class UNet(nn.Module):
         return self.conv_out(F.silu(self.norm_out(h)))
 
 
-# ----------------------------------------------------------------------------
-# Gaussian diffusion process
-# ----------------------------------------------------------------------------
+# --- Gaussian diffusion process ---
 
 def cosine_beta_schedule(T: int, s: float = 0.008) -> torch.Tensor:
     """Cosine schedule from Nichol & Dhariwal 2021 (arXiv:2102.09672)."""
@@ -290,15 +282,16 @@ def cosine_beta_schedule(T: int, s: float = 0.008) -> torch.Tensor:
 class GaussianDiffusion:
     """Wrapper around the forward and reverse processes.
 
-    All buffers are precomputed at construction. The class is stateless wrt
-    the model — pass any model that implements forward(x, t, cobb, drop_mask).
+    All buffers are precomputed at construction. The class is stateless with
+    respect to the model; any model that implements forward(x, t, cobb,
+    drop_mask) can be passed.
 
     Supports two parameterizations:
       - "eps" (default): model predicts the noise ε. Standard DDPM.
       - "v": model predicts the v-target from Salimans & Ho 2022. More
         numerically stable across timesteps because the target magnitude
-        stays consistent — at high noise v ≈ ε (unit-normal), at low noise
-        v ≈ −x_0 (bounded by data scale). Recommended for heterogeneous
+        stays consistent: at high noise v ≈ ε (unit-normal), at low noise
+        v ≈ -x_0 (bounded by data scale). Recommended for heterogeneous
         datasets and small-data regimes where ε-prediction is fragile at
         low-α timesteps.
 
@@ -356,7 +349,7 @@ class GaussianDiffusion:
     def _get_v(self, x_0: torch.Tensor, noise: torch.Tensor,
                t: torch.Tensor) -> torch.Tensor:
         """Compute the v-target from Salimans & Ho 2022:
-            v = sqrt(alpha_t) * noise − sqrt(1 - alpha_t) * x_0
+            v = sqrt(alpha_t) * noise - sqrt(1 - alpha_t) * x_0
         """
         sa = self._extract(self.sqrt_alphas_cumprod, t, x_0.shape)
         soma = self._extract(self.sqrt_one_minus_alphas_cumprod, t, x_0.shape)
@@ -369,10 +362,10 @@ class GaussianDiffusion:
         parameterization. This lets the samplers share code between eps
         and v parameterizations.
 
-        For 'eps' parameterization: model_output IS eps_pred.
+        For 'eps' parameterization: model_output is eps_pred.
             x_0_pred = (x_t - sqrt(1 - alpha_t) * eps) / sqrt(alpha_t)
 
-        For 'v' parameterization: model_output IS v_pred.
+        For 'v' parameterization: model_output is v_pred.
             x_0_pred = sqrt(alpha_t) * x_t - sqrt(1 - alpha_t) * v
             eps_pred = sqrt(alpha_t) * v + sqrt(1 - alpha_t) * x_t
         """
@@ -412,9 +405,7 @@ class GaussianDiffusion:
             target = self._get_v(x_0, noise, t)
         return F.mse_loss(pred, target)
 
-    # ------------------------------------------------------------------ #
-    # Sampling
-    # ------------------------------------------------------------------ #
+    # --- Sampling ---
     @torch.no_grad()
     def _predict_raw_with_cfg(self, model: nn.Module, x_t: torch.Tensor,
                               t: torch.Tensor, cobb: torch.Tensor,
@@ -439,14 +430,15 @@ class GaussianDiffusion:
 
         Returns (x_0_clamped, eps_consistent).
 
-        Why re-derive eps: the original DDIM sampler computed both x_0_pred
-        AND direction-from-eps. If model's eps is miscalibrated, direction
-        blows up even after x_0_pred is clamped. Re-deriving eps from the
-        clamped x_0 propagates the clamp into all subsequent computations.
+        Why re-derive eps: an unmodified DDIM update uses both x_0_pred and
+        the direction from eps. If the model's eps is miscalibrated, the
+        direction term diverges even after x_0_pred is clamped. Re-deriving
+        eps from the clamped x_0 propagates the clamp into all subsequent
+        computations.
 
         At numerical-boundary timesteps where sqrt(1-alpha_t) ≈ 0, the
-        re-derivation is unstable. In that regime we return the original
-        eps (any miscalibration there is harmless since the direction
+        re-derivation is unstable. In that regime the unmodified eps is
+        returned (any miscalibration there is harmless since the direction
         coefficient sqrt(1-alpha) is also near zero).
         """
         sa = self._extract(self.sqrt_alphas_cumprod, t, x_t.shape)
@@ -458,7 +450,7 @@ class GaussianDiffusion:
         x_0_clamped = x_0_pred.clamp(-clamp_value, clamp_value)
 
         # Re-derive eps from the clamped x_0, but only where soma is large
-        # enough for stable division. We use ε_consistent = (x_t - √α · x_0_clamp) / √(1−α).
+        # enough for stable division: ε_consistent = (x_t - √α * x_0_clamp) / √(1-α).
         safe = (soma > 1e-3)
         eps_consistent = torch.where(
             safe,
@@ -522,9 +514,7 @@ class GaussianDiffusion:
         return x
 
 
-# ----------------------------------------------------------------------------
-# Exponential moving average over model weights (standard for diffusion)
-# ----------------------------------------------------------------------------
+# --- Exponential moving average over model weights (standard for diffusion) ---
 
 class EMA:
     """Maintain an EMA copy of model weights for sampling."""
@@ -555,7 +545,7 @@ class EMA:
                 p.data.copy_(self.shadow[n])
 
     def store(self, model: nn.Module) -> dict:
-        """Backup current model weights (so we can restore after sampling)."""
+        """Back up current model weights (so they can be restored after sampling)."""
         return {n: p.detach().clone() for n, p in model.named_parameters()
                 if p.requires_grad}
 

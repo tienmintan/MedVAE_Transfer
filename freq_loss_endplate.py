@@ -1,35 +1,43 @@
 """
-freq_loss_endplate.py — Step 2 (rebuilt): endplate bands vs body centroids.
+freq_loss_endplate.py: reconstruction error in vertebral endplate bands versus body centroids, per MedVAE configuration.
 
-The first attempt used disks around all 68 corners; at the needed radius they
-merged into whole-vertebra blobs, so "edge" and "interior" measured nearly the
-same mixed region and the effect washed out.
-
-This version isolates the structure the mechanism is actually about. Corner
-ordering is confirmed: grouped by vertebra, [TL, TR, BL, BR]. So per vertebra:
+Disks around all 68 corners (as in freq_loss_edge_interior.py) merge into
+whole-vertebra blobs at the radius needed, so "edge" and "interior" measure
+nearly the same mixed region. This script instead uses thin, non-overlapping
+regions that isolate the structures that define the Cobb angle. Corner
+ordering (as determined with verify_corner_ordering.py) is grouped by
+vertebra, [TL, TR, BL, BR]. So per vertebra:
   superior endplate = segment corner0 -> corner1
   inferior endplate = segment corner2 -> corner3
   body centroid     = mean of the 4 corners
 
-ENDPLATE band  = thin strip (half-width band_hw px) along the 2 endplate lines.
-CENTROID disk  = small disk (radius cent_r px) at the body centre.
-These don't overlap, and each isolates its target: endplates are the sharp,
+Endplate band  = thin strip (half-width band_hw px) along the 2 endplate lines.
+Centroid disk  = small disk (radius cent_r px) at the body centre.
+These do not overlap, and each isolates its target: endplates are the sharp,
 oriented, high-frequency edges that define the Cobb angle; centroids sit in the
 smooth, low-frequency vertebral-body interior.
 
-Prediction: endplate error > centroid error, and the gap widens with
-compression. That would localise the Step-1 high-frequency loss onto the
-Cobb-critical structures.
+Interpretation:
+  endplate error > centroid error, with the gap widening with compression
+  -> the high-frequency loss measured by freq_loss_spectrum.py falls on the
+  structures that define the Cobb angle.
 
---verify shows the regions over |residual| first. Run it before the full pass.
+--verify shows the regions over |residual|, so that placement can be checked
+before the full run.
 
-Usage (verify):
+Inputs:  --csv and --img-dir (BoostNet); --lookup from fix_landmark_lookup.py;
+         --landmarks (labels/test/landmarks.csv).
+Outputs: in --out-dir: endplate_verify.png (--verify), or
+         endplate_summary.csv, endplate_per_image.csv and
+         endplate_vs_centroid.png (full run); a summary printed to stdout.
+
+Usage (verification run):
   python freq_loss_endplate.py --verify \\
     --csv ./medvae/data/boostnet.csv --img-dir ./medvae/data/boostnet \\
     --lookup ./landmark_row_lookup_test_fixed.csv \\
-    --landmarks ~/MedVAE/data/boostnet_labeldata/labels/test/landmarks.csv \\
+    --landmarks ./data/boostnet_labeldata/labels/test/landmarks.csv \\
     --out-dir ./outputs/freq_loss
-Then full run (drop --verify).
+The full run is the same command without --verify.
 """
 
 import argparse
@@ -86,7 +94,7 @@ def map_landmarks(lm_norm, bbox):
 
 
 def endplate_centroid_masks(lm_px, shape, content_mask, band_hw, cent_r):
-    """Confirmed ordering per vertebra: [TL, TR, BL, BR].
+    """Corner ordering per vertebra: [TL, TR, BL, BR].
     superior endplate = pts[0]->pts[1], inferior = pts[2]->pts[3]."""
     H, W = shape
     ep_seeds = np.ones((H, W), dtype=bool)
@@ -151,7 +159,7 @@ def main():
         uuids = uuids[:args.limit]
     print(f"{len(uuids)}/{len(df)} test images have a landmark row.")
 
-    # ---------- VERIFY ----------
+    # Verification mode
     if args.verify:
         cfg = args.configs[0]
         mvae = MVAE(model_name=cfg, modality=args.modality).to(device).eval()
@@ -176,7 +184,7 @@ def main():
             ax.imshow(ov)
             ax.set_title(f"{uuid[:18]}\nendplate(red) vs centroid(teal)", fontsize=8)
             ax.axis("off")
-        fig.suptitle("Step 2 rebuilt — verify endplate bands & centroids on |residual|",
+        fig.suptitle("Verification: endplate bands and centroids on |residual|",
                      fontsize=11)
         out = args.out_dir / "endplate_verify.png"
         fig.savefig(out, dpi=140, bbox_inches="tight")
@@ -184,7 +192,7 @@ def main():
               f"re-run without --verify.")
         return 0
 
-    # ---------- FULL ----------
+    # Full measurement
     rec = {c: {"ep": [], "ct": [], "uuid": []} for c in args.configs}
     example = {}
     for cfg in args.configs:
@@ -216,7 +224,7 @@ def main():
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
 
-    # ---- aggregate ----
+    # Aggregate
     summary, per_image = [], []
     print("\n=== Endplate vs centroid reconstruction error (mean squared residual) ===")
     for cfg in args.configs:
@@ -246,9 +254,9 @@ def main():
         ep = np.array(rec[cfg]["ep"]); ct = np.array(rec[cfg]["ct"])
         d = ep - ct
         dm, dlo, dhi = bootstrap_ci(d)
-        verdict = "endplate WORSE (as predicted)" if dlo > 0 else (
-                  "no clear difference" if dlo <= 0 <= dhi else "endplate BETTER")
-        print(f"  {CONFIG_LABELS.get(cfg,cfg):>3}: Δ(ep−ct)={dm:+.4f} "
+        verdict = "endplate worse" if dlo > 0 else (
+                  "no clear difference" if dlo <= 0 <= dhi else "endplate better")
+        print(f"  {CONFIG_LABELS.get(cfg,cfg):>3}: Δ(ep-ct)={dm:+.4f} "
               f"[{dlo:+.4f},{dhi:+.4f}]  -> {verdict}")
 
     # across-config: does the endplate/centroid ratio grow with compression?
@@ -257,15 +265,15 @@ def main():
         r4 = np.array(rec[c4]["ep"]) / np.maximum(np.array(rec[c4]["ct"]), 1e-12)
         r8 = np.array(rec[c8]["ep"]) / np.maximum(np.array(rec[c8]["ct"]), 1e-12)
         gm, glo, ghi = bootstrap_ci(r8 - r4)
-        print(f"\nRatio growth (8x − 4x): {gm:+.2f} [{glo:+.2f},{ghi:+.2f}]")
+        print(f"\nRatio growth (8x - 4x): {gm:+.2f} [{glo:+.2f},{ghi:+.2f}]")
         if glo > 0:
-            print("  -> compression preferentially sacrifices ENDPLATE fidelity.")
+            print("  -> compression preferentially loses endplate fidelity.")
         elif glo <= 0 <= ghi:
             print("  -> no clear compression-dependent change in the ratio.")
         else:
-            print("  -> ratio DECREASES with compression (endplates relatively spared).")
+            print("  -> ratio decreases with compression (endplates relatively spared).")
 
-    # ---- figure ----
+    # Figure
     fig, axes = plt.subplots(1, 2, figsize=(13, 5))
     x = np.arange(len(args.configs)); w = 0.36
     ep_m = [s["endplate_mean"] for s in summary]

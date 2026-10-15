@@ -1,17 +1,20 @@
 """
-compare_runs.py — paired per-image comparison between two frontier runs.
+compare_runs.py: paired per-image comparison between two train_frontier.py runs.
 
-WHY THIS IS NEEDED. Comparing two runs by their reported means is not enough
-when the difference is smaller than the seed-to-seed spread. The CLAHE run
-improved Cobb by ~0.2 deg while the across-seed sd was 0.25-0.42 deg, so a
-difference of means proves nothing. But both runs score the SAME test images,
-so the comparison can be paired image-by-image, which removes patient-to-
-patient variation and is far more sensitive.
+Comparing two runs by their reported means is not enough when the difference
+is smaller than the seed-to-seed spread. Both runs score the same test images,
+so the comparison can be paired image by image, which removes
+patient-to-patient variation and gives a more sensitive test (paired t-test,
+Wilcoxon signed-rank test and a bootstrap CI on the mean difference).
 
 Reads each run's `frontier_per_image.csv` (written by train_frontier.py) and
-joins on image_uuid — never on row order.
+joins on image_uuid, not on row order.
 
-Run:
+Inputs:  --run-a / --run-b (run directories or per-image CSVs).
+Outputs: a comparison table printed to stdout; optionally the same table as
+         a CSV at --out.
+
+Usage:
   python compare_runs.py --run-a ./outputs/frontier --run-b ./outputs/clahe \
       --label-a replicated --label-b clahe
 """
@@ -77,10 +80,10 @@ def main():
                   & set(map(tuple, B[["config", "task"]].drop_duplicates().values)))
         keys = [(c, c, t) for c, t in sorted(common)]
     if not keys:
-        raise SystemExit("no comparable (config, task) pairs — use --config-a/--config-b")
+        raise SystemExit("no comparable (config, task) pairs; use --config-a/--config-b")
 
     print(f"paired comparison: {args.label_b} vs {args.label_a}")
-    print(f"  negative delta = {args.label_b} is BETTER\n")
+    print(f"  negative delta = {args.label_b} is better\n")
     hdr = (f"{'compared':<22}{'task':<10}{f'{args.label_a}':>10}{f'{args.label_b}':>10}"
            f"{'delta':>9}{'rel %':>8}{'95% CI':>20}{'p':>9}{'% imgs better':>14}")
     print(hdr); print("-" * len(hdr))
@@ -107,15 +110,15 @@ def main():
     tab = pd.DataFrame(rows)
     if len(tab) > 1:
         alpha = 0.05 / len(tab)
-        print(f"\n  {len(tab)} comparisons — Bonferroni threshold p < {alpha:.4f}")
+        print(f"\n  {len(tab)} comparisons; Bonferroni threshold p < {alpha:.4f}")
     print("\n  '% imgs better' is the fraction of individual images improved;")
-    print("  a real effect should move well over half of them, not just the mean.")
-    print("  NOTE: both runs must share the same test images for the pairing to be valid.")
+    print("  an effect that is consistent across images moves well over half of them, not only the mean.")
+    print("  Pairing assumes both runs share the same test images.")
 
     if args.out:
         args.out.parent.mkdir(parents=True, exist_ok=True)
         tab.to_csv(args.out, index=False)
-        print(f"\nwrote {args.out}")
+        print(f"\nWrote {args.out}")
 
 
 if __name__ == "__main__":

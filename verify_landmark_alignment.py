@@ -1,21 +1,26 @@
 """
-verify_landmark_alignment.py — confirm landmarks.csv rows map to the right images.
+verify_landmark_alignment.py: check that landmarks.csv rows map to the right images.
 
 landmarks.csv is positional (no IDs). The AASCE/BoostNet distribution pairs it
 with filenames.csv in the same folder, same row order. This script:
 
   1. Locates landmarks.csv + filenames.csv for a split.
   2. Builds the row -> filename -> uuid mapping.
-  3. Cross-checks those uuids against the uuids your pipeline uses
+  3. Cross-checks those uuids against the uuids the pipeline uses
      (boostnet.csv / boostnet_with_angles.csv) for the same split.
   4. Overlays each sampled image's landmarks (ordering A: all-x then all-y,
-     normalised) on THAT specific image, so correspondence is confirmed by eye.
-  5. Writes a uuid -> landmark-row-index lookup CSV that Step 2 will consume.
+     normalised) on that specific image, so correspondence can be checked by eye.
+  5. Writes a uuid -> landmark-row-index lookup CSV, which
+     freq_loss_edge_interior.py consumes.
 
 Read-only except for the diagnostic PNG and the lookup CSV.
 
-Run:  python verify_landmark_alignment.py --split test
-Then open landmark_alignment_check.png and paste console output back.
+Inputs:  landmarks.csv and filenames.csv under LABELDATA; the pipeline CSV at
+         PIPELINE_CSV (paths set in the module).
+Outputs: landmark_alignment_check.png and landmark_row_lookup_<split dir>.csv
+         in the current directory.
+
+Usage:  python verify_landmark_alignment.py --split test
 """
 
 import argparse
@@ -68,13 +73,13 @@ def main():
     fn_path = label_dir / "filenames.csv"
 
     print("=" * 66)
-    print(f"LANDMARK ALIGNMENT CHECK  (split dir: {sub})")
+    print(f"Landmark alignment check  (split dir: {sub})")
     print("=" * 66)
     print(f"landmarks.csv: {lm_path}  exists={lm_path.exists()}")
     print(f"filenames.csv: {fn_path}  exists={fn_path.exists()}")
 
     if not lm_path.exists():
-        print("ERROR: landmarks.csv missing. Listing label dir:")
+        print("Error: landmarks.csv missing. Listing label dir:")
         for p in label_dir.glob("*"):
             print("  ", p.name)
         return 1
@@ -90,8 +95,8 @@ def main():
         print(f"filenames.csv: {len(filenames)} entries")
         print(f"  examples: {filenames[:3]}")
         if len(filenames) != len(landmarks):
-            print(f"  WARNING: {len(filenames)} filenames vs {len(landmarks)} "
-                  f"landmark rows — counts disagree, alignment suspect.")
+            print(f"  WARNING: row-count check failed ({len(filenames)} filenames vs {len(landmarks)} "
+                  f"landmark rows). The row-to-filename alignment is likely invalid.")
     else:
         print("\nNo filenames.csv. Trying to infer order from the image directory")
         print("(AASCE images are often numbered in the same order as the labels).")
@@ -124,11 +129,11 @@ def main():
             print(f"\nUUID overlap (landmark filenames ∩ pipeline): "
                   f"{len(overlap)}/{len(set_pipe)}")
             if len(overlap) == len(set_pipe):
-                print("  -> FULL overlap: same images, just need row mapping. Good.")
+                print("  Check passed: full overlap; same images, only the row mapping is needed.")
             else:
                 missing = list(set_pipe - set_lm)[:3]
-                print(f"  -> partial. Examples in pipeline but not landmark set: {missing}")
-                print("     (May be a naming-format difference; inspect before trusting.)")
+                print(f"  WARNING: partial overlap. Examples in pipeline but not landmark set: {missing}")
+                print("     (May be a naming-format difference; the mapping may be unreliable until this is resolved.)")
 
     # --- visual overlay on the correctly-matched images ---
     rng = np.random.default_rng(0)
@@ -156,15 +161,15 @@ def main():
             ax.invert_yaxis()
             ax.set_title(f"row {row_idx}\n(image not found)", fontsize=8)
         ax.axis("off")
-    fig.suptitle("Landmarks overlaid on their MATCHED images — dots should sit on vertebrae",
+    fig.suptitle("Landmarks overlaid on their matched images: dots should sit on vertebrae",
                  fontsize=11)
     out_png = Path.cwd() / "landmark_alignment_check.png"
     fig.savefig(out_png, dpi=130, bbox_inches="tight")
     print(f"\nSaved {out_png}")
     if not any_image:
-        print("  (No images found to overlay — set IMG_DIRS so the visual check works.)")
+        print("  (No images found to overlay; the visual check needs IMG_DIRS to point at the images.)")
 
-    # --- write the uuid -> row lookup for Step 2 ---
+    # --- write the uuid -> row lookup for freq_loss_edge_interior.py ---
     if filenames is not None:
         lookup = pd.DataFrame({
             "landmark_row": np.arange(len(filenames)),
@@ -173,10 +178,10 @@ def main():
         out_csv = Path.cwd() / f"landmark_row_lookup_{sub}.csv"
         lookup.to_csv(out_csv, index=False)
         print(f"Saved {out_csv}  ({len(lookup)} rows)")
-        print("\nStep 2 will use this to fetch the right landmark row per uuid.")
+        print("\nfreq_loss_edge_interior.py uses this to fetch the landmark row per uuid.")
 
-    print("\n-> Confirm the red dots sit on vertebrae in EACH panel, then we")
-    print("   build Step 2 (edge vs interior reconstruction error).")
+    print("\nVisual check: the red dots should sit on vertebrae in each panel.")
+    print("Next: python freq_loss_edge_interior.py --verify ... (edge vs interior reconstruction error)")
     return 0
 
 

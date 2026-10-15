@@ -3,6 +3,19 @@
 Writes diagnostic JSON only. Does not overwrite caches, train heads, relax
 tolerances or produce a training-ready study. Default: the failing 4_1 training
 split, including the same first image checked by prepare_projection_study.py.
+
+For each spot-checked image and each precision mode (current, ieee, tf32), the
+fresh raw encoding is compared with the cached raw latent, and the projection
+formula with the API output, within --atol / --rtol. Modes that pass every
+check on all selected images are reported as compatible.
+
+Inputs:  --raw-dir (latents_{config}_{split}.npz), --split-csv and --img-dir.
+Outputs: <out-dir>/diagnosis.json (updated after each check); a per-check line
+         and the compatible modes printed to stdout.
+
+Usage:
+  python diagnose_projection_mismatch.py --raw-dir <dir> --split-csv <csv> \
+      --img-dir <dir> --out-dir <new empty dir> [--config medvae_4_1_2d --split train]
 """
 import argparse
 import sys
@@ -32,7 +45,7 @@ def diagnose(args):
     expected = split_ids(args.split_csv)
     require(1 <= args.spot_checks <= COUNTS[args.split], "Invalid number of spot checks")
     out = args.out_dir.resolve()
-    require(not out.exists() or not any(out.iterdir()), f"Use a new empty diagnostic directory: {out}")
+    require(not out.exists() or not any(out.iterdir()), f"Diagnostic directory is not empty; a new empty directory is required: {out}")
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
     report = dict(schema=1, status="diagnostic_only", expected_checks_per_mode=args.spot_checks,
         config=args.config, split=args.split, requested_modes=args.modes, checks=[],
@@ -84,11 +97,11 @@ def diagnose(args):
         report["compatible_modes_for_checked_cases"] = summarise_modes(report)
         report["diagnostic_complete"] = True
         report["next_step"] = (
-            "A listed mode satisfies the unchanged checks on these cases. Use that mode explicitly in a fresh "
-            "preparation run; only completion of every preparation check permits training."
+            "A listed mode satisfies the unchanged checks on these cases. The next step is a fresh "
+            "preparation run with that mode set explicitly; training is permitted only when every preparation check passes."
             if report["compatible_modes_for_checked_cases"] else
-            "No tested mode passed every required check. Return diagnosis.json for review; do not loosen "
-            "the threshold or start training from the incomplete study.")
+            "No tested mode passed every required check, so the cause is not identified by diagnosis.json. Loosening "
+            "the threshold or training from the incomplete study would make the results unreliable.")
         atomic_json(out/"diagnosis.json",report)
         print("\nCompatible modes on checked cases:",report["compatible_modes_for_checked_cases"])
         print(report["next_step"])

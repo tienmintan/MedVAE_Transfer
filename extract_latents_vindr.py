@@ -1,33 +1,32 @@
 """
-extract_latents_vindr.py
-
-DICOM -> SD-VAE latent extraction for VinDr-SpineXR.
+extract_latents_vindr.py: DICOM -> SD-VAE latent extraction for VinDr-SpineXR.
 
 For each DICOM file in train_images/ and test_images/:
   1. Read DICOM and extract pixel array.
   2. Apply Rescale Slope/Intercept (DICOM tags 0028,1053 and 0028,1052).
   3. Handle MONOCHROME1 inversion (high values = dark vs standard high = bright).
-  4. Per-image min-max normalize to [0, 1].
+  4. Per-image min-max normalise to [0, 1].
   5. Resize with aspect-padding to 512x512 (preserves anatomy, black borders).
-  6. Replicate grayscale to 3 channels and scale to [-1, 1].
+  6. Replicate greyscale to 3 channels and scale to [-1, 1].
   7. Encode through SD-VAE -> (4, 64, 64) latent.
 
-Output: a single .npz at <out>/latents_vindr.npz containing:
+Inputs:  --vindr-dir with train_images/*.dicom and test_images/*.dicom.
+Outputs: a single .npz at <out>/latents_vindr.npz containing:
   - latents : (N, 4, 64, 64) float16
   - image_ids : (N,) array of image_id strings
   - splits : (N,) array of "vindr_train" or "vindr_test"
-  - aspect_pad : (N,) array of "horizontal" or "vertical" (which axis was padded)
+  - aspect_pad : (N,) array of "horizontal", "vertical" or "none" (which axis was padded)
 
 Plus a vindr_processing_log.csv recording per-file outcome (ok/skipped/failed)
-and a small subset of visualized examples for sanity checking.
+and a small subset of visualised examples for sanity checking.
 
 This script is resumable: it skips images already in the output .npz, so
 if it crashes partway through, re-running picks up where it left off.
 
 Usage:
     python extract_latents_vindr.py \\
-        --vindr-dir ~/MedVAE/vindr-spinexr \\
-        --out-dir   ~/MedVAE/MedVAE/latents_vindr \\
+        --vindr-dir ./vindr-spinexr \\
+        --out-dir   ./MedVAE/latents_vindr \\
         --batch-size 8
 """
 
@@ -47,22 +46,18 @@ from tqdm import tqdm
 from diffusers import AutoencoderKL
 
 
-# ---------------------------------------------------------------------------
-# Configuration
-# ---------------------------------------------------------------------------
+# --- Configuration ---
 
 TARGET_SIZE = 512               # 512x512 input to SD-VAE
 LATENT_H = TARGET_SIZE // 8      # 64
 LATENT_W = TARGET_SIZE // 8      # 64
 LATENT_CHANNELS = 4
 
-# How many sanity-check visualizations to save (sampled across the dataset)
+# How many sanity-check visualisations to save (sampled across the dataset)
 N_VISUAL_CHECKS = 24
 
 
-# ---------------------------------------------------------------------------
-# DICOM -> normalized grayscale array
-# ---------------------------------------------------------------------------
+# --- DICOM -> normalised greyscale array ---
 
 def dicom_to_array(dicom_path: Path) -> Tuple[Optional[np.ndarray], str]:
     """Read DICOM and return float32 image in [0, 1], or (None, error_msg)
@@ -71,7 +66,7 @@ def dicom_to_array(dicom_path: Path) -> Tuple[Optional[np.ndarray], str]:
     Handles:
       - Rescale Slope/Intercept (linear mapping to anatomically meaningful units)
       - MONOCHROME1 inversion (DICOM tag 0028,0004)
-      - Per-image min-max normalization to [0, 1]
+      - Per-image min-max normalisation to [0, 1]
     """
     try:
         ds = pydicom.dcmread(str(dicom_path), force=True)
@@ -94,12 +89,12 @@ def dicom_to_array(dicom_path: Path) -> Tuple[Optional[np.ndarray], str]:
     intercept = float(getattr(ds, "RescaleIntercept", 0.0))
     arr = arr * slope + intercept
 
-    # MONOCHROME1 vs MONOCHROME2 — handle photometric inversion.
+    # MONOCHROME1 vs MONOCHROME2: handle photometric inversion.
     photo = str(getattr(ds, "PhotometricInterpretation", "MONOCHROME2"))
     if photo == "MONOCHROME1":
         arr = arr.max() - arr     # invert so bone is bright (MONOCHROME2 convention)
 
-    # Per-image min-max normalize to [0, 1] — matches what we do for BoostNet.
+    # Per-image min-max normalise to [0, 1]; matches the BoostNet preprocessing.
     lo, hi = float(arr.min()), float(arr.max())
     if hi - lo < 1e-6:
         return None, f"degenerate intensity range [{lo}, {hi}]"
@@ -107,9 +102,7 @@ def dicom_to_array(dicom_path: Path) -> Tuple[Optional[np.ndarray], str]:
     return arr.astype(np.float32), "ok"
 
 
-# ---------------------------------------------------------------------------
-# Aspect-padding to a fixed square size
-# ---------------------------------------------------------------------------
+# --- Aspect-padding to a fixed square size ---
 
 def aspect_pad_to_square(arr: np.ndarray, target_size: int) -> Tuple[np.ndarray, str]:
     """Resize the longer dimension to target_size, pad the shorter dim with
@@ -142,9 +135,7 @@ def aspect_pad_to_square(arr: np.ndarray, target_size: int) -> Tuple[np.ndarray,
     return out, pad_axis
 
 
-# ---------------------------------------------------------------------------
-# SD-VAE encoding (batched)
-# ---------------------------------------------------------------------------
+# --- SD-VAE encoding (batched) ---
 
 @torch.no_grad()
 def encode_batch(vae, arrs: list, device, dtype) -> np.ndarray:
@@ -152,7 +143,7 @@ def encode_batch(vae, arrs: list, device, dtype) -> np.ndarray:
 
     Returns (B, 4, 64, 64) float16 array.
     """
-    # Stack to (B, H, W), grayscale-to-RGB, scale to [-1, 1]
+    # Stack to (B, H, W), greyscale-to-RGB, scale to [-1, 1]
     batch = np.stack(arrs, axis=0)                       # (B, H, W)
     t = torch.from_numpy(batch).unsqueeze(1)             # (B, 1, H, W)
     t = t.repeat(1, 3, 1, 1)                             # (B, 3, H, W)
@@ -163,16 +154,13 @@ def encode_batch(vae, arrs: list, device, dtype) -> np.ndarray:
     return latents.to(torch.float16).cpu().numpy()
 
 
-# ---------------------------------------------------------------------------
-# Sanity-check visualization
-# ---------------------------------------------------------------------------
+# --- Sanity-check visualisation ---
 
 def save_visual_check(orig_arrs, recon_arrs, image_ids, out_path: Path):
     """Side-by-side grid of original 512x512 and SD-VAE reconstruction.
 
-    `recon_arrs` is decoded from the latents we just produced. This lets us
-    visually verify that the latents we're storing actually encode the
-    images we think they do.
+    `recon_arrs` is decoded from the newly produced latents, so it can be
+    checked visually that the stored latents encode the expected images.
     """
     n = len(orig_arrs)
     fig, axes = plt.subplots(n, 2, figsize=(6, 3 * n),
@@ -198,9 +186,7 @@ def save_visual_check(orig_arrs, recon_arrs, image_ids, out_path: Path):
     plt.close()
 
 
-# ---------------------------------------------------------------------------
-# Main pipeline
-# ---------------------------------------------------------------------------
+# --- Main pipeline ---
 
 def main():
     p = argparse.ArgumentParser()
@@ -210,8 +196,8 @@ def main():
     p.add_argument("--out-dir",   required=True, type=Path)
     p.add_argument("--batch-size", type=int, default=8,
                     help="Encoding batch size. SD-VAE encoder at 512x512 "
-                         "uses ~2 GB attention memory per sample, so keep "
-                         "this small on the A10 (24 GB total).")
+                         "uses ~2 GB attention memory per sample, so a small "
+                         "value is needed on the A10 (24 GB total).")
     p.add_argument("--limit",     type=int, default=None,
                     help="Process only this many files (for debugging).")
     p.add_argument("--device",    default="cuda")
@@ -240,7 +226,7 @@ def main():
                 [(p, "vindr_test") for p in test_files]
     print(f"Total to process: {len(all_files)}")
 
-    # Resumability — load any existing latents and skip already-processed IDs
+    # Resumability: load any existing latents and skip already-processed IDs
     processed_ids = set()
     existing_latents = []
     existing_ids = []
@@ -376,7 +362,7 @@ def main():
     if visual_originals:
         save_visual_check(visual_originals, visual_recons, visual_ids,
                             visual_dir / "vindr_sanity_check.png")
-        print(f"  Saved {len(visual_originals)} sanity-check visualizations "
+        print(f"  Saved {len(visual_originals)} sanity-check visualisations "
               f"to {visual_dir / 'vindr_sanity_check.png'}")
 
 

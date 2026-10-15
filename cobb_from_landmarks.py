@@ -1,33 +1,38 @@
 """
-cobb_from_landmarks.py — the mechanism test (position -> orientation -> Cobb).
+cobb_from_landmarks.py: test the position -> orientation -> Cobb mechanism on predicted landmarks.
 
-The frontier left an open tension: landmark POSITION is compression-invariant,
-yet Cobb (built from those same landmarks) degrades. This walks a three-rung
-ladder on the *predicted* landmarks to resolve it:
+Tests how landmark position error can be insensitive to compression while
+Cobb error (built from the same landmarks) is not. Errors are measured at
+three levels on the *predicted* landmarks:
 
-  1. position    mean landmark Euclidean error            (known: flat)
-  2. orientation per-vertebra endplate slope error         (Step-2 quantity)
-  3. Cobb        landmark-derived main-thoracic angle error (extremum of 2)
+  1. position    mean landmark Euclidean error
+  2. orientation per-vertebra endplate slope error
+  3. Cobb        error of the landmark-derived angle matched to the provided
+                 MT column (col 1)
 
-If sensitivity climbs down the ladder, compression preserves WHERE structures
-are but erodes FINE ANGULAR detail. And it settles the tension:
+Interpretation:
+  - sensitivity increasing from 1 to 3 -> compression preserves where structures
+                                          are but erodes fine angular detail
   - landmark-derived Cobb degrades  -> apex-orientation loss the position metric hid
   - landmark-derived Cobb stays flat -> the direct Cobb regressor used a texture
                                         shortcut that compression erodes
 
-VERIFY FIRST: we don't trust the Cobb-from-landmarks geometry until it
-reproduces the PROVIDED angles from GROUND-TRUTH landmarks. The vertebra
-corner ordering is unknown, so we search all 24 orderings and keep the one that
-best reproduces the provided main-thoracic angle. Only then do we touch the
-predictions.
+The Cobb-from-landmarks geometry is validated before predictions are
+processed: it must reproduce the provided angles from ground-truth landmarks.
+The vertebra corner ordering is unknown, so all 24 orderings (under both point
+groupings) are tried, and the one that best reproduces the provided MT angle
+is kept.
 
 Inputs: preds_{config}.npz from `train_frontier.py --save-preds`, each with
     uuids, gt_landmarks (N,136), gt_cobb (N,3)=[PT,MT,TL],
     pred_landmarks (N,136), pred_cobb (N,3).
 
-Run:
+Outputs: the geometry validation, the ladder table and the per-angle
+    direct-Cobb table, printed to stdout.
+
+Usage:
     python cobb_from_landmarks.py --preds-dir ./outputs/frontier
-    python cobb_from_landmarks.py --smoke        # geometry self-test
+    python cobb_from_landmarks.py --smoke        # synthetic-data self-test (corner-ordering recovery)
 """
 import argparse
 import itertools
@@ -40,13 +45,11 @@ CONFIGS = ["medvae_4_1_2d", "medvae_8_1_2d"]
 LABEL = {"medvae_4_1_2d": "4x", "medvae_8_1_2d": "8x"}
 N_LM = 68
 N_VERT = 17
-MT = 1  # column index of main-thoracic angle in [PT, MT, TL]
+MT = 1  # column index of the angle named main thoracic (col 1) in [PT, MT, TL]
 PERMS = list(itertools.permutations(range(4)))
 
 
-# --------------------------------------------------------------------------
-# geometry
-# --------------------------------------------------------------------------
+# --- Geometry ---
 def to_vertebrae(rows, grouping="vmajor"):
     """(N,136) ordering A -> (N,17,4,2), under one of two point layouts:
        'vmajor' : 4 consecutive points per vertebra (v0c0,v0c1,v0c2,v0c3,v1c0,...)
@@ -102,9 +105,7 @@ def apex_pair(theta_gt):
     return pairs
 
 
-# --------------------------------------------------------------------------
-# stats
-# --------------------------------------------------------------------------
+# --- Statistics ---
 def boot_ci(v, seed=0, nb=10000):
     rng = np.random.default_rng(seed); v = np.asarray(v); n = len(v)
     b = np.array([v[rng.integers(0, n, n)].mean() for _ in range(nb)])
@@ -124,9 +125,7 @@ def paired(a, b):
             "rel": 100 * m / (np.mean(a) + 1e-12)}
 
 
-# --------------------------------------------------------------------------
-# corner-ordering discovery (verify-first)
-# --------------------------------------------------------------------------
+# --- Corner-ordering discovery (run before predictions are processed) ---
 def best_assignment(cm):
     """cm[i,j] = corr(derived_i, provided_j). Return the derived->provided
     column assignment maximising total |corr|, as a tuple where a[j] is the
@@ -158,7 +157,7 @@ def discover_geometry(gt_rows, provided):
     return best
 
 
-# --------------------------------------------------------------------------
+# --- Evaluation ---
 def load(preds_dir, config):
     d = np.load(Path(preds_dir) / f"preds_{config}.npz", allow_pickle=True)
     return {k: d[k] for k in d.files}
@@ -180,9 +179,10 @@ def _find_image(img_dir, uuid):
 
 def to_pixels(lm, uuids, img_dir):
     """Landmarks are normalised anisotropically (x/width, y/height). Spine
-    radiographs are ~1:2, so ANGLES computed in that space are flattened by
-    roughly half. Rescale to pixel space before any angle computation.
-    (Position error stays in normalised units — that's the reported metric.)"""
+    radiographs are ~1:2, so angles computed in that space are flattened by
+    roughly half. Landmarks are rescaled to pixel space before any angle
+    computation. (Position error stays in normalised units, the units of the
+    reported metric.)"""
     from PIL import Image
     out = lm.astype(float).copy()
     found = 0
@@ -204,23 +204,23 @@ def to_pixels(lm, uuids, img_dir):
 def run(preds_dir, img_dir=None):
     data = {c: load(preds_dir, c) for c in CONFIGS}
 
-    # ---- rescale to pixel space for ANGLE geometry ----
+    # Rescale to pixel space for angle geometry
     if img_dir is not None:
         for c in CONFIGS:
             d = data[c]
             d["gt_landmarks_px"], nf = to_pixels(d["gt_landmarks"], d["uuids"], img_dir)
             d["pred_landmarks_px"], _ = to_pixels(d["pred_landmarks"], d["uuids"], img_dir)
-        print(f"GEOMETRY: landmarks rescaled to pixel space ({nf}/{len(data[CONFIGS[0]]['uuids'])} "
-              f"images) — angles in true image geometry.\n")
+        print(f"Geometry: landmarks rescaled to pixel space ({nf}/{len(data[CONFIGS[0]]['uuids'])} "
+              f"images); angles in true image geometry.\n")
     else:
         for c in CONFIGS:
             data[c]["gt_landmarks_px"] = data[c]["gt_landmarks"].astype(float)
             data[c]["pred_landmarks_px"] = data[c]["pred_landmarks"].astype(float)
-        print("GEOMETRY WARNING: no --img-dir — angles computed in anisotropically\n"
-              "  normalised space and will be FLATTENED (~2x for 1:2 radiographs).\n"
-              "  Absolute degree values below are not trustworthy. Pass --img-dir.\n")
+        print("WARNING: no --img-dir given, so angles are computed in anisotropically\n"
+              "  normalised space and are flattened (~2x for 1:2 radiographs).\n"
+              "  Absolute degree values below are likely invalid. Passing --img-dir avoids this.\n")
 
-    # ---- verify the geometry on GT landmarks (config-independent labels) ----
+    # Verify the geometry on GT landmarks (config-independent labels)
     ref = data[CONFIGS[0]]
     provided = ref["gt_cobb"]
     grouping, perm, assign, cm = discover_geometry(ref["gt_landmarks_px"], provided)
@@ -246,15 +246,15 @@ def run(preds_dir, img_dir=None):
     print("   " + str(cm).replace("\n", "\n   "))
     mt_r = cm[mt_idx, MT]
     if abs(mt_r) < 0.85:
-        print(f"   !! MT tracker correlation only {mt_r:.2f} — derived-Cobb rungs "
-              "remain provisional; position/orientation rungs do not.")
+        print(f"   WARNING: MT tracker correlation is {mt_r:.2f} (|r| threshold 0.85). "
+              "The derived-Cobb results may be unreliable; the position and orientation results are unaffected.")
     else:
-        print(f"   MT tracker r={mt_r:.2f} — derived-Cobb rung is now on solid geometry.")
+        print(f"   Check passed: MT tracker r={mt_r:.2f} (|r| threshold 0.85); the derived-Cobb geometry is validated.")
 
     theta_gt = endplate_angles(Vgt, perm)
     ap = apex_pair(theta_gt)   # (N,2) apex vertebra indices per image
 
-    # ---- the ladder, per config ----
+    # The ladder, per configuration
     rungs = {}
     for c in CONFIGS:
         d = data[c]
@@ -278,7 +278,7 @@ def run(preds_dir, img_dir=None):
              "mt_cobb_vs_geom", "mt_cobb_vs_true", "direct_cobb"]
     units = {"position": "norm", "orientation": "deg", "apex_orientation": "deg",
              "mt_cobb_vs_geom": "deg", "mt_cobb_vs_true": "deg", "direct_cobb": "deg"}
-    print("\nLADDER — error at each rung, and the 4x->8x paired change:\n")
+    print("\nLadder: error at each level, and the 4x->8x paired change:\n")
     hdr = f"{'rung':<20}{'4x':>10}{'8x':>10}{'Δ(8x-4x)':>12}{'rel%':>8}{'paired p':>11}"
     print(hdr); print("-" * len(hdr))
     for r in order:
@@ -288,12 +288,12 @@ def run(preds_dir, img_dir=None):
         print(f"{r:<20}{m4:>10.4f}{m8:>10.4f}{pr['delta']:>12.4f}"
               f"{pr['rel']:>7.1f}%{pr['p_t']:>11.3g}  ({units[r]})")
 
-    print("\nreading: position should be ~flat; if orientation/apex/Cobb grow, "
+    print("\nInterpretation: position should be ~flat; if orientation/apex/Cobb grow, "
           "compression erodes angular detail. If landmark-derived MT (mt_cobb_vs_geom) "
           "stays flat but direct_cobb grows, the direct regressor used a texture shortcut.")
 
-    # ---- per-angle decomposition of the DIRECT-Cobb degradation ----
-    print("\nDIRECT-Cobb per-angle (does the degradation concentrate in one curve?):")
+    # Per-angle decomposition of the direct-Cobb degradation
+    print("\nDirect-Cobb per angle (does the degradation concentrate in one curve?):")
     hdr = f"{'angle':<8}{'4x':>9}{'8x':>9}{'Δ':>9}{'rel%':>8}{'paired p':>11}"
     print(hdr); print("-" * len(hdr))
     for k, nm in enumerate(["PT", "MT", "TL"]):
@@ -307,15 +307,13 @@ def run(preds_dir, img_dir=None):
     return grouping, perm, mt_idx, rungs
 
 
-# --------------------------------------------------------------------------
-# smoke: synthetic vertebrae with known tilts + a scrambled corner order
-# --------------------------------------------------------------------------
+# --- Synthetic-data self-test: known tilts and a scrambled corner order ---
 def smoke():
     rng = np.random.default_rng(0)
     N = 30
     # a curve: tilt increases then decreases down the spine
     base = np.concatenate([np.linspace(-5, 25, 9), np.linspace(25, -3, 8)])  # 17 deg
-    true_perm = (2, 0, 3, 1)   # the "unknown" ordering we must recover
+    true_perm = (2, 0, 3, 1)   # the "unknown" ordering to be recovered
     inv = np.argsort(true_perm)
     gt_lm, gt_cobb = [], []
     for _ in range(N):
@@ -347,14 +345,14 @@ def smoke():
     for j, nm in enumerate(["PT", "MT", "TL"]):
         print(f"  {nm}: derived vs true MAE = {np.abs(derived[:,assign[j]]-gt_cobb[:,j]).mean():.3f} deg")
     ok = np.abs(derived[:, assign[MT]] - gt_cobb[:, MT]).mean() < 0.5
-    print("SMOKE:", "PASS" if ok else "FAIL", "(MT recovered from scrambled corners)")
+    print("Self-test:", "PASS" if ok else "FAIL", "(MT recovered from scrambled corners)")
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--preds-dir", type=Path)
     ap.add_argument("--img-dir", type=Path, default=None,
-                    help="image dir; REQUIRED for correct angle geometry")
+                    help="image dir; needed for correct angle geometry")
     ap.add_argument("--smoke", action="store_true")
     args = ap.parse_args()
     if args.smoke:
@@ -362,7 +360,7 @@ def main():
     elif args.preds_dir:
         run(args.preds_dir, args.img_dir)
     else:
-        raise SystemExit("--preds-dir required (or --smoke)")
+        raise SystemExit("--preds-dir is required (or --smoke for the synthetic-data self-test)")
 
 
 if __name__ == "__main__":
