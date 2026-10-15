@@ -1,7 +1,23 @@
-"""Read-only check of all projected caches against the split CSV and raw caches.
+"""Read-only check of projected latent caches against the split CSV and the raw caches.
 
-Requires numpy and pandas. Does not verify checkpoint identity or anatomical
-correctness of labels. It has not been run on the user's absent NPZ files.
+For each configuration in --configs (default medvae_4_3_2d and medvae_8_4_2d)
+and each split, checks that the projected cache is marked "projected", that its
+identifiers match the split CSV and the raw cache without duplicates, that the
+latents have the expected shape, are finite float32 and not constant, and that
+the cobb and landmark labels match the raw cache after aligning by identifier.
+Any failed check raises ValueError.
+
+Requires numpy and pandas. Does not verify checkpoint identity or the
+anatomical correctness of labels. It has not been run against the project NPZ
+files.
+
+Inputs:  --projected-dir and --raw-dir (latents_{config}_{split}.npz in each),
+         --split-csv (image_uuid and split columns).
+Outputs: a JSON summary of the passed checks, printed to stdout.
+
+Usage:
+  python check_projected_caches.py --projected-dir <dir> --raw-dir <dir> \
+      --split-csv <csv> [--configs medvae_4_3_2d medvae_8_4_2d]
 """
 import argparse
 import json
@@ -73,7 +89,7 @@ def main():
                                     shape=list(z.shape), representation="projected",
                                     latent_sd=float(np.std(z)), raw_labels_match=True))
     print(json.dumps({"cache_checks_passed": records,
-                      "scope": "Stored-array checks only; verify checkpoint weights and run logs separately"},
+                      "scope": "Stored-array checks only; checkpoint weights and run logs are not checked"},
                      indent=2))
 
 

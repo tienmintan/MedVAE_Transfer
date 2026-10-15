@@ -1,37 +1,45 @@
 """
-landmark_fullres.py — the FULL-RESOLUTION detector control.
+landmark_fullres.py: landmark detector trained on the uncompressed (full-resolution) image, as a control for the latent detector.
 
-Question: the latent detector localises at ~68 px (vertebra-scale). Is that
-coarseness a fact about the COMPRESSION, or just a weak detector?
+Question: is the latent detector's coarse (vertebra-scale) localisation due to
+the compression, or to a weak detector?
 
-Control: train a landmark detector on the UNCOMPRESSED image — the same
-aspect-padded input MedVAE's encoder itself receives — and compare. Because the
-input is the encoder's own input, the only difference is compression.
+Control: a landmark detector is trained on the uncompressed image (the same
+aspect-padded input MedVAE's encoder receives) and compared with the latent
+detector. Because the input is the encoder's own input, the only difference is
+compression. --input latent runs the same backbone on the latent instead, as a
+matched-capacity control.
 
-  * detector sharpens markedly on full-res  -> the ceiling is the LATENT.
-    This underwrites the whole "coarse because compressed" mechanism claim.
-  * detector still ~68 px on full-res       -> our detector is simply weak, and
-    the mechanism story needs revisiting.
+Interpretation:
+  detector clearly sharper on full-res -> the latent is the ceiling; the
+      coarseness is due to compression.
+  detector equally coarse on full-res  -> the detector is weak, and the
+      coarseness is not explained by compression.
 
-Fair-effort caution: full-res detection is a bigger modelling problem than a
-tiny latent head, so we give it a real backbone (ResNet18, optionally
-ImageNet-pretrained) and optional augmentation. Crippling the full-res arm
-would rig the control toward the answer we want.
+Design: full-res detection is a bigger modelling problem than a small latent
+head, so the full-res detector gets a full backbone (ResNet18, optionally
+ImageNet-pretrained) and optional intensity augmentation. An under-powered
+full-res condition would bias the control toward the compression explanation.
 
 Predictions are saved in the shared format (uuids, pred_landmarks, gt_landmarks;
 (N,136) ordering A normalised [0,1]) so landmark_pixel_audit.py audits it
 identically (pixels, % of spine extent, per-region, overlays).
 
-Run:
+Inputs:  --input image: --csv, --img-dir, --landmarks-dir and the train/test
+         lookups; --input latent: --latents-dir and --config.
+Outputs: <out-dir>/preds_{fullres|latent_<config>}.npz; errors printed to
+         stdout.
+
+Usage:
   python landmark_fullres.py \
       --csv ./medvae/data/boostnet_with_angles.csv \
       --img-dir ./medvae/data/boostnet \
-      --landmarks-dir ~/MedVAE/data/boostnet_labeldata/labels \
+      --landmarks-dir ./data/boostnet_labeldata/labels \
       --train-lookup ./landmark_row_lookup_train_fixed.csv \
       --test-lookup ./landmark_row_lookup_test_fixed.csv \
       --out-dir ./outputs/fullres --seeds 0 1 2
 
-  python landmark_fullres.py --smoke
+  python landmark_fullres.py --smoke      # synthetic-data self-test
 """
 import argparse
 from pathlib import Path
@@ -50,13 +58,14 @@ SPLIT_TO_LMK_SUBDIR = {"train": "training", "val": "training", "test": "test"}
 LATENT_REF = {"4x": 0.0420, "8x": 0.0418}
 
 
-# ==========================================================================
-# data
-# ==========================================================================
+# --- Data ---
 def aspect_pad_square(img, size):
-    """PIL grayscale -> (1,size,size) float tensor in [-1,1], aspect-padded.
-    Mirrors the encoder's aspect-padded square preprocessing so the control
-    sees the same framing (and the same [0,1] landmark convention holds)."""
+    """PIL greyscale -> (1,size,size) float tensor in [-1,1], aspect-padded.
+    Scales so max(W,H) fills the square, as the encoder's preprocessing does,
+    but pastes the image top-left; diffusion_latent.py (--mode align)
+    describes MedVAE's loader as centring the content, so the framing matches
+    in scale but not in position. Landmark targets stay in original-image
+    normalised coordinates (see load_split_images)."""
     import PIL.Image as Image
     w, h = img.size
     s = size / max(w, h)
@@ -69,7 +78,7 @@ def aspect_pad_square(img, size):
 
 
 def landmarks_to_canvas(lm136, nw, nh, size):
-    """Landmarks are normalised to the ORIGINAL image. After aspect-pad into a
+    """Landmarks are normalised to the original image. After aspect-pad into a
     top-left (nw,nh) region of a size×size canvas, re-normalise to the canvas."""
     x = lm136[:N_LM] * nw / size
     y = lm136[N_LM:] * nh / size
@@ -77,10 +86,10 @@ def landmarks_to_canvas(lm136, nw, nh, size):
 
 
 def load_split_images(df, split, img_dir, uuid_to_row, lmk_all, size):
-    """Targets stay in ORIGINAL-IMAGE normalised coords — the same convention as
-    the latent detector (train_frontier.py) — so the two arms are directly
+    """Targets stay in original-image normalised coords, the same convention as
+    the latent detector (train_frontier.py), so the two conditions are directly
     comparable and landmark_pixel_audit.py can convert both to pixels. The model
-    infers the aspect from the visible padding, exactly as the latent model does."""
+    infers the aspect from the visible padding, as the latent model does."""
     xs, ys, uu = [], [], []
     import PIL.Image as Image
     sub = df[df["split"] == split].reset_index(drop=True)
@@ -101,7 +110,7 @@ def load_split_images(df, split, img_dir, uuid_to_row, lmk_all, size):
 
 
 def load_split_latents(latents_dir, config, split):
-    """Matched-capacity control: same backbone, but reading the LATENT."""
+    """Matched-capacity control: same backbone, but reading the latent."""
     d = np.load(Path(latents_dir) / f"latents_{config}_{split}.npz", allow_pickle=True)
     return (torch.as_tensor(d["latents"], dtype=torch.float32),
             d["landmarks"].astype(np.float32), d["uuids"])
@@ -143,9 +152,7 @@ class ImgLM(Dataset):
         return x, self.y[i]
 
 
-# ==========================================================================
-# model
-# ==========================================================================
+# --- Model ---
 def build_model(backbone, pretrained, in_ch=1):
     if backbone == "resnet18":
         try:
@@ -225,7 +232,7 @@ def predict(model, x, device):
         return torch.cat([model(x[i:i + 32].to(device)) for i in range(0, len(x), 32)]).cpu().numpy()
 
 
-# ==========================================================================
+# --- Training run ---
 def run(args):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     args.out_dir.mkdir(parents=True, exist_ok=True)
@@ -237,7 +244,7 @@ def run(args):
             print(f"[{split}] {len(data[split][0])} latents "
                   f"{tuple(data[split][0].shape[1:])} ({args.config})")
         in_ch = data["train"][0].shape[1]
-        src = f"LATENT {args.config}"
+        src = f"latent {args.config}"
     else:
         df = pd.read_csv(args.csv)
         lookups = {}
@@ -249,7 +256,7 @@ def run(args):
             data[split] = load_split_images(df, split, args.img_dir, u2r, lmk, args.size)
             print(f"[{split}] {len(data[split][0])} images at {args.size}x{args.size}")
         in_ch = 1
-        src = f"FULL-RES image {args.size}px"
+        src = f"full-res image {args.size}px"
 
     tr = (data["train"][0], data["train"][1])
     va = (data["val"][0], data["val"][1])
@@ -269,23 +276,23 @@ def run(args):
     errs = norm_err(ens, yte)
     train_err = norm_err(np.mean(seed_train, axis=0), tr[1]).mean()
     m, lo, hi = boot_ci(errs)
-    gap = "OVERFIT" if m > 1.5 * train_err else "ok"
+    gap = "overfit" if m > 1.5 * train_err else "ok"
     print(f"\n{src} detector ({args.backbone}"
           f"{'' if args.no_pretrained else ', pretrained'}):")
     print(f"  test  norm error = {m:.4f}  CI[{lo:.4f},{hi:.4f}]   [{gap}]")
     print(f"  train norm error = {train_err:.4f}")
     print(f"  small-head-on-latent reference: 4x {LATENT_REF['4x']:.4f} | 8x {LATENT_REF['8x']:.4f}")
-    print("\n  NOTE: units are ORIGINAL-IMAGE normalised, matching the latent arm.")
+    print("\n  Units are original-image normalised, matching the latent condition.")
     if args.input == "image":
-        print("  To separate 'compression is the ceiling' from 'our head was small',\n"
-              "  run the SAME backbone on the latent:  --input latent "
+        print("  Next: the same backbone on the latent separates 'compression is the ceiling' from\n"
+              "  'the latent head was small':  python landmark_fullres.py --input latent "
               "--latents-dir ./latents_aspect --config medvae_4_1_2d")
 
     tag = "fullres" if args.input == "image" else f"latent_{args.config}"
     np.savez_compressed(args.out_dir / f"preds_{tag}.npz",
                         pred_landmarks=ens.astype(np.float32),
                         gt_landmarks=yte.astype(np.float32), uuids=ute)
-    print(f"\nwrote {args.out_dir}/preds_{tag}.npz "
+    print(f"\nWrote {args.out_dir}/preds_{tag}.npz "
           f"(audit it with landmark_pixel_audit.py for px / % of spine)")
 
 
@@ -309,7 +316,7 @@ def smoke():
                             pretrained=False, aug=0.0, in_ch=1)
     pv = predict(model, te[0], device)
     e = norm_err(pv, te[1]).mean()
-    # padding helper still used for the image arm
+    # padding helper still used for the image condition
     import PIL.Image as Image
     im = Image.new("L", (200, 400), 128)
     t, (nw, nh) = aspect_pad_square(im, 96)
@@ -320,7 +327,7 @@ def smoke():
           and y3.shape == (2, 136) and np.isfinite(e))
     print(f"pad: {tuple(t.shape)} content {(nw,nh)}  |  3ch latent -> {tuple(y3.shape)}")
     print(f"pred {pv.shape}, test err {e:.4f}")
-    print("SMOKE:", "PASS" if ok else "FAIL")
+    print("Self-test:", "PASS" if ok else "FAIL")
 
 
 def main():
@@ -336,7 +343,7 @@ def main():
     ap.add_argument("--latents-dir", type=Path)
     ap.add_argument("--config", default="medvae_4_1_2d")
     ap.add_argument("--size", type=int, default=384,
-                    help="input square size; 384 = the encoder's own input (cleanest control)")
+                    help="input square size; 384 = the encoder's own input (the control closest to the latent input)")
     ap.add_argument("--backbone", choices=["resnet18", "scratch"], default="resnet18")
     ap.add_argument("--no-pretrained", action="store_true")
     ap.add_argument("--seeds", nargs="+", type=int, default=[0, 1, 2])
@@ -352,12 +359,12 @@ def main():
         smoke()
     elif args.input == "latent":
         if not args.latents_dir:
-            raise SystemExit("--latents-dir required for --input latent")
+            raise SystemExit("--latents-dir is required for --input latent")
         run(args)
     elif args.csv and args.img_dir and args.landmarks_dir:
         run(args)
     else:
-        raise SystemExit("need --csv --img-dir --landmarks-dir (or --smoke)")
+        raise SystemExit("--csv, --img-dir and --landmarks-dir are required (or --smoke for the synthetic-data self-test)")
 
 
 if __name__ == "__main__":

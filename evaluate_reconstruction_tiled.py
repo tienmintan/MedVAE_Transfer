@@ -1,25 +1,31 @@
 """
-evaluate_reconstruction_tiled.py
+evaluate_reconstruction_tiled.py: tile-and-stitch reconstruction metrics on full-resolution BoostNet test images for three MedVAE checkpoints.
 
-Phase 2 evaluation: tile-and-stitch reconstruction of full-resolution BoostNet
-test images through three MedVAE checkpoints (pretrained, aspect-finetuned,
-patch-finetuned), with masked metrics computed over the spine bounding box.
+Tile-and-stitch reconstruction of full-resolution BoostNet test images through
+three MedVAE checkpoints (pretrained, aspect-finetuned, patch-finetuned), with
+masked metrics computed over the spine bounding box.
 
-This is the fair comparison for Phase 1's patch-training experiment: all three
-models go through the same inference pipeline (slide window, encode/decode each
-tile at native resolution, blend back to full image), so the only difference
-between conditions is the encoder/decoder weights themselves.
+All three models go through the same inference pipeline (slide window,
+encode/decode each tile at native resolution, blend back to full image), so
+for the patch-training comparison the only difference between conditions is
+the encoder/decoder weights themselves.
+
+Inputs:  --csv with split and bbox_x0/y0/x1/y1 (from prepare_spine_bboxes.py);
+         JPEG images in --img-dir; the aspect- and patch-finetuned checkpoints.
+Outputs: per-image metrics at --out-csv; per-model means and paired
+         comparisons printed to stdout.
 
 Usage:
     python evaluate_reconstruction_tiled.py \\
         --csv         $PROJECT_DIR/medvae/data/boostnet.csv \\
         --img-dir     $PROJECT_DIR/medvae/data/boostnet \\
-        --pretrained-ckpt  (omit; auto-downloads from HF hub) \\
         --aspect-ckpt /lambda/.../boostnet_finetuning_aspect/.../checkpoints/best.pt \\
         --patch-ckpt  /lambda/.../boostnet_finetuning_patch/.../checkpoints/best.pt \\
         --tile-size 384 \\
         --stride 192 \\
         --out-csv     ./tiled_metrics_per_image.csv
+
+The pretrained model is downloaded from the HuggingFace hub automatically.
 
 Notes
 -----
@@ -30,11 +36,11 @@ Notes
   reconstruction back to its original intensity range before blending.
   Without this step, tiles with low natural contrast would have their noise
   amplified visibly in the stitched output.
-- Masking uses the bbox columns added by prepare_spine_bboxes.py. We compute
-  PSNR/MS-SSIM both unmasked (over the whole image) and masked (over the
-  spine bbox region only). Unmasked metrics include near-background regions
-  outside the spine — they're easier to reconstruct, so the unmasked numbers
-  are systematically higher than the masked ones.
+- Masking uses the bbox columns added by prepare_spine_bboxes.py.
+  PSNR/MS-SSIM are computed both unmasked (over the whole image) and masked
+  (over the spine bbox region only). Unmasked metrics include near-background
+  regions outside the spine; these are easier to reconstruct, so the unmasked
+  numbers are systematically higher than the masked ones.
 """
 
 import argparse
@@ -61,9 +67,7 @@ from medvae.models.autoencoder_kl import AutoencoderKL
 from huggingface_hub import hf_hub_download
 
 
-# ----------------------------------------------------------------------------
-# Tile-and-stitch reconstruction
-# ----------------------------------------------------------------------------
+# --- Tile-and-stitch reconstruction ---
 
 def make_cosine_window(tile_size: int, device) -> torch.Tensor:
     """2D cosine window: 1.0 at centre, ~0 at edges. For blending overlapping
@@ -109,14 +113,14 @@ def tile_and_stitch(
     """
     _, H, W = image.shape
 
-    # Pad image to a multiple of stride so the last tile lands cleanly.
+    # Pad image to a multiple of stride so the last tile lands on the edge.
     # The last-position trick in tile_positions makes this unnecessary for
-    # coverage, but having the canvas exactly multiple-of-stride simplifies
-    # bookkeeping. We crop back at the end.
+    # coverage, but having the canvas an exact multiple of the stride
+    # simplifies bookkeeping. The padding is cropped off at the end.
     pad_h = (stride - (H - tile_size) % stride) % stride if H > tile_size else 0
     pad_w = (stride - (W - tile_size) % stride) % stride if W > tile_size else 0
     if pad_h > 0 or pad_w > 0:
-        # Reflect padding so the model doesn't see hard zero edges
+        # Reflect padding so the model does not see hard zero edges
         image_padded = F.pad(image.unsqueeze(0), (0, pad_w, 0, pad_h),
                              mode="reflect").squeeze(0)
     else:
@@ -147,7 +151,7 @@ def tile_and_stitch(
             inp = tile_norm.unsqueeze(0).to(device=device, dtype=dtype)
             with torch.autocast(device_type=device.type, dtype=dtype):
                 recon, _, _ = model(inp)
-            recon = recon.squeeze(0).float()      # (1, T, T) in [-1, 1] (ish)
+            recon = recon.squeeze(0).float()      # (1, T, T) in approximately [-1, 1]
 
             # De-normalise back to original tile intensity range
             recon = (recon * 0.5) + 0.5            # [-1, 1] -> [0, 1]
@@ -169,14 +173,12 @@ def tile_and_stitch(
     return output
 
 
-# ----------------------------------------------------------------------------
-# Model loading
-# ----------------------------------------------------------------------------
+# --- Model loading ---
 
 def load_pretrained_medvae(device: torch.device, dtype: torch.dtype) -> AutoencoderKL:
     """Construct medvae_4_1_2d with original Stanford weights.
 
-    The HuggingFace yaml is flat — it has `embed_dim` and `ddconfig` at the
+    The HuggingFace yaml is flat: it has `embed_dim` and `ddconfig` at the
     top level, matching AutoencoderKL.__init__'s signature directly. (Not
     nested under `model.params` like ldm/stable-diffusion configs.)
     """
@@ -205,8 +207,8 @@ def load_finetuned_medvae(ckpt_dir: str, device: torch.device, dtype: torch.dtyp
     model = load_pretrained_medvae(device, dtype)
 
     # Accelerate saves the AE weights as pytorch_model.bin (and shards the
-    # rest as pytorch_model_N.bin for the optimizer / discriminator). We only
-    # need the first file for the autoencoder.
+    # rest as pytorch_model_N.bin for the optimizer / discriminator). Only the
+    # first file is needed for the autoencoder.
     weight_path = os.path.join(ckpt_dir, "pytorch_model.bin")
     if not os.path.exists(weight_path):
         raise FileNotFoundError(f"Expected {weight_path}")
@@ -221,9 +223,7 @@ def load_finetuned_medvae(ckpt_dir: str, device: torch.device, dtype: torch.dtyp
     return model.eval()
 
 
-# ----------------------------------------------------------------------------
-# Per-image evaluation
-# ----------------------------------------------------------------------------
+# --- Per-image evaluation ---
 
 @torch.no_grad()
 def evaluate_model(
@@ -239,8 +239,8 @@ def evaluate_model(
     """Loop over all test images, reconstruct each via tile-and-stitch,
     compute PSNR and MS-SSIM both unmasked and masked-to-bbox."""
 
-    # Metric objects are stateful in torchmetrics; create per-image instances
-    # so we don't accumulate across images (we want per-image numbers).
+    # Metric objects are stateful in torchmetrics; they are created once and
+    # reset before each computation, so values do not accumulate across images.
     psnr_fn  = PeakSignalNoiseRatio(data_range=1.0).to(device)
     msssim_fn = MSSSIM(data_range=1.0).to(device)
 
@@ -263,12 +263,12 @@ def evaluate_model(
         bx1 = max(bx1, bx0 + 1);   by1 = max(by1, by0 + 1)
 
         # MS-SSIM needs at least 161x161 for the default 5-scale pyramid.
-        # If a bbox is tiny (shouldn't happen with BoostNet but guard anyway)
-        # we fall back to the whole image for masked metrics.
+        # If a bbox is tiny (not expected with BoostNet, but guarded anyway)
+        # the whole image is used for the masked metrics.
         bbox_h, bbox_w = by1 - by0, bx1 - bx0
         if bbox_h < 161 or bbox_w < 161:
-            print(f"  WARN: bbox too small for {row['image_uuid']} "
-                  f"({bbox_h}x{bbox_w}); using full image for masked metrics")
+            print(f"  WARNING: bbox for {row['image_uuid']} is smaller than the 161x161 MS-SSIM minimum "
+                  f"({bbox_h}x{bbox_w}); its masked metrics use the full image and are not comparable with the others.")
             o_m, r_m = orig, recon
         else:
             o_m = orig [:, by0:by1, bx0:bx1]
@@ -298,22 +298,20 @@ def evaluate_model(
     return pd.DataFrame(rows)
 
 
-# ----------------------------------------------------------------------------
-# Aggregation + paired comparison
-# ----------------------------------------------------------------------------
+# --- Aggregation + paired comparison ---
 
 def summarise(df: pd.DataFrame) -> None:
     """Print mean ± std for each model and each metric, plus paired
     comparisons between models."""
     print("\n" + "=" * 78)
-    print("PER-MODEL MEANS (n = {} test images)".format(df["image_uuid"].nunique()))
+    print("Per-model means (n = {} test images)".format(df["image_uuid"].nunique()))
     print("=" * 78)
     metrics = ["psnr_unmasked", "psnr_masked", "msssim_unmasked", "msssim_masked"]
     summary = df.groupby("model")[metrics].agg(["mean", "std"])
     print(summary.round(4).to_string())
 
     print("\n" + "=" * 78)
-    print("PAIRED COMPARISONS (Δ = row − col, masked metrics)")
+    print("Paired comparisons (Δ = row - col, masked metrics)")
     print("=" * 78)
     models = df["model"].unique()
     pivot_psnr   = df.pivot(index="image_uuid", columns="model", values="psnr_masked")
@@ -357,7 +355,7 @@ def main() -> None:
     for col in ["bbox_x0", "bbox_y0", "bbox_x1", "bbox_y1"]:
         if col not in test_df.columns:
             raise ValueError(
-                f"Column {col!r} missing — run prepare_spine_bboxes.py first.")
+                f"Column {col!r} missing. The bbox columns come from prepare_spine_bboxes.py.")
 
     all_results = []
     for name, ckpt_path in [

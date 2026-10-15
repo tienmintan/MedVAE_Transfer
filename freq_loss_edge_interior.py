@@ -1,17 +1,18 @@
 """
-freq_loss_edge_interior.py — Step 2 of the compression-frontier analysis.
+freq_loss_edge_interior.py: reconstruction error at vertebral edges/corners versus vertebral interiors, per MedVAE configuration.
 
-Step 1 showed MedVAE preferentially discards high-frequency content, more so
-at 8x. Step 2 asks: does that lost content land on the vertebral edges/corners
-that Cobb measurement and landmark localisation depend on?
+Follows freq_loss_spectrum.py, which measures which spatial frequencies
+MedVAE discards at each compression level. This script tests whether the lost
+content falls on the vertebral edges/corners that Cobb measurement and
+landmark localisation depend on.
 
 Method, per test image, per config:
-  1. Reconstruct at 384x384 (same path as Step 1 / evaluate_reconstruction.py).
+  1. Reconstruct at 384x384 (same path as freq_loss_spectrum.py / evaluate_reconstruction.py).
   2. Residual r = original - reconstruction.
   3. Detect content bbox empirically (x > -0.8 mask).
   4. Map the 68 normalised landmarks into that bbox:
          (nx,ny) -> (c0 + nx*(c1-c0), r0 + ny*(r1-r0))
-     (exact for aspect-pad-to-square-then-resize, any centering).
+     (exact for aspect-pad-to-square-then-resize, any centring).
   5. EDGE region   = pixels within disk_radius of any landmark.
      INTERIOR region = content pixels farther than excl_radius from every
                        landmark.
@@ -21,16 +22,23 @@ Aggregate across images with image-level bootstrap CIs, and report the
 edge/interior ratio per config and whether it grows with compression.
 
 --verify mode: overlays mapped landmarks + the edge/interior masks on a few
-images so region placement is confirmed BEFORE trusting any numbers.
+images so that region placement can be checked before the measurements are
+used.
 
-Usage (verify first):
+Inputs:  --csv and --img-dir (BoostNet); --lookup from fix_landmark_lookup.py;
+         --landmarks (labels/test/landmarks.csv).
+Outputs: in --out-dir: edge_interior_verify.png (--verify), or
+         edge_interior_summary.csv, edge_interior_per_image.csv and
+         edge_interior.png (full run); a summary printed to stdout.
+
+Usage (verification run):
   python freq_loss_edge_interior.py --verify \\
       --csv ./medvae/data/boostnet.csv --img-dir ./medvae/data/boostnet \\
       --lookup ./landmark_row_lookup_test_fixed.csv \\
-      --landmarks ~/MedVAE/data/boostnet_labeldata/labels/test/landmarks.csv \\
+      --landmarks ./data/boostnet_labeldata/labels/test/landmarks.csv \\
       --out-dir ./outputs/freq_loss
 
-Then full run (drop --verify).
+The full run is the same command without --verify.
 """
 
 import argparse
@@ -138,13 +146,13 @@ def main():
     lookup = pd.read_csv(args.lookup).set_index("image_uuid")
     landmarks_all = pd.read_csv(args.landmarks, header=None).values.astype(float)
 
-    # keep only images we have a landmark row for
+    # keep only images with a landmark row
     uuids = [u for u in df["image_uuid"] if u in lookup.index]
     if args.limit:
         uuids = uuids[:args.limit]
     print(f"{len(uuids)}/{len(df)} test images have a landmark row.")
 
-    # ---------- VERIFY MODE ----------
+    # Verification mode
     if args.verify:
         cfg = args.configs[0]
         mvae = MVAE(model_name=cfg, modality=args.modality).to(device).eval()
@@ -178,14 +186,14 @@ def main():
             axes[1, j].imshow(overlay)
             axes[1, j].set_title("edge (red) vs interior (teal)\non |residual|", fontsize=8)
             axes[1, j].axis("off")
-        fig.suptitle("Step 2 verify — confirm dots sit on vertebrae and "
-                     "regions are sensible", fontsize=11)
+        fig.suptitle("Verification: landmark dots on vertebrae and "
+                     "edge/interior regions", fontsize=11)
         out = args.out_dir / "edge_interior_verify.png"
         fig.savefig(out, dpi=130, bbox_inches="tight")
-        print(f"Saved {out}\nIf placement looks right, re-run WITHOUT --verify.")
+        print(f"Saved {out}\nIf placement looks right, the full run is the same command without --verify.")
         return 0
 
-    # ---------- FULL MEASUREMENT ----------
+    # Full measurement
     records = {c: {"edge": [], "interior": [], "uuid": []} for c in args.configs}
     example = {}
 
@@ -219,7 +227,7 @@ def main():
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
 
-    # ---- aggregate + bootstrap ----
+    # Aggregate + bootstrap
     summary_rows, per_image_rows = [], []
     print("\n=== Edge vs interior reconstruction error (mean squared residual) ===")
     for cfg in args.configs:
@@ -243,7 +251,7 @@ def main():
     pd.DataFrame(summary_rows).to_csv(args.out_dir / "edge_interior_summary.csv", index=False)
     pd.DataFrame(per_image_rows).to_csv(args.out_dir / "edge_interior_per_image.csv", index=False)
 
-    # ---- ratio-growth check (the key claim) ----
+    # Ratio-growth check (second config vs first)
     if len(args.configs) >= 2:
         c4, c8 = args.configs[0], args.configs[1]
         r4 = np.array(records[c4]["edge"]) / np.maximum(np.array(records[c4]["interior"]), 1e-12)
@@ -251,11 +259,11 @@ def main():
         # paired per-image growth in the ratio (same images both configs)
         growth = r8 - r4
         gm, glo, ghi = bootstrap_ci(growth)
-        print(f"\nEdge/interior ratio growth (8x − 4x): {gm:+.2f} [{glo:+.2f},{ghi:+.2f}]")
-        print("  >0 with CI excluding 0 => compression preferentially sacrifices")
-        print("  edge fidelity, confirming the frequency loss lands on the anatomy.")
+        print(f"\nEdge/interior ratio growth (8x - 4x): {gm:+.2f} [{glo:+.2f},{ghi:+.2f}]")
+        print("  Interpretation: > 0 with CI excluding 0 -> compression preferentially loses")
+        print("  edge fidelity, i.e. the frequency loss falls on the vertebral edges.")
 
-    # ---- figure ----
+    # Figure
     fig, axes = plt.subplots(1, 2, figsize=(13, 5))
     # grouped bars
     x = np.arange(len(args.configs)); w = 0.36

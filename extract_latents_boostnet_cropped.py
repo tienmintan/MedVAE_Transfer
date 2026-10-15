@@ -1,22 +1,25 @@
 """
-extract_latents_boostnet_cropped.py
+extract_latents_boostnet_cropped.py: extract BoostNet SD-VAE latents with the aspect-padding region cropped out.
 
-Modified version of extract_latents_boostnet_512.py that crops out the
-aspect-padding region before SD-VAE encoding, addressing the distribution
-shift identified in investigate_dataset_shift_content_only.py.
+Variant of extract_latents_boostnet_512.py that crops out the aspect-padding
+region before SD-VAE encoding, to address the distribution shift identified
+in investigate_dataset_shift_content_only.py.
 
-For BoostNet, we use the spine bbox from prepare_spine_bboxes.py if
+For BoostNet, the spine bbox is used if
 available (the bbox columns: xmin, ymin, xmax, ymax in the CSV).
-Otherwise we fall back to content-based detection via detect_content_bbox.
+Otherwise the script falls back to content-based detection via
+detect_content_bbox.
 
 Pipeline per image:
-  1. Load JPEG, convert to grayscale, normalise to [0, 1].
+  1. Load JPEG, convert to greyscale, normalise to [0, 1].
   2. Use spine bbox from CSV (or detect via threshold).
   3. Crop to bbox, then resize+pad to 1:1.5 aspect centred in 512×512.
-  4. SD-VAE encode → (4, 64, 64) latent.
+  4. SD-VAE encode -> (4, 64, 64) latent.
 
-Output schema is v2 (compatible with train_diffusion.py):
-  latents, splits, angles, uuids
+Inputs:  --csv (image_uuid, split, three angle columns); optionally
+         --bbox-csv; JPEG images in --img-dir.
+Outputs: --out .npz in the v2 schema (compatible with train_diffusion.py):
+         latents, splits, angles, uuids.
 
 Usage:
     python extract_latents_boostnet_cropped.py \\
@@ -58,7 +61,7 @@ def encode_one(img_norm: np.ndarray, vae, device,
 
 
 def load_image(path: Path) -> np.ndarray:
-    """Load a JPEG, convert to grayscale, normalise to [0, 1]."""
+    """Load a JPEG, convert to greyscale, normalise to [0, 1]."""
     pil = Image.open(path).convert("L")
     arr = np.array(pil).astype(np.float32) / 255.0
     return arr
@@ -85,7 +88,7 @@ def main():
 
     device = torch.device(args.device)
 
-    # ---- Load CSV ----
+    # Load CSV
     df = pd.read_csv(args.csv)
     print(f"Loaded {len(df)} rows from {args.csv}")
     print(f"  Columns: {df.columns.tolist()}")
@@ -133,9 +136,9 @@ def main():
         has_bbox_columns = all(c in df.columns
                                 for c in ["xmin", "ymin", "xmax", "ymax"])
         if has_bbox_columns:
-            print("  Spine bbox columns found in main CSV — using them.")
+            print("  Spine bbox columns found in main CSV; using them.")
         else:
-            print("  No spine bbox columns — using content detection for all images.")
+            print("  No spine bbox columns; using content detection for all images.")
 
     # Tag splits for the v2 schema. BoostNet uses boostnet_train / boostnet_val
     # / boostnet_test
@@ -151,13 +154,13 @@ def main():
 
     df["v2_split"] = df["split"].map(_split_tag)
 
-    # ---- Load SD-VAE ----
+    # Load SD-VAE
     print("\nLoading SD-VAE...")
     vae = SDAutoencoderKL.from_pretrained("stabilityai/sd-vae-ft-mse",
                                             torch_dtype=torch.float16).to(device)
     vae.eval()
 
-    # ---- Encode ----
+    # Encode
     all_latents = np.empty((len(df), 4, 64, 64), dtype=np.float16)
     all_angles  = np.empty((len(df), 3), dtype=np.float32)
     all_splits  = np.empty(len(df), dtype=object)
@@ -198,7 +201,7 @@ def main():
 
     print(f"\nBbox source: {n_bbox_used} from CSV, {n_fallback} from content detection")
 
-    # ---- Save ----
+    # Save
     args.out.parent.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(
         args.out,

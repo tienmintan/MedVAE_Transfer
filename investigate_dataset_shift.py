@@ -1,11 +1,10 @@
 """
-investigate_dataset_shift.py
+investigate_dataset_shift.py: measure the distribution shift between VinDr-SpineXR and BoostNet.
 
-Diagnose the distribution shift between VinDr-SpineXR and BoostNet at three
-levels relevant to the diffusion pipeline:
+The shift is measured at three levels relevant to the diffusion pipeline:
 
   1. Raw pixel intensities (post-preprocessing, before encoding).
-     Tests whether our DICOM and JPEG pipelines yield comparable pixel
+     Tests whether the DICOM and JPEG pipelines yield comparable pixel
      statistics, or whether one corpus dominates the input distribution
      before anything touches the VAE.
 
@@ -16,17 +15,19 @@ levels relevant to the diffusion pipeline:
 
   3. Pooled-standardisation effect.
      Computes per-corpus mean/std versus the pooled mean/std used by
-     train_diffusion.py. If pooled stats are essentially VinDr's (due to
-     the 22× sample-count imbalance), BoostNet ends up displaced from
-     N(0, 1) after standardisation — directly explaining why conditional
-     fine-tune learns weak conditioning.
+     train_diffusion.py. If the pooled stats are essentially VinDr's (the
+     corpora differ in sample count by about 22×), BoostNet is displaced
+     from N(0, 1) after standardisation, which is one possible cause of
+     weak conditioning in the conditional fine-tune.
 
+The script is diagnostic only: it loads pre-computed latents from the
+extraction stage rather than re-running encoding.
+
+Inputs:  VinDr and BoostNet latent .npz files (SD-VAE, 4 channels);
+         optionally .npz files of preprocessed pixel images for level 1.
 Outputs:
   - Printed numerical summary table
-  - A multi-panel figure with histograms at each level
-
-This is a diagnostic script — it loads pre-computed latents from the
-extraction stage rather than re-running encoding from scratch.
+  - A multi-panel figure with histograms at each level (--out-fig)
 
 Usage:
     python investigate_dataset_shift.py \\
@@ -37,9 +38,9 @@ Usage:
         --out-fig          ./outputs/figures/dataset_shift_diagnosis.png \\
         --n-pixel-samples  500
 
-Pixel-image npz files are optional. If they don't exist, the script skips
-the pixel-space comparison and reports just the latent-level findings
-(which is the level that actually matters for the diffusion training).
+Pixel-image npz files are optional. If they do not exist, the script skips
+the pixel-space comparison and reports only the latent-level results (the
+latent level is the one the diffusion model is trained on).
 """
 
 import argparse
@@ -94,11 +95,11 @@ def print_summary_table(vindr_pix, boost_pix, vindr_lat, boost_lat,
                          pooled_mean, pooled_std):
     """Print the human-readable diagnostic table."""
     print("\n" + "=" * 78)
-    print("DATASET DISTRIBUTION DIAGNOSIS")
+    print("Dataset distribution diagnosis")
     print("=" * 78)
 
     if vindr_pix is not None and boost_pix is not None:
-        print("\n--- LEVEL 1: pixel-space stats (post-preprocessing, before VAE) ---")
+        print("\n--- Level 1: pixel-space stats (post-preprocessing, before VAE) ---")
         print(f"{'Statistic':<25} {'VinDr':>14} {'BoostNet':>14} {'Δ (Vin-Boost)':>15}")
         print("-" * 78)
         for stat in ["mean", "std", "min", "max", "p01", "p99"]:
@@ -114,7 +115,7 @@ def print_summary_table(vindr_pix, boost_pix, vindr_lat, boost_lat,
             print(f"{'std of per-img ' + stat:<25} {v_std:>14.4f} {b_std:>14.4f} "
                   f"{v_std - b_std:>15.4f}")
 
-    print("\n--- LEVEL 2: SD-VAE latent stats (per-channel) ---")
+    print("\n--- Level 2: SD-VAE latent stats (per-channel) ---")
     print(f"{'Statistic':<25} {'VinDr':>14} {'BoostNet':>14} {'Δ (Vin-Boost)':>15}")
     print("-" * 78)
     n_ch = 4
@@ -129,11 +130,11 @@ def print_summary_table(vindr_pix, boost_pix, vindr_lat, boost_lat,
         v = vindr_lat[key]; b = boost_lat[key]
         print(f"{f'all-channel {k}':<25} {v:>14.4f} {b:>14.4f} {v - b:>15.4f}")
 
-    print("\n--- LEVEL 3: pooled-standardisation effect ---")
-    print("The training pipeline standardises every sample by the *pooled*")
+    print("\n--- Level 3: pooled-standardisation effect ---")
+    print("The training pipeline standardises every sample by the pooled")
     print("VinDr+BoostNet mean and std (a single scalar mean and std across")
     print("all channels). This is the form of standardisation that")
-    print("train_diffusion.py actually uses.\n")
+    print("train_diffusion.py uses.\n")
 
     print(f"  Pooled (used by train_diffusion.py): mean={pooled_mean:.4f}  std={pooled_std:.4f}")
     print(f"  VinDr-only:                          mean={vindr_lat['all_mean']:.4f}  std={vindr_lat['all_std']:.4f}")
@@ -145,13 +146,13 @@ def print_summary_table(vindr_pix, boost_pix, vindr_lat, boost_lat,
     boost_post_mean = (boost_lat["all_mean"] - pooled_mean) / pooled_std
     boost_post_std  = boost_lat["all_std"] / pooled_std
 
-    print(f"\nAfter scalar standardisation by POOLED stats (all channels collapsed):")
+    print(f"\nAfter scalar standardisation by pooled stats (all channels collapsed):")
     print(f"  VinDr     post: mean={vindr_post_mean:+.4f}  std={vindr_post_std:.4f}  (ideal: 0, 1)")
     print(f"  BoostNet  post: mean={boost_post_mean:+.4f}  std={boost_post_std:.4f}  (ideal: 0, 1)")
 
-    # Per-channel post-standardisation — the more important diagnostic
-    print(f"\n--- LEVEL 3b: PER-CHANNEL post-standardisation ---")
-    print(f"Even when the *aggregate* mean and std are normalised, each")
+    # Per-channel post-standardisation (the more important diagnostic)
+    print(f"\n--- Level 3b: per-channel post-standardisation ---")
+    print(f"Even when the aggregate mean and std are normalised, each")
     print(f"individual channel may still be displaced from N(0, 1). The")
     print(f"diffusion model sees the per-channel structure, not the aggregate.\n")
     print(f"{'Channel':<10} {'VinDr (μ, σ)':<22} {'BoostNet (μ, σ)':<22}")
@@ -165,26 +166,26 @@ def print_summary_table(vindr_pix, boost_pix, vindr_lat, boost_lat,
               f"({b_mean_post:+.3f}, {b_std_post:.3f})")
 
     # SD-VAE convention diagnostic
-    print(f"\n--- LEVEL 3c: SD-VAE scaling-factor convention ---")
+    print(f"\n--- Level 3c: SD-VAE scaling-factor convention ---")
     print(f"Stable Diffusion's published convention is to multiply raw SD-VAE")
     print(f"latents by 0.18215 to normalise them to ≈N(0, 1) before diffusion.")
-    print(f"If our latents were saved as raw (un-scaled), they'd have native")
+    print(f"If the latents were saved raw (un-scaled), they would have native")
     print(f"std much larger than 1.\n")
     print(f"  VinDr   raw std:                {vindr_lat['all_std']:.4f}")
     print(f"  BoostNet raw std:               {boost_lat['all_std']:.4f}")
     print(f"  Expected if SD-VAE scaling applied:  ≈ 1.0")
     print(f"  Expected if raw (un-scaled):         ≈ 5-8")
     sf = 0.18215
-    print(f"\n  If we applied 0.18215 retroactively:")
+    print(f"\n  With the 0.18215 scaling applied:")
     print(f"    VinDr would have std ≈ {vindr_lat['all_std'] * sf:.4f}")
     print(f"    BoostNet would have std ≈ {boost_lat['all_std'] * sf:.4f}")
     if vindr_lat['all_std'] > 3.0:
-        print(f"  ⚠ Latents are RAW (un-scaled by 0.18215).")
-        print(f"    Pooled empirical standardisation is masking this but cannot")
+        print(f"  WARNING: VinDr raw latent std is {vindr_lat['all_std']:.2f} (threshold 3.0), so the latents are stored without the 0.18215 scaling.")
+        print(f"    Pooled empirical standardisation masks this but cannot")
         print(f"    correct per-channel offsets that differ between corpora.")
 
-    # Verdict — corrected to use per-channel scores
-    print(f"\n--- VERDICT ---")
+    # Result, based on per-channel scores
+    print(f"\n--- Result ---")
     max_channel_mean_diff = max(
         abs(vindr_lat[f"c{c}_mean"] - boost_lat[f"c{c}_mean"]) / pooled_std
         for c in range(4)
@@ -192,11 +193,11 @@ def print_summary_table(vindr_pix, boost_pix, vindr_lat, boost_lat,
     print(f"Largest per-channel mean offset between VinDr and BoostNet, in")
     print(f"units of pooled std: {max_channel_mean_diff:.3f}")
     if max_channel_mean_diff > 0.15:
-        print(f"  ⚠ Substantial per-channel distribution shift between corpora.")
-        print(f"    Scalar pooled standardisation CANNOT correct this — only")
+        print(f"  WARNING: largest per-channel mean offset is {max_channel_mean_diff:.3f} pooled SD (threshold 0.15).")
+        print(f"    Scalar pooled standardisation cannot correct this shift;")
         print(f"    per-channel normalisation can.")
     else:
-        print(f"  ✓ Per-channel shifts are small. Pooled scalar standardisation")
+        print(f"  Check passed: per-channel shifts are below 0.15 pooled SD. Pooled scalar standardisation")
         print(f"    is adequate.")
     print("=" * 78)
 
@@ -247,7 +248,7 @@ def make_figure(vindr_pix, boost_pix, vindr_lats, boost_lats,
 
     # --- Per-channel latent histograms ---
     # Promote to fp64 for stable computation, especially for the pooled
-    # standardisation visualization below
+    # standardisation visualisation below
     vindr_lats_64 = vindr_lats.astype(np.float64)
     boost_lats_64 = boost_lats.astype(np.float64)
 
@@ -276,7 +277,7 @@ def make_figure(vindr_pix, boost_pix, vindr_lats, boost_lats,
     for j in range(n_lat_channels, axes.shape[1]):
         axes[latent_row, j].axis("off")
 
-    # --- Pooled-standardisation visualization ---
+    # --- Pooled-standardisation visualisation ---
     # Show what happens to each corpus after pooled standardisation
     vindr_post = (vindr_lats_64.ravel() - pooled_mean) / pooled_std
     boost_post = (boost_lats_64.ravel() - pooled_mean) / pooled_std
@@ -321,7 +322,7 @@ def make_figure(vindr_pix, boost_pix, vindr_lats, boost_lats,
     for j in range(2, axes.shape[1]):
         axes[pool_row, j].axis("off")
 
-    fig.suptitle("VinDr-SpineXR vs BoostNet — distribution shift diagnosis",
+    fig.suptitle("VinDr-SpineXR vs BoostNet: distribution shift diagnosis",
                   fontsize=13, weight="bold", y=0.995)
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -339,8 +340,8 @@ def main():
     p.add_argument("--vindr-images",     type=Path, default=None,
                     help="Optional: NPZ with sampled preprocessed VinDr "
                          "images. Without it, pixel-level comparison is "
-                         "skipped (which is fine — latent-level is what "
-                         "matters for diffusion).")
+                         "skipped (the latent level is the one used by "
+                         "the diffusion model).")
     p.add_argument("--boostnet-images",  type=Path, default=None)
     p.add_argument("--out-fig", required=True, type=Path)
     p.add_argument("--n-vindr-subsample", type=int, default=2000,
@@ -351,7 +352,7 @@ def main():
 
     rng = np.random.default_rng(args.seed)
 
-    # ---- Load latents ----
+    # --- Load latents ---
     print("Loading VinDr latents...")
     vindr_data = np.load(args.vindr_latents, allow_pickle=True)
     vindr_lats = vindr_data["latents"]
@@ -368,7 +369,7 @@ def main():
     boost_lats = boost_data["latents"]
     print(f"  Shape: {boost_lats.shape}")
     # Use the train+val splits only (excluding test) to match what the
-    # diffusion pipeline actually sees
+    # diffusion pipeline sees
     if "splits" in boost_data:
         splits = boost_data["splits"].astype(str)
         mask = splits != "boostnet_test"
@@ -376,10 +377,10 @@ def main():
             boost_lats = boost_lats[mask]
             print(f"  Filtered to train+val: {len(boost_lats)} samples")
 
-    # ---- Compute pooled mean/std as train_diffusion.py would ----
+    # --- Compute pooled mean/std as train_diffusion.py does ---
     # train_diffusion.py concatenates the lists then computes one scalar
-    # mean/std (all channels treated as a single distribution). We compute
-    # in fp64 to avoid the fp16 overflow that affects per-sample variance.
+    # mean/std (all channels treated as a single distribution). Computed in
+    # fp64 to avoid the fp16 overflow that affects per-sample variance.
     pooled = np.concatenate([vindr_lats, boost_lats], axis=0).astype(np.float64)
     pooled_mean = float(pooled.mean())
     pooled_std  = float(pooled.std())
@@ -387,12 +388,12 @@ def main():
           f"mean={pooled_mean:.4f}  std={pooled_std:.4f}")
     del pooled
 
-    # ---- Latent-level stats ----
+    # --- Latent-level stats ---
     print("\nComputing per-channel latent statistics...")
     vindr_lat_stats = per_channel_latent_stats(vindr_lats)
     boost_lat_stats = per_channel_latent_stats(boost_lats)
 
-    # ---- Optional pixel-level stats ----
+    # --- Optional pixel-level stats ---
     vindr_pix_stats = boost_pix_stats = None
     if args.vindr_images and args.vindr_images.exists():
         print("\nLoading pixel-space samples for level-1 comparison...")
@@ -404,7 +405,7 @@ def main():
         boost_imgs = bp["images"] if "images" in bp else bp[list(bp)[0]]
         boost_pix_stats = per_image_pixel_stats(boost_imgs)
 
-    # ---- Print & plot ----
+    # --- Print and plot ---
     print_summary_table(vindr_pix_stats, boost_pix_stats,
                          vindr_lat_stats, boost_lat_stats,
                          pooled_mean, pooled_std)

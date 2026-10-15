@@ -1,40 +1,36 @@
 """
-extract_latents_tiled_pretrained.py
+extract_latents_tiled_pretrained.py: encode BoostNet images into tile-and-stitch latent grids with the pretrained MedVAE 4x/1ch encoder.
 
-Phase A.3 ablation — pre-encode all BoostNet images into per-image latent
-grids using the PRETRAINED MedVAE 4x/1ch encoder via tile-and-stitch in
-latent space. Companion to extract_latents_tiled.py, which uses the
-patch-finetuned encoder.
+Ablation companion to extract_latents_tiled.py, which uses the
+patch-finetuned encoder. The patch-finetuned tile-and-stitch configuration
+(matched_tiled) combines two changes: native-resolution access via
+tile-and-stitch, and patch-based encoder finetuning. This script provides
+the pretrained encoder accessed via the same tile-and-stitch protocol, under
+the same matched regressor, so that comparing it with matched_tiled
+isolates the effect of patch finetuning.
 
-Motivation. The Phase 2 multi-seed table established that the
-patch-finetuned encoder accessed via tile-and-stitch (matched_tiled) is
-the project's best Cobb regression configuration. But that result mixes
-two changes simultaneously: native-resolution access via tile-and-stitch,
-and patch-based encoder finetuning. The ablation cell we are filling here
-is "pretrained encoder, accessed via the same tile-and-stitch protocol,
-under the same matched regressor". Comparing it to matched_tiled isolates
-the contribution of patch finetuning specifically. Three outcomes are
-possible:
-  - If pretrained_tiled achieves similar MAE to matched_tiled, then
-    tile-and-stitch access is doing the work; patch finetuning adds
-    little.
-  - If pretrained_tiled is no better than the aspect-padded baseline,
-    then patch finetuning is essential; native-resolution access alone
-    does not help.
-  - If pretrained_tiled lands somewhere in between, both contribute.
+Interpretation:
+  pretrained_tiled MAE similar to matched_tiled -> tile-and-stitch access
+      accounts for the difference; patch finetuning adds little.
+  pretrained_tiled no better than the aspect-padded baseline -> patch
+      finetuning is essential; native-resolution access alone does not help.
+  pretrained_tiled in between -> both contribute.
 
 Pipeline is identical to extract_latents_tiled.py in every respect
 (resize, tile geometry, per-tile normalisation, cosine blending in latent
 space) except that the encoder weights come from the HuggingFace
 pretrained release rather than a local patch-finetuned checkpoint.
 
-Note on preprocessing. We keep per-tile min-max normalisation here even
-though the pretrained encoder was trained on per-image-normalised inputs.
-The rationale: matching the preprocessing of matched_tiled exactly means
-the comparison between the two conditions isolates only the encoder
-weights. If the pretrained encoder underperforms in this protocol, that
-is itself part of the answer — patch finetuning would then be understood
-in part as adapting the encoder to per-tile-normalised inputs.
+Preprocessing: per-tile min-max normalisation is kept even though the
+pretrained encoder was trained on per-image-normalised inputs. Matching the
+preprocessing of matched_tiled means the comparison between the two
+conditions isolates the encoder weights. If the pretrained encoder
+underperforms under this protocol, part of the effect of patch finetuning
+is then adaptation of the encoder to per-tile-normalised inputs.
+
+Inputs:  --csv (image_uuid, split); JPEG images in --img-dir; pretrained
+         weights for --model-name (loaded via extract_latents_aspect.py).
+Outputs: <out-dir>/latents_{train,val,test}.npz (compressed).
 
 Usage:
     python extract_latents_tiled_pretrained.py \\
@@ -145,7 +141,7 @@ def main() -> None:
     df = pd.read_csv(args.csv)
     args.out_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"Loading PRETRAINED MedVAE variant: {args.model_name}")
+    print(f"Loading pretrained MedVAE variant: {args.model_name}")
     model = load_medvae_variant(args.model_name, device, dtype)
 
     for split in ["train", "val", "test"]:

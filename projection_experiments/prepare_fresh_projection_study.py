@@ -2,8 +2,24 @@
 
 Historical caches supply IDs and labels only. Their latent values are used for
 descriptive spot comparisons, never as training features or an acceptance gate.
-Every raw/projected pair comes from ONE deterministic compute_latent_proj call.
+Every raw/projected pair comes from one deterministic compute_latent_proj call.
 All scores must be fitted again in this study; no historical scores are imported.
+
+On --spot-checks images per split, the projection formula is compared with the
+API output and encode().mode() with the API raw latent; a failed comparison
+stops preparation and writes numerical_failure.json. Source-image bytes are
+required to be identical across configurations.
+
+Inputs:  --label-cache-dir (historical latents_{config}_{split}.npz, for IDs and
+         labels), --split-csv and --img-dir ({uuid}.jpg).
+Outputs: <out-dir>/manifest.json (status "ready" when complete),
+         <out-dir>/caches/{raw_keep,projected_keep,raw_mean,projected_mean}/latents_{config}_{split}.npz
+         (mean variants for multi-channel configurations only) and
+         <out-dir>/source_images/{config}_{split}.json.
+
+Usage:
+  python prepare_fresh_projection_study.py --label-cache-dir <dir> --split-csv <csv> \
+      --img-dir <dir> --out-dir <new empty dir> [--precision ieee]
 """
 import argparse
 import gc
@@ -37,7 +53,7 @@ def extract_pair(model, x, device, check_api=False):
 
 def _prepare(args, torch):
     out = args.out_dir.resolve()
-    require(not out.exists() or not any(out.iterdir()), f"Use a new empty study directory: {out}")
+    require(not out.exists() or not any(out.iterdir()), f"Study directory is not empty; a new empty directory is required: {out}")
     expected = split_ids(args.split_csv)
     require(1 <= args.spot_checks <= min(map(len, expected.values())), "Invalid source-image check count")
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")

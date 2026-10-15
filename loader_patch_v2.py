@@ -1,17 +1,14 @@
-# =============================================================================
-# Patch loader for native-resolution training (Phase 1 of patch-based pipeline)
-# =============================================================================
+# loader_patch_v2.py: random-crop patch loader for native-resolution MedVAE fine-tuning.
 #
-# Append this to MedVAE/medvae/utils/loaders.py.
+# Intended to be appended to MedVAE/medvae/utils/loaders.py.
 #
-# Unlike load_2d_finetune and load_2d_finetune_aspect, this loader does NOT
+# Unlike load_2d_finetune and load_2d_finetune_aspect, this loader does not
 # resize the input. It opens the native-resolution image (~880x2480 for
 # BoostNet) and returns a single 384x384 random crop, biased toward the spine
-# bounding box so we don't waste capacity on empty corners.
+# bounding box so that training capacity is not spent on empty corners.
 #
 # The bbox argument is normalised [0, 1] coordinates of the spine region,
 # precomputed by prepare_spine_bboxes.py.
-# =============================================================================
 
 import random
 
@@ -34,14 +31,15 @@ def load_2d_finetune_patch(
         Path to the image file.
     bbox : (x0, y0, x1, y1)
         Normalised [0, 1] coordinates of the spine bounding box. The crop's
-        TOP-LEFT corner is sampled uniformly within this bbox; the resulting
+        top-left corner is sampled uniformly within this bbox; the resulting
         384x384 patch is then guaranteed to contain at least the top-left
         portion of the spine, and on average will be well-centred over it.
-        If the image is smaller than the patch in either dim, we fall back
-        to the largest valid crop and pad-center to (patch_size, patch_size).
+        If the image is smaller than the patch in either dim, the loader falls
+        back to the largest valid crop and zero-pads it at the bottom/right to
+        (patch_size, patch_size).
     flip_p : float
         Probability of horizontal flip. Cobb angles are reported as magnitudes,
-        so flipping doesn't break labels.
+        so flipping does not change the labels.
 
     Returns
     -------
@@ -49,18 +47,18 @@ def load_2d_finetune_patch(
 
     Notes on the design
     -------------------
-    - We sample the TOP-LEFT corner uniformly from the bbox region (rather
+    - The top-left corner is sampled uniformly from the bbox region (rather
       than centring the patch on the bbox centre) so that successive epochs
-      see different parts of the same image. Random crop = data augmentation
-      effectively for free.
-    - We clamp the corner so that (corner + patch_size) <= image dim, so the
-      crop never goes off the edge.
-    - Per-image ScaleIntensity is applied AFTER cropping. This means each
+      see different parts of the same image. The random crop acts as data
+      augmentation at no extra cost.
+    - The corner is clamped so that (corner + patch_size) <= image dim, so
+      the crop never goes off the edge.
+    - Per-image ScaleIntensity is applied after cropping. This means each
       patch has its own dynamic range stretched to fill [0, 1]. For a patch
-      that's mostly soft tissue (low contrast) this exaggerates noise; for
+      that is mostly soft tissue (low contrast) this exaggerates noise; for
       a patch over a vertebral body (high contrast) it preserves detail.
-      This matches the existing pipeline; revisit if reconstruction quality
-      looks weird on low-contrast patches.
+      This matches the normalisation of the rest of the pipeline;
+      reconstruction quality on low-contrast patches may be affected.
     """
     try:
         # Open at native resolution
@@ -92,8 +90,8 @@ def load_2d_finetune_patch(
         else:
             top = random.randint(min_top, max_top)
 
-        # Crop. If image is smaller than patch, the crop will be smaller too,
-        # then we pad with zeros to (patch_size, patch_size).
+        # Crop. If the image is smaller than the patch, the crop is smaller too
+        # and is then padded with zeros to (patch_size, patch_size).
         crop = img[:, top:top + patch_size, left:left + patch_size]
         ch, cH, cW = crop.shape
         if cH < patch_size or cW < patch_size:
@@ -106,10 +104,10 @@ def load_2d_finetune_patch(
         if flip_p > 0 and random.random() < flip_p:
             crop = torch.flip(crop, dims=[-1])
 
-        # ScaleIntensity per-patch to [0, 1], then Normalize to [-1, 1].
-        # We do this manually rather than via MONAI Compose to avoid the
-        # lazy-execution issues we hit before, and because applying these
-        # to a tensor we already own is trivial.
+        # ScaleIntensity per-patch to [0, 1], then normalise to [-1, 1].
+        # Done manually rather than via MONAI Compose, to avoid MONAI's
+        # lazy-execution behaviour and because applying these to an existing
+        # tensor is straightforward.
         cmin, cmax = crop.min(), crop.max()
         if cmax > cmin:
             crop = (crop - cmin) / (cmax - cmin)

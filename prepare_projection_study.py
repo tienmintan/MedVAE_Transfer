@@ -4,6 +4,28 @@ Run from the MedVAE repository root. Existing caches are read only. The new
 directory must be empty; an interrupted preparation can be restarted in a new
 directory. All projection weights and representative encoder/API outputs are
 checked before the manifest is marked ready for training.
+
+For each configuration, the trained projection weights (channel_ds.* and
+channel_proj.*) are compared with the checkpoint, and --spot-checks images per
+split are re-encoded to confirm that the raw cache matches the encoder
+posterior mode and that projecting the cached latent matches the API's
+projected output (within --atol / --rtol). For multi-channel configurations
+the existing projected cache is checked against the recomputed projection and
+then reused as is, so the features match those used by the existing fitted
+heads. Mean-channel variants are written for multi-channel configurations;
+for 1-channel configurations they are recorded as aliases of the retained
+variants.
+
+Inputs:  --raw-dir and --existing-projected-dir (latents_{config}_{split}.npz),
+         --split-csv, --img-dir ({uuid}.jpg), and
+         references/{raw,projected}_frontier_per_image.csv next to this script.
+Outputs: <out-dir>/manifest.json (status "ready" when complete) and
+         <out-dir>/caches/{projected_keep,raw_mean,projected_mean}/latents_{config}_{split}.npz;
+         the raw_keep variant points at the existing raw caches.
+
+Usage:
+  python prepare_projection_study.py --raw-dir <dir> --existing-projected-dir <dir> \
+      --split-csv <csv> --img-dir <dir> --out-dir <new empty dir>
 """
 import argparse
 import gc
@@ -26,14 +48,14 @@ def prepare(args):
 
     out = args.out_dir.resolve()
     require(not out.exists() or not any(out.iterdir()),
-            f"Use a new empty study directory; refusing to overwrite {out}")
+            f"Study directory is not empty, so nothing was overwritten; a new empty directory is required: {out}")
     expected = split_ids(args.split_csv)
     references = Path(__file__).parent / "references"
     import pandas as pd
     for name in ("raw_frontier_per_image.csv", "projected_frontier_per_image.csv"):
         ref = pd.read_csv(references / name, dtype={"image_uuid": str})
         require(set(ref.image_uuid) == set(expected["test"]),
-                f"Test IDs differ from the report reference: {name}")
+                f"Test IDs differ from the reference file: {name}")
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
     manifest = dict(schema=1, status="preparing", expected_ids=expected, cells={},
                     validation=[], checkpoints={}, device=device,
@@ -79,7 +101,7 @@ def prepare(args):
                 align_to(label_reference[split], raw)
                 if split != "test":
                     require(np.array_equal(label_reference[split]["uuids"], raw["uuids"]),
-                            f"Cross-config {split} row order differs; verify existing-run comparability before reuse")
+                            f"Cross-config {split} row order differs; existing runs may not be comparable")
             else: label_reference[split] = {k: raw[k].copy() for k in ("uuids", "cobb", "landmarks")}
             raw_hash = sha256(raw_file)
             record = dict(config=config, split=split, n=len(raw["uuids"]), spot_checks=[])
@@ -120,13 +142,13 @@ def prepare(args):
                     np.array_equal(existing["uuids"], raw["uuids"]))
                 if split != "test":
                     require(record["existing_projected_row_order_matches_raw"],
-                            f"Raw/projected {split} row order differs; verify the old head runs before reuse")
+                            f"Raw/projected {split} row order differs; the existing head runs may not be comparable")
                 existing = align_to(raw, existing)
                 record["existing_projected_agreement"] = numeric_agreement(
                     projected, existing["latents"], args.atol, args.rtol,
                     f"{config}/{split} full existing projected cache")
                 record["existing_projected_sha256"] = sha256(existing_file)
-                # Preserve the EXACT features used by the existing fitted heads.
+                # Preserve the exact features used by the existing fitted heads.
                 projected = existing["latents"]
             sources = {"raw_keep": raw["latents"], "projected_keep": projected}
             if config in MULTI:

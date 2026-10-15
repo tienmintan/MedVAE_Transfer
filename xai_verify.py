@@ -1,19 +1,19 @@
 """
-xai_verify.py — Direction 3: XAI as mechanism verification.
+xai_verify.py: gradient-saliency test of whether the Cobb regressor attends to endplate regions, and whether this changes with compression.
 
-The compression arc concluded that the DIRECT Cobb regressor reads fine endplate
-detail (high-frequency, endplate-localised) that compression strips. That gives
-a falsifiable saliency prediction:
+The hypothesis tested is that the direct Cobb regressor (train_frontier.py)
+relies on fine endplate detail (high-frequency, endplate-localised) that
+compression removes. That hypothesis gives a falsifiable saliency prediction:
 
-  (a) the Cobb regressor's saliency should CONCENTRATE on the endplate regions
-      (the Step-2 bands), above chance; and
-  (b) that concentration should be LOWER / more diffuse at 8x than at 4x, because
-      the fine endplate cues are degraded.
+  (a) the Cobb regressor's saliency should concentrate on the endplate regions
+      (the endplate bands of freq_loss_endplate.py), above chance; and
+  (b) that concentration should be lower / more diffuse at 8x than at 4x,
+      because the fine endplate cues are degraded.
 
 This loads the saved Cobb models (train_frontier.py --save-models), computes
 ensemble gradient saliency over the latent for each test image, and measures how
-much saliency lands on the endplate band vs the body centroids — the same
-region decomposition as the Step-2 reconstruction analysis. Both configs are
+much saliency lands on the endplate band vs the body centroids, the same
+region decomposition as freq_loss_endplate.py. Both configs are
 evaluated on a common 96x96 grid so 4x and 8x are directly comparable.
 
 Metrics per image:
@@ -26,11 +26,13 @@ Tests: ep_frac vs chance (within config); 4x-vs-8x paired change (across configs
 Inputs:
   --models-dir : dir with model_{config}_cobb_seed*.pt  (from --save-models)
   --latents-dir: dir with latents_{config}_test.npz  (latents + landmarks)
+Outputs: <out-dir>/xai_per_image.csv and xai_saliency_examples.png; raw and
+         resolution-matched comparison tables printed to stdout.
 
-Run:
+Usage:
   python xai_verify.py --models-dir ./outputs/frontier --latents-dir ./latents_aspect \
       --out-dir ./outputs/xai
-  python xai_verify.py --smoke      # toy-model self-test
+  python xai_verify.py --smoke      # synthetic-data self-test (untrained toy model)
 """
 import argparse
 from pathlib import Path
@@ -55,14 +57,12 @@ GRID = 96          # common evaluation grid
 EPS = 1e-8
 
 
-# ==========================================================================
-# models
-# ==========================================================================
+# --- Models ---
 def load_models(models_dir, config, device):
     ckpts = sorted(Path(models_dir).glob(f"model_{config}_cobb_seed*.pt"))
     if not ckpts:
         raise SystemExit(f"no Cobb models for {config} in {models_dir} "
-                         f"(did you run train_frontier.py --save-models?)")
+                         f"(they are written by train_frontier.py --save-models)")
     models = []
     for cp in ckpts:
         d = torch.load(cp, map_location=device, weights_only=False)
@@ -72,9 +72,7 @@ def load_models(models_dir, config, device):
     return models
 
 
-# ==========================================================================
-# saliency  (gradient of the main-thoracic output w.r.t. the latent)
-# ==========================================================================
+# --- Saliency (gradient of the col 1 (MT) output w.r.t. the latent) ---
 def saliency(models, latent, device, target=1, smooth=0, noise=0.15):
     """latent: (C,H,W) numpy. Returns (H,W) ensemble mean |gradient| saliency.
     target: output index to attribute (1 = MT). smooth>0 -> SmoothGrad passes."""
@@ -107,7 +105,7 @@ def to_grid(sal, size=GRID):
 def grid_at(sal, low, size=GRID):
     """Route a native saliency map through a `low`x`low` bottleneck, then up to
     `size`. With low = the coarsest config's latent resolution, this applies the
-    SAME low-pass to every config, removing the upsampling confound in the
+    same low-pass to every config, removing the upsampling confound in the
     4x-vs-8x concentration comparison."""
     arr = np.asarray(sal)
     if arr.ndim == 3:
@@ -117,9 +115,7 @@ def grid_at(sal, low, size=GRID):
     return to_grid(arr, size)
 
 
-# ==========================================================================
-# anatomy masks  (endplate bands + centroid disks, on the common grid)
-# ==========================================================================
+# --- Anatomy masks (endplate bands + centroid disks, on the common grid) ---
 def content_bbox(latent_grid, freq=0.15):
     a = np.abs(latent_grid)
     m = a > (freq * a.max() + EPS)
@@ -169,9 +165,7 @@ def concentration(sal, ep, ct):
             "ep_ct_ratio": ep_mean / (ct_mean + EPS)}
 
 
-# ==========================================================================
-# stats
-# ==========================================================================
+# --- Stats ---
 def boot_ci(v, seed=0, nb=10000):
     rng = np.random.default_rng(seed); v = np.asarray(v); n = len(v)
     b = np.array([v[rng.integers(0, n, n)].mean() for _ in range(nb)])
@@ -186,9 +180,7 @@ def paired(a, b):
             "rel": 100 * m / (np.mean(a) + EPS)}
 
 
-# ==========================================================================
-# main analysis
-# ==========================================================================
+# --- Main analysis ---
 def analyse(models_dir, latents_dir, out_dir, device, smooth=0):
     out_dir.mkdir(parents=True, exist_ok=True)
     rows = []
@@ -241,14 +233,14 @@ def analyse(models_dir, latents_dir, out_dir, device, smooth=0):
 
     report("raw")
     report("matched")
-    print("\nThe RAW 4x->8x drop is confounded by upsampling (8x saliency is "
-          "48->96). The MATCHED table low-passes both configs to "
-          f"{LOW}x{LOW} first — trust that one for the compression claim. "
-          "The chance test (>1) is unaffected by this and stands either way.")
+    print("\nThe raw 4x->8x change is confounded by upsampling (8x saliency is "
+          "48->96). The matched table low-passes both configs to "
+          f"{LOW}x{LOW} first, so it is the appropriate comparison across compression levels. "
+          "The chance test (>1) is not affected by this.")
 
     pd.DataFrame(rows).to_csv(out_dir / "xai_per_image.csv", index=False)
     make_figure(examples, out_dir / "xai_saliency_examples.png")
-    print(f"\nwrote {out_dir}/xai_per_image.csv and xai_saliency_examples.png")
+    print(f"\nWrote {out_dir}/xai_per_image.csv and xai_saliency_examples.png")
 
 
 def make_figure(examples, path):
@@ -262,16 +254,14 @@ def make_figure(examples, path):
             sal, ep = examples[(config, i)]
             ax.imshow(sal, cmap="magma")
             ax.contour(ep, levels=[0.5], colors="cyan", linewidths=0.8)
-            ax.set_title(f"{LABEL[config]} · example {i}", fontsize=9)
+            ax.set_title(f"{LABEL[config]}, example {i}", fontsize=9)
             ax.axis("off")
     fig.suptitle("Cobb-regressor saliency (heat) vs endplate regions (cyan)", fontsize=12)
     fig.tight_layout()
     fig.savefig(path, dpi=130, bbox_inches="tight"); plt.close(fig)
 
 
-# ==========================================================================
-# smoke: toy model whose output depends on a known latent stripe
-# ==========================================================================
+# --- Synthetic-data self-test (untrained toy model on random latents) ---
 def smoke():
     torch.manual_seed(0); np.random.seed(0)
     device = "cpu"
@@ -287,7 +277,7 @@ def smoke():
           and np.isfinite(list(c.values())).all())
     print(f"saliency grid {salg.shape}, endplate px={ep.sum()}, centroid px={ct.sum()}")
     print(f"concentration keys: {c}")
-    print("SMOKE:", "PASS" if ok else "FAIL")
+    print("Self-test:", "PASS" if ok else "FAIL")
 
 
 def main():
@@ -305,7 +295,7 @@ def main():
         device = "cuda" if torch.cuda.is_available() else "cpu"
         analyse(args.models_dir, args.latents_dir, args.out_dir, device, smooth=args.smooth)
     else:
-        raise SystemExit("need --models-dir and --latents-dir (or --smoke)")
+        raise SystemExit("--models-dir and --latents-dir are required (or --smoke for the synthetic-data self-test)")
 
 
 if __name__ == "__main__":

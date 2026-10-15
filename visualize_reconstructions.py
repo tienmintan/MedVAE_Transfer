@@ -1,12 +1,12 @@
 """
-visualize_reconstructions.py
+visualize_reconstructions.py: qualitative comparison of pretrained and finetuned MedVAE reconstructions.
 
 Quick qualitative check: pretrained MedVAE vs finetuned MedVAE on a handful of
 test images. Saves a single PNG with rows = images, columns = [original,
 pretrained recon, finetuned recon, |orig - finetuned|].
 
-All grayscale image panels (cols 0–2) share the SAME intensity windowing —
-vmin/vmax computed globally across every pixel we display. This matches the
+All greyscale image panels (cols 0-2) share the same intensity windowing:
+vmin/vmax are computed globally across every displayed pixel. This matches the
 medical-image viewing convention (window/level): the display bounds are
 fixed deliberately so visible differences reflect real differences in the
 data rather than per-panel auto-scaling artefacts. A colorbar on the right
@@ -14,10 +14,15 @@ shows the active scale. The |diff| column (col 3, 'hot' colormap) uses its
 own scale, also computed globally across all diff panels, with its bounds
 stated in the caption.
 
-IMPORTANT: this script intentionally uses load_2d_finetune (resize to 384x384)
-rather than mvae.apply_transform() (which uses load_2d, NO resize). The model
+Input transform: the script uses load_2d_finetune (resize to 384x384) rather
+than mvae.apply_transform() (which uses load_2d, without resizing). The model
 was trained at 384x384, and feeding native-resolution BoostNet images
-(~880x2480) into the encoder explodes the bottleneck self-attention to ~74 GB.
+(~880x2480) into the encoder would grow the bottleneck self-attention to
+~74 GB.
+
+Inputs:  --csv (image_uuid, split); JPEG images in --img-dir; the finetuned
+         checkpoint (.bin file or accelerate checkpoint directory).
+Outputs: the comparison PNG at --out; per-image L1 printed to stdout.
 
 Usage:
   python visualize_reconstructions.py \\
@@ -47,7 +52,7 @@ def load_finetuned_weights(mvae: MVAE, ckpt_path: Path) -> None:
     Accepts either:
       - a path to the .bin file directly (e.g. .../best.pt/pytorch_model.bin), or
       - a path to the accelerate-style checkpoint directory (e.g. .../best.pt/),
-        in which case we look for pytorch_model.bin inside it.
+        in which case pytorch_model.bin inside it is used.
     The directory form matches the convention used by the tile-and-stitch
     evaluation scripts, so the same env var can be used across scripts.
     """
@@ -70,7 +75,7 @@ def load_finetuned_weights(mvae: MVAE, ckpt_path: Path) -> None:
 
 
 def transform_image(path: str) -> torch.Tensor:
-    """Apply the SAME transform used during finetuning (resize to 384x384)."""
+    """Apply the same transform used during finetuning (resize to 384x384)."""
     img = load_2d_finetune(path, merge_channels=True)   # (1, 384, 384) in [-1, 1]
     return img.unsqueeze(0)                              # (1, 1, 384, 384)
 
@@ -83,7 +88,7 @@ def reconstruct(mvae: MVAE, img: torch.Tensor) -> torch.Tensor:
 
 
 def to_display(x: torch.Tensor) -> np.ndarray:
-    """[-1, 1] tensor → [0, 1] numpy array, clipped, on CPU."""
+    """[-1, 1] tensor -> [0, 1] numpy array, clipped, on CPU."""
     return ((x.detach().float().cpu().clamp(-1, 1) + 1) / 2).numpy()
 
 
@@ -115,7 +120,7 @@ def main() -> None:
     p.add_argument("--window-mode", choices=["percentile", "minmax", "fixed"],
                    default="percentile",
                    help="How to pick the global vmin/vmax for windowing the "
-                        "grayscale image columns. 'percentile' is robust to "
+                        "greyscale image columns. 'percentile' is robust to "
                         "bright outliers; 'minmax' uses raw global bounds; "
                         "'fixed' uses [0, 1].")
     p.add_argument("--window-low",  type=float, default=1.0,
@@ -147,9 +152,7 @@ def main() -> None:
     finetuned.to(device)
     finetuned.requires_grad_(False)
 
-    # =========================================================================
-    # PASS 1: collect everything we'll display
-    # =========================================================================
+    # Pass 1: collect everything to be displayed
     print("\nRunning reconstructions...")
     records = []
     for i, fpath in enumerate(paths):
@@ -174,19 +177,17 @@ def main() -> None:
             "l1_pre":  l1_pre,   "l1_ft": l1_ft,
         })
 
-    # =========================================================================
-    # PASS 2: global windowing bounds
-    # =========================================================================
+    # Pass 2: global windowing bounds
     grayscale_arrays = [r[k] for r in records for k in ("orig", "pre", "ft")]
     vmin, vmax = compute_bounds(
         grayscale_arrays, args.window_mode,
         args.window_low, args.window_high)
-    print(f"\nGrayscale window ({args.window_mode}): "
+    print(f"\nGreyscale window ({args.window_mode}): "
           f"[{vmin:.4f}, {vmax:.4f}]")
 
-    # Diff column has its own scale — use the same percentile policy on the
-    # diff distribution for consistency. (Diff values are non-negative, so we
-    # pin the lower bound at 0 and only compute the upper.)
+    # Diff column has its own scale, using the same percentile policy on the
+    # diff distribution for consistency. (Diff values are non-negative, so the
+    # lower bound is pinned at 0 and only the upper is computed.)
     diff_arrays = [r["diff"] for r in records]
     if args.window_mode == "fixed":
         diff_vmax = 0.5
@@ -198,14 +199,12 @@ def main() -> None:
             diff_vmax = float(np.percentile(diff_flat, args.window_high))
     print(f"Diff window: [0, {diff_vmax:.4f}]")
 
-    # =========================================================================
-    # PASS 3: render
-    # =========================================================================
+    # Pass 3: render
     fig, axes = plt.subplots(n, 4, figsize=(4 * 3, n * 3))
     if n == 1:
         axes = axes[None, :]
     for c, t in enumerate(["Original", "Pretrained", "Finetuned",
-                           "|Original − Finetuned|"]):
+                           "|Original - Finetuned|"]):
         axes[0, c].set_title(t, fontsize=11)
 
     last_gray = None
@@ -218,7 +217,7 @@ def main() -> None:
         last_diff = axes[i, 3].imshow(r["diff"], cmap="hot",
                                       vmin=0, vmax=diff_vmax)
         axes[i, 3].set_xticks([]); axes[i, 3].set_yticks([])
-        axes[i, 0].set_ylabel(f"L1: {r['l1_pre']:.3f} → {r['l1_ft']:.3f}",
+        axes[i, 0].set_ylabel(f"L1: {r['l1_pre']:.3f} -> {r['l1_ft']:.3f}",
                               fontsize=9)
 
     fig.tight_layout()
@@ -227,23 +226,23 @@ def main() -> None:
     gray_cbar_ax = fig.add_axes([0.895, 0.18, 0.012, 0.64])
     diff_cbar_ax = fig.add_axes([0.945, 0.18, 0.012, 0.64])
     gcb = fig.colorbar(last_gray, cax=gray_cbar_ax)
-    gcb.set_label("Grayscale intensity", rotation=270, labelpad=12, fontsize=9)
+    gcb.set_label("Greyscale intensity", rotation=270, labelpad=12, fontsize=9)
     dcb = fig.colorbar(last_diff, cax=diff_cbar_ax)
-    dcb.set_label("|Original − Finetuned|", rotation=270, labelpad=12, fontsize=9)
+    dcb.set_label("|Original - Finetuned|", rotation=270, labelpad=12, fontsize=9)
 
     # Caption
     if args.window_mode == "percentile":
-        caption = (f"Display windowing: grayscale cols use "
-                   f"{args.window_low:.0f}th–{args.window_high:.0f}th "
+        caption = (f"Display windowing: greyscale cols use "
+                   f"{args.window_low:.0f}th-{args.window_high:.0f}th "
                    f"percentile of all panel pixels "
                    f"(vmin={vmin:.3f}, vmax={vmax:.3f}); diff col uses "
                    f"[0, {diff_vmax:.3f}]. Same scale within each colormap.")
     elif args.window_mode == "minmax":
-        caption = (f"Display windowing: grayscale cols use global min/max "
+        caption = (f"Display windowing: greyscale cols use global min/max "
                    f"(vmin={vmin:.3f}, vmax={vmax:.3f}); diff col uses "
                    f"[0, {diff_vmax:.3f}]. Same scale within each colormap.")
     else:
-        caption = (f"Display windowing: grayscale cols fixed [0, 1]; diff col "
+        caption = (f"Display windowing: greyscale cols fixed [0, 1]; diff col "
                    f"fixed [0, {diff_vmax:.3f}].")
     fig.text(0.5, 0.02, caption, ha="center", va="bottom",
              fontsize=9, style="italic")

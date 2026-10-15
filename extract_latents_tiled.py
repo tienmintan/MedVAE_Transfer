@@ -1,25 +1,27 @@
 """
-extract_latents_tiled.py
+extract_latents_tiled.py: encode BoostNet images into per-image latent grids by tile-and-stitch in latent space.
 
-Phase 3 step 1 — pre-encode all BoostNet images into per-image latent grids
-using the patch-trained MedVAE encoder via tile-and-stitch in latent space.
+Pre-encodes all BoostNet images into per-image latent grids using the
+patch-trained MedVAE encoder via tile-and-stitch in latent space.
 
 Pipeline per image:
   1. Open at native resolution, convert to single-channel float in [0, 1].
   2. Resize to a fixed (H_fix, W_fix) = (2304, 768). This is divisible by
      the encoder's effective stride (4x downsampling * 384 tile = 1536, but
-     we use 384-tile / stride-192 with 4x downsampling so the latent grid
-     also tiles cleanly at stride 48 in latent space). The resize is mild
-     for BoostNet (mean ~880x2480 → resized to 768x2304).
+     384-tile / stride-192 with 4x downsampling is used so the latent grid
+     also tiles at stride 48 in latent space). The resize is mild for
+     BoostNet (mean ~880x2480 -> resized to 768x2304).
   3. Slide 384x384 tiles, encode each, populate a single latent buffer of
      shape (1, H_fix/4, W_fix/4) = (1, 576, 192). Overlaps are blended with
-     a cosine window in latent space (matching the Phase 2 reconstruction
-     blending logic, just in the latent domain).
-  4. Save the latent (along with per-tile min/max stats and the spine bbox)
-     to one .npz file per split, keyed by image_uuid.
+     a cosine window in latent space (matching the reconstruction blending
+     in evaluate_reconstruction_tiled.py, applied in the latent domain).
+  4. Save the latents to one .npz file per split (latents, uuids), in
+     image_uuid order. Per-tile min/max stats and the spine bbox are not
+     saved.
 
-Why save min/max: future analyses might want to de-normalise. We don't need
-them for the Cobb regressor itself.
+Inputs:  --csv (image_uuid, split); JPEG images in --img-dir; the
+         patch-finetuned checkpoint (--ckpt).
+Outputs: <out-dir>/latents_{train,val,test}.npz (compressed).
 
 Usage:
     python extract_latents_tiled.py \\
@@ -69,7 +71,7 @@ def encode_image_tiled(
     assert (H, W) == (H_FIX, W_FIX), \
         f"encode_image_tiled expects {(H_FIX, W_FIX)}, got {(H, W)}"
 
-    # We don't know z_channels up front; defer buffer creation until first tile.
+    # z_channels is not known up front; buffer creation is deferred until the first tile.
     output  = None
     weights = None
     window  = make_cosine_window(LATENT_TILE, device)   # (96, 96)
@@ -87,12 +89,12 @@ def encode_image_tiled(
                 tile_n = (tile - tmin) / (tmax - tmin)
             else:
                 tile_n = torch.zeros_like(tile)
-            tile_n = (tile_n - 0.5) / 0.5      # [0, 1] → [-1, 1]
+            tile_n = (tile_n - 0.5) / 0.5      # [0, 1] -> [-1, 1]
 
             inp = tile_n.unsqueeze(0).to(device=device, dtype=dtype)
             with torch.autocast(device_type=device.type, dtype=dtype):
                 # encode() returns a DiagonalGaussianDistribution; .mode() gives
-                # the deterministic latent we want (mean, not sampled). This
+                # the deterministic latent (mean, not sampled). This
                 # matches what AutoencoderKL.forward does internally when
                 # sample_posterior=False, i.e. inference mode.
                 posterior = model.encode(inp)
@@ -131,7 +133,7 @@ def main() -> None:
     print(f"Loading patch-finetuned MedVAE from {args.ckpt}")
     model = load_finetuned_medvae(args.ckpt, device, dtype)
 
-    # Pre-allocate per-split arrays. We'll save one .npz per split.
+    # Pre-allocate per-split arrays; one .npz is saved per split.
     for split in ["train", "val", "test"]:
         sub = df[df["split"] == split].reset_index(drop=True)
         if len(sub) == 0:

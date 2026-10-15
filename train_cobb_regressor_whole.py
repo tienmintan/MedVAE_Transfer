@@ -1,31 +1,37 @@
 """
-train_cobb_regressor_whole.py
+train_cobb_regressor_whole.py: train a Cobb angle regressor on whole-image latents.
 
-Phase 3-redux step 2 — train a Cobb angle regressor on whole-image latents
-produced by extract_latents_whole.py.
+The latents are produced by extract_latents_whole.py.
 
-Architecture: 2D CNN, closely matched to the previous 96x96 baseline regressor.
-    Input: (B, Cz, 96, 192) latent (Cz=1 for medvae_4_1_2d)
-    Five stride-2 conv blocks bring the spatial down: 96×192 → 48×96 →
-      24×48 → 12×24 → 6×12 → 3×6, channels 32→64→128→128→192.
-    Adaptive average pool to (3, 3), then small MLP → 3 angles.
+Architecture: 2D CNN, modelled on the 96x96 baseline regressor
+(CobbRegressor in train_cobb_regressor.py).
+    Input: (B, Cz, 192, 96) latent, H x W (Cz=1 for medvae_4_1_2d)
+    Five stride-2 conv blocks bring the spatial down: 192×96 -> 96×48 ->
+      48×24 -> 24×12 -> 12×6 -> 6×3, channels 32->64->128->128->192.
+    Adaptive average pool to (3, 3), then small MLP -> 3 angles.
 
-Total params: ~680k. Architecturally as close as possible to the previous
-600k-param 96x96 baseline — same depth, same conv-block design — just with
-slightly more channels in the last layer to handle the rectangular input,
-and an adaptive pool to bring everything to a fixed shape before the head.
+Total params: ~680k (the baseline has about 1.76M). The channel schedule
+follows the baseline's (32, 64, 128, 128), with a fifth block (192
+channels) for the larger rectangular input and an adaptive pool to bring
+everything to a fixed shape before the head. The blocks are single
+stride-2 conv + BatchNorm blocks, not the baseline's paired conv +
+GroupNorm blocks with MaxPool.
 
-Why this architecture vs. the Phase 3 (tiled) regressor:
-  - Smaller input (18k positions vs 110k) means a smaller regressor is
-    appropriate. Phase 3's 1.2M-param regressor overfit on 409 training
-    images; this one should overfit less because there's less to overfit on.
-  - The architecture is now genuinely comparable to the previous 96x96
-    baseline, making the encoder comparison cleaner: same regressor shape,
-    different encoded representation.
+Design relative to the tiled regressor (train_cobb_regressor_tiled.py):
+  - The smaller input (18k positions vs 110k) suits a smaller regressor,
+    which lowers the risk of overfitting on 409 training images.
+  - The architecture is modelled on the 96x96 baseline regressor, so that
+    differences in the comparison mainly reflect the encoded representation.
 
 Training: smooth-L1 on standardised labels, AdamW with cosine LR schedule,
-early stopping on val MAE. Same hyperparameters as Phase 3 by default,
-override via CLI if needed.
+early stopping on val MAE. The default hyperparameters are the same as in
+train_cobb_regressor_tiled.py and can be overridden via the CLI.
+
+Inputs:  --latents-dir with latents_{train,val,test}.npz (latents, uuids);
+         --labels-csv with image_uuid, split and the angle columns.
+Outputs: in --out-dir: best.pt, test_predictions.csv, cobb_whole.npz (same
+         schema as the other Cobb regressor outputs), history.csv,
+         config.json.
 
 Usage:
     python train_cobb_regressor_whole.py \\
@@ -45,16 +51,14 @@ import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 
 
-# ----------------------------------------------------------------------------
-# Model
-# ----------------------------------------------------------------------------
+# --- Model ---
 
 class CobbRegressorWhole(nn.Module):
-    """Whole-image latent (96x192) → 3 Cobb angles.
+    """Whole-image latent (192x96, H x W) -> 3 Cobb angles.
 
-    Architectural twin of the previous 96x96 baseline regressor — same depth,
-    same conv-block design, an adaptive pool before the MLP head so the
-    head's input dimension is fixed regardless of small input variations.
+    Modelled on the 96x96 baseline regressor, with an adaptive pool before
+    the MLP head so the head's input dimension is fixed regardless of small
+    input variations.
     """
     def __init__(self, in_channels: int = 1, dropout: float = 0.3):
         super().__init__()
@@ -65,12 +69,12 @@ class CobbRegressorWhole(nn.Module):
                 nn.GELU(),
                 nn.Dropout2d(dropout),
             )
-        self.conv1 = block(in_channels, 32)    # 96×192 → 48×96
-        self.conv2 = block(32,          64)    # 48×96  → 24×48
-        self.conv3 = block(64,         128)    # 24×48  → 12×24
-        self.conv4 = block(128,        128)    # 12×24  → 6×12
-        self.conv5 = block(128,        192)    # 6×12   → 3×6
-        self.pool  = nn.AdaptiveAvgPool2d((3, 3))   # → 3×3
+        self.conv1 = block(in_channels, 32)    # 192×96 -> 96×48
+        self.conv2 = block(32,          64)    # 96×48  -> 48×24
+        self.conv3 = block(64,         128)    # 48×24  -> 24×12
+        self.conv4 = block(128,        128)    # 24×12  -> 12×6
+        self.conv5 = block(128,        192)    # 12×6   -> 6×3
+        self.pool  = nn.AdaptiveAvgPool2d((3, 3))   # -> 3×3
         self.head = nn.Sequential(
             nn.Flatten(),
             nn.Linear(192 * 3 * 3, 128),
@@ -85,15 +89,13 @@ class CobbRegressorWhole(nn.Module):
         return self.head(x)
 
 
-# ----------------------------------------------------------------------------
-# Data
-# ----------------------------------------------------------------------------
+# --- Data ---
 
 class CobbLatentDataset(Dataset):
     """Loads pre-extracted whole-image latents and Cobb angle labels.
 
-    Identical interface to the tiled-pipeline version, just operating on
-    smaller (1, 96, 192) latent tensors.
+    Same interface as the dataset in train_cobb_regressor_tiled.py, operating
+    on smaller (1, 192, 96) latent tensors.
     """
     def __init__(self, latents_npz: Path, labels_df: pd.DataFrame,
                  angle_cols: list,
@@ -120,9 +122,7 @@ class CobbLatentDataset(Dataset):
         return z, torch.from_numpy(y_std).float(), torch.from_numpy(y).float()
 
 
-# ----------------------------------------------------------------------------
-# Train / eval loop
-# ----------------------------------------------------------------------------
+# --- Train / eval loop ---
 
 def run_epoch(model, loader, optimizer, criterion, device,
               label_mean, label_std, train: bool):
@@ -265,9 +265,6 @@ def main() -> None:
     print(f"  MAE all angles:       {test_mae:.3f}°")
     print(f"  Per-angle MAE:        {test_per.round(3)}")
     print(f"  Mean-baseline MAE:    {mean_baseline_mae:.2f}°")
-    print(f"  Previous best (pretrained encoder, aspect):       7.50°")
-    print(f"  Previous (aspect-finetuned encoder, aspect):      7.58°")
-    print(f"  Previous (patch encoder, tile-and-stitch, 2d):    8.16°")
 
     pred_df = pd.DataFrame({
         "image_uuid":  test_ds.uuids,
@@ -278,7 +275,7 @@ def main() -> None:
     pred_df.to_csv(args.out_dir / "test_predictions.csv", index=False)
     print(f"  Wrote {args.out_dir / 'test_predictions.csv'}")
 
-    # Save .npz in the same schema as the previous Cobb runs for easy comparison
+    # Save .npz in the same schema as the other Cobb regressor outputs for comparison
     per_image_mae = np.abs(test_preds - test_trues).mean(axis=1).astype(np.float32)
     per_angle_mae = np.abs(test_preds - test_trues).mean(axis=0).astype(np.float32)
     np.savez(

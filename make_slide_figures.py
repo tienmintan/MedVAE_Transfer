@@ -1,14 +1,20 @@
 """
-make_slide_figures.py — generate presentation figures from the result CSVs.
+make_slide_figures.py: generate presentation figures from the multi-seed result CSVs.
 
 Produces three slide-ready PNGs (transparent-friendly white background,
-large fonts, palette-matched) from the Phase A result CSVs:
+large fonts, palette-matched).
 
-  fig_forest.png        — paired Δ-vs-baseline with bootstrap CIs (forest plot)
-  fig_cohort.png        — per-cohort MAE, baseline vs key configs (grouped bars)
-  fig_ablation.png      — decomposition of the improvement (waterfall-style bars)
+All numbers in the figures are read from the CSVs or computed from them,
+including the cohort sizes in fig_cohort.png and the shares of the total
+MAE change in fig_ablation.png.
 
-All numbers are read from the CSVs, so the figures always match the data.
+Inputs:  phase_a_bootstrap_results.csv (from phase_a_bootstrap.py) and
+         phase_a_per_cohort_results.csv (from phase_a_breakdowns.py) in the
+         current directory.
+Outputs (in ./slide_figs/):
+  fig_forest.png        paired Δ-vs-baseline with bootstrap CIs (forest plot)
+  fig_cohort.png        per-cohort MAE, baseline vs key configs (grouped bars)
+  fig_ablation.png      decomposition of the MAE change from baseline (waterfall-style bars)
 """
 
 import matplotlib
@@ -19,7 +25,7 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 
-# ---- Palette (Ocean Gradient, matches the deck) ----
+# Palette (Ocean Gradient, matches the slide deck)
 DEEP   = "#065A82"   # deep blue (primary)
 TEAL   = "#1C7293"   # teal (secondary)
 MID    = "#21295C"   # midnight (accent)
@@ -42,9 +48,7 @@ OUT = Path("./slide_figs/")
 OUT.mkdir(exist_ok=True)
 
 
-# ---------------------------------------------------------------------------
-# Figure 1 — Forest plot of paired Δ vs baseline
-# ---------------------------------------------------------------------------
+# Figure 1: forest plot of paired Δ vs baseline
 def make_forest():
     df = pd.read_csv(SRC / "phase_a_bootstrap_results.csv")
     df = df[df.prefix != "matched_4x"].copy()   # drop baseline (Δ=0)
@@ -82,7 +86,7 @@ def make_forest():
     ax.set_yticks(ys)
     ax.set_yticklabels([labels[p] for p in df.prefix], fontsize=14)
     ax.set_xlabel("Δ MAE vs baseline  (degrees, negative = better)", fontsize=14, color=GREY)
-    ax.set_title("Paired improvement over aspect-padded baseline\n"
+    ax.set_title("Paired difference from aspect-padded baseline\n"
                  "(bootstrap 95% CI, image-level resampling)",
                  fontsize=15.5, color=MID, pad=12)
     ax.tick_params(colors=GREY)
@@ -100,12 +104,10 @@ def make_forest():
     fig.tight_layout()
     fig.savefig(OUT / "fig_forest.png", bbox_inches="tight", facecolor="white")
     plt.close(fig)
-    print("wrote fig_forest.png")
+    print("Wrote fig_forest.png")
 
 
-# ---------------------------------------------------------------------------
-# Figure 2 — Per-cohort grouped bars
-# ---------------------------------------------------------------------------
+# Figure 2: per-cohort grouped bars
 def make_cohort():
     df = pd.read_csv(SRC / "phase_a_per_cohort_results.csv")
     configs = [
@@ -114,7 +116,8 @@ def make_cohort():
         ("matched_diffusion_features", "Diffusion\nfeatures", BAD),
     ]
     cohorts = ["mild", "moderate", "severe"]
-    cohort_labels = ["Mild\n(n=28)", "Moderate\n(n=67)", "Severe\n(n=33)"]
+    n_by_cohort = df[df.prefix == "matched_4x"].set_index("cohort")["n_images"]
+    cohort_labels = [f"{c.capitalize()}\n(n={int(n_by_cohort[c])})" for c in cohorts]
 
     fig, ax = plt.subplots(figsize=(9.2, 4.8))
     x = np.arange(len(cohorts))
@@ -137,7 +140,7 @@ def make_cohort():
     ax.set_xticks(x)
     ax.set_xticklabels(cohort_labels, fontsize=13)
     ax.set_ylabel("Test MAE (degrees)", fontsize=14, color=GREY)
-    ax.set_title("Where the methods differ: MAE by scoliosis severity",
+    ax.set_title("MAE by scoliosis severity",
                  fontsize=15.5, color=MID, pad=12)
     ax.tick_params(colors=GREY)
     for s in ("top", "right"):
@@ -150,12 +153,10 @@ def make_cohort():
     fig.tight_layout()
     fig.savefig(OUT / "fig_cohort.png", bbox_inches="tight", facecolor="white")
     plt.close(fig)
-    print("wrote fig_cohort.png")
+    print("Wrote fig_cohort.png")
 
 
-# ---------------------------------------------------------------------------
-# Figure 3 — Ablation decomposition (waterfall-style)
-# ---------------------------------------------------------------------------
+# Figure 3: ablation decomposition (waterfall-style)
 def make_ablation():
     df = pd.read_csv(SRC / "phase_a_bootstrap_results.csv").set_index("prefix")
     base  = df.loc["matched_4x", "mean_mae"]
@@ -186,13 +187,14 @@ def make_ablation():
         ax.text((x0+x1)/2, max(y0, y1)+0.05, share, ha="center",
                 fontsize=10.5, color=GREY)
 
-    delta(0, 1, base, pre, f"−{base-pre:.2f}°", "73% of total gain")
-    delta(1, 2, pre, patch, f"−{pre-patch:.2f}°", "27% of total gain")
+    total = base - patch   # total MAE change from baseline to patch finetuning
+    delta(0, 1, base, pre, f"{pre-base:+.2f}°", f"{100 * (base - pre) / total:.0f}% of total change")
+    delta(1, 2, pre, patch, f"{patch-pre:+.2f}°", f"{100 * (pre - patch) / total:.0f}% of total change")
 
     ax.set_xticks(xs)
     ax.set_xticklabels(labels, fontsize=12.5)
     ax.set_ylabel("Test MAE (degrees)", fontsize=14, color=GREY)
-    ax.set_title("Decomposing the improvement: access pattern vs encoder finetuning",
+    ax.set_title("MAE change from baseline: access pattern vs encoder finetuning",
                  fontsize=15.5, color=MID, pad=14)
     ax.tick_params(colors=GREY)
     for s in ("top", "right"):
@@ -204,7 +206,7 @@ def make_ablation():
     fig.tight_layout()
     fig.savefig(OUT / "fig_ablation.png", bbox_inches="tight", facecolor="white")
     plt.close(fig)
-    print("wrote fig_ablation.png")
+    print("Wrote fig_ablation.png")
 
 
 if __name__ == "__main__":

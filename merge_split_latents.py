@@ -1,17 +1,22 @@
 """
-merge_split_latents.py
+merge_split_latents.py: merge per-split latent files into one .npz with Cobb angles.
 
-Merge per-split latent files (latents_train.npz / latents_val.npz /
-latents_test.npz) into a single unified .npz file in the schema expected
-by train_cobb_regressor_matched.py (and train_cobb_regressor.py):
+Merges latents_train.npz / latents_val.npz / latents_test.npz into a single
+.npz file in the schema expected by train_cobb_regressor_matched.py (and
+train_cobb_regressor.py):
 
     latents : (N, C, H, W)
-    angles  : (N, 3) — PT, MT, TL
-    splits  : (N,)   — "train" / "val" / "test"
-    uuids   : (N,)   — image_uuid strings
+    angles  : (N, 3), in CSV column order (PT, MT, TL)
+    splits  : (N,), "train" / "val" / "test"
+    uuids   : (N,), image_uuid strings
 
 Cobb angles are joined from the BoostNet labels CSV by image_uuid.
-Auto-detects angle column names from common naming conventions.
+Angle column names are auto-detected from common naming conventions.
+Rows without angles are dropped.
+
+Inputs:  --latent-dir with the per-split .npz files (latents, uuids);
+         --csv with image_uuid and angle columns.
+Outputs: --out (compressed .npz).
 
 Usage:
     python merge_split_latents.py \\
@@ -37,7 +42,7 @@ def main():
     p.add_argument("--out", required=True, type=Path)
     args = p.parse_args()
 
-    # ---- Load CSV and detect angle columns ----
+    # Load CSV and detect angle columns
     df = pd.read_csv(args.csv)
     print(f"Loaded {len(df)} rows from {args.csv}")
     print(f"  Columns: {df.columns.tolist()}")
@@ -64,7 +69,7 @@ def main():
     angle_lookup = {row["image_uuid"]: (row[pt_col], row[mt_col], row[tl_col])
                      for _, row in df.iterrows()}
 
-    # ---- Concatenate per-split files ----
+    # Concatenate per-split files
     all_latents = []
     all_uuids   = []
     all_splits  = []
@@ -73,7 +78,7 @@ def main():
     for split_name in ["train", "val", "test"]:
         path = args.latent_dir / f"latents_{split_name}.npz"
         if not path.exists():
-            print(f"  ⚠ {path} missing, skipping")
+            print(f"  WARNING: {path} not found; the {split_name} split is skipped and will be absent from the output.")
             continue
         data = np.load(path, allow_pickle=True)
         lats = data["latents"]
@@ -90,8 +95,8 @@ def main():
                 angs.append((np.nan, np.nan, np.nan))
                 missing.append(u)
         if missing:
-            print(f"    ⚠ {len(missing)} samples have no angle row in CSV "
-                  f"(first 3: {missing[:3]})")
+            print(f"    WARNING: {len(missing)} {split_name} samples have no angle row in the CSV "
+                  f"(first 3: {missing[:3]}). These rows will be dropped from the output.")
 
         all_latents.append(lats)
         all_uuids.append(uids)
@@ -120,7 +125,7 @@ def main():
     print(f"  latents shape: {merged_latents.shape}")
     print(f"  Splits: {dict(zip(*np.unique(merged_splits, return_counts=True)))}")
 
-    # ---- Save ----
+    # Save
     args.out.parent.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(
         args.out,

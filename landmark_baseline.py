@@ -1,20 +1,29 @@
 """
-landmark_baseline.py — sanity control for the frontier.
+landmark_baseline.py: trivial-predictor baselines for the landmark and Cobb tasks, as a sanity check on the compression comparison.
 
-The frontier shows landmark error is FLAT across compression while Cobb degrades.
-That's only meaningful if the landmark regressor is actually localising from the
-latent rather than predicting a canonical mean spine (which would be flat under
+A landmark error that does not change across compression levels is
+informative only if the landmark regressor localises from the latent rather
+than predicting a canonical mean spine (which would be insensitive to
 compression trivially, because it ignores the image).
 
 This computes the trivial baselines from the extracted labels:
-  - landmark: predict the TRAIN-mean 68-point shape for every test image
-  - cobb:     predict the TRAIN-mean 3 angles for every test image
-and reports the same normalised metrics, so you can compare against the trained
-numbers (landmark 0.0418 / cobb ~7.7-8.2 deg). If trained landmark error is far
-below the mean-shape baseline, the regressor is genuinely localising and the
-null is real. If it's close, the flatness is an artifact.
+  - landmark: predict the train-split mean 68-point shape for every test image
+  - cobb:     predict the train-split mean 3 angles for every test image
+and reports the same normalised metrics, with bootstrap 95% CIs, alongside the
+trained-regressor errors from train_frontier.py (set in `trained` in main()).
 
-Run:
+Interpretation:
+  trained landmark error well below the mean-shape baseline -> the regressor
+      localises from the latent, so a flat landmark error across compression
+      is not explained by mean-shape prediction.
+  trained landmark error close to the baseline -> a flat landmark error is
+      an artefact of mean-shape prediction.
+
+Inputs:  <latents-dir>/latents_<config>_{train,test}.npz with `landmarks`
+         and `cobb` arrays, for the configurations in CONFIGS.
+Outputs: none; results are printed to stdout.
+
+Usage:
   python landmark_baseline.py --latents-dir ./latents_aspect
 """
 import argparse
@@ -48,7 +57,7 @@ def main():
     ap.add_argument("--latents-dir", type=Path, required=True)
     args = ap.parse_args()
 
-    # trained numbers for reference (from your frontier run)
+    # trained-regressor errors for reference (landmark, Cobb deg), from train_frontier.py
     trained = {"medvae_4_1_2d": (0.04179, 7.709), "medvae_8_1_2d": (0.04178, 8.237)}
 
     for c in CONFIGS:

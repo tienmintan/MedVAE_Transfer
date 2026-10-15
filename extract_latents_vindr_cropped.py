@@ -1,27 +1,32 @@
 """
-extract_latents_vindr_cropped.py
+extract_latents_vindr_cropped.py: extract VinDr-SpineXR SD-VAE latents with the padding region cropped out.
 
-Modified version of extract_latents_vindr.py that crops out the aspect-
-padding region before SD-VAE encoding, addressing the distribution shift
-identified in investigate_dataset_shift_content_only.py.
+Variant of extract_latents_vindr.py that crops out the aspect-padding region
+before SD-VAE encoding, to address the distribution shift identified in
+investigate_dataset_shift_content_only.py.
 
 Pipeline per DICOM:
   1. Load DICOM, apply Rescale Slope/Intercept, handle MONOCHROME1 inversion.
   2. Per-image min-max normalise to [0, 1].
-  3. Detect content bbox via detect_content_bbox() — the smallest rectangle
+  3. Detect content bbox via detect_content_bbox(): the smallest rectangle
      containing all non-black pixels (i.e., excluding scanner-edge padding,
      DICOM black borders).
   4. Crop to bbox, then resize+pad to a fixed target aspect ratio of 1:1.5
      centred in a 512×512 square. Result: content fills ~67% of the 512×512
      output by area, regardless of the original DICOM aspect ratio.
-  5. SD-VAE encode → (4, 64, 64) latent.
+  5. SD-VAE encode -> (4, 64, 64) latent.
 
 Resumable via checkpointing every 500 images (writes intermediate .npz
 files; combined into a single output at the end).
 
+Inputs:  --dicom-dir, searched recursively for *.dicom and *.dcm.
+Outputs: <out-dir>/latents_vindr_cropped.npz in the v2 schema (latents,
+         filenames, splits = "vindr_train", zero placeholder angles);
+         intermediate chunks in <out-dir>/intermediate/.
+
 Usage:
     python extract_latents_vindr_cropped.py \\
-        --dicom-dir   ~/MedVAE/vindr-spinexr \\
+        --dicom-dir   ./vindr-spinexr \\
         --out-dir     ./latents_vindr_cropped \\
         --batch-size  1 \\
         --device      cuda
@@ -42,12 +47,10 @@ from diffusers import AutoencoderKL as SDAutoencoderKL
 from detect_content_bbox import detect_content_bbox, crop_and_repad_to_aspect
 
 
-# ---------------------------------------------------------------------------
 # DICOM loading (matches extract_latents_vindr.py)
-# ---------------------------------------------------------------------------
 
 def load_dicom_to_array(dcm_path: str) -> np.ndarray:
-    """Load a DICOM file, return a normalised [0, 1] grayscale array."""
+    """Load a DICOM file, return a normalised [0, 1] greyscale array."""
     dcm = pydicom.dcmread(dcm_path)
     img = dcm.pixel_array.astype(np.float32)
 
@@ -72,9 +75,7 @@ def load_dicom_to_array(dcm_path: str) -> np.ndarray:
     return img
 
 
-# ---------------------------------------------------------------------------
 # Encoding pipeline
-# ---------------------------------------------------------------------------
 
 @torch.no_grad()
 def encode_one(img_norm: np.ndarray, vae, device,
@@ -99,9 +100,7 @@ def encode_one(img_norm: np.ndarray, vae, device,
     return latent.squeeze(0).cpu().float().numpy()
 
 
-# ---------------------------------------------------------------------------
 # Main extraction loop
-# ---------------------------------------------------------------------------
 
 def main():
     p = argparse.ArgumentParser()
@@ -126,7 +125,7 @@ def main():
     ckpt_dir = args.out_dir / "intermediate"
     ckpt_dir.mkdir(exist_ok=True)
 
-    # ---- Collect DICOM paths ----
+    # Collect DICOM paths
     dicom_paths = sorted(
         list(args.dicom_dir.rglob("*.dicom"))
         + list(args.dicom_dir.rglob("*.dcm"))
@@ -135,7 +134,7 @@ def main():
         dicom_paths = dicom_paths[:args.max_images]
     print(f"Found {len(dicom_paths)} DICOM files in {args.dicom_dir}")
 
-    # ---- Determine resume point ----
+    # Determine resume point
     existing_ckpts = sorted(ckpt_dir.glob("chunk_*.npz"))
     if existing_ckpts:
         n_processed = sum(np.load(c)["latents"].shape[0] for c in existing_ckpts)
@@ -145,13 +144,13 @@ def main():
     else:
         n_processed = 0
 
-    # ---- Load VAE ----
+    # Load VAE
     print("Loading SD-VAE...")
     vae = SDAutoencoderKL.from_pretrained("stabilityai/sd-vae-ft-mse",
                                             torch_dtype=torch.float16).to(device)
     vae.eval()
 
-    # ---- Process in chunks for resumability ----
+    # Process in chunks for resumability
     chunk_latents = []
     chunk_filenames = []
     chunk_idx = len(existing_ckpts)
@@ -187,7 +186,7 @@ def main():
             in_chunk_count = 0
             torch.cuda.empty_cache()
 
-    # ---- Save final partial chunk ----
+    # Save final partial chunk
     if chunk_latents:
         chunk_path = ckpt_dir / f"chunk_{chunk_idx:04d}.npz"
         np.savez_compressed(
@@ -196,7 +195,7 @@ def main():
             filenames=np.array(chunk_filenames),
         )
 
-    # ---- Combine all chunks into final output ----
+    # Combine all chunks into final output
     print("\nCombining chunks into final output...")
     all_chunks = sorted(ckpt_dir.glob("chunk_*.npz"))
     all_latents = []
@@ -209,8 +208,8 @@ def main():
     final_latents = np.concatenate(all_latents, axis=0)
     final_filenames = np.array(all_filenames)
 
-    # In the v2 schema used by train_diffusion.py, we add split labels and
-    # placeholder Cobb angles (VinDr has no Cobb labels, so all-zeros)
+    # For the v2 schema used by train_diffusion.py, split labels and
+    # placeholder Cobb angles are added (VinDr has no Cobb labels, so all-zeros)
     splits = np.array(["vindr_train"] * len(final_latents))
     angles = np.zeros((len(final_latents), 3), dtype=np.float32)
 

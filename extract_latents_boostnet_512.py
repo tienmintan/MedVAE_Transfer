@@ -1,21 +1,27 @@
 """
-extract_latents_boostnet_512.py
+extract_latents_boostnet_512.py: extract BoostNet SD-VAE latents at 512x512 in the VinDr latent schema.
 
-Extract BoostNet latents through SD-VAE at 512x512, in a schema matching
-extract_latents_vindr.py:
+Output schema, matching extract_latents_vindr.py:
 
   latents     : (N, 4, 64, 64) float16
   image_ids   : (N,) array of BoostNet image_uuid strings
   splits      : (N,) array of "boostnet_train", "boostnet_val", "boostnet_test"
-  angles      : (N, 3) float32 — proximal_thoracic, main_thoracic, thoracolumbar
+  angles      : (N, 3) float32; CSV columns angle_proximal_thoracic,
+                angle_main_thoracic, angle_thoracolumbar (col 0 holds the major curve)
   aspect_pad  : (N,) array of "horizontal", "vertical", or "none"
 
-The "boostnet_train/val/test" split naming distinguishes from VinDr's
-"vindr_train/test" so we can pool them downstream without confusion.
+The "boostnet_train/val/test" split naming distinguishes these rows from
+VinDr's "vindr_train/test", so the two datasets can be pooled downstream
+without ambiguity.
 
 This script mirrors the VinDr preprocessing: aspect-padded resize to 512x512,
-SD-VAE encode at fp16. Cobb angles come from the existing
-boostnet_with_angles.csv. Each input is a JPEG, not a DICOM.
+SD-VAE encode at fp16. Cobb angles come from boostnet_with_angles.csv. Each
+input is a JPEG, not a DICOM.
+
+Inputs:  --csv (image_uuid, split, three angle columns); JPEG images in
+         --img-dir.
+Outputs: <out-dir>/latents_boostnet_512.npz (compressed); summary statistics
+         printed to stdout.
 
 Usage:
     python extract_latents_boostnet_512.py \\
@@ -44,11 +50,9 @@ ANGLE_COLS = ["angle_proximal_thoracic", "angle_main_thoracic",
               "angle_thoracolumbar"]
 
 
-# ---------------------------------------------------------------------------
 # Aspect-padding (same as VinDr extraction, kept inline so this script is
-# self-contained — small enough that duplication is cleaner than a shared
-# utils file).
-# ---------------------------------------------------------------------------
+# self-contained; the function is small enough that duplicating it is simpler
+# than a shared utils file).
 
 def aspect_pad_to_square(arr: np.ndarray, target_size: int):
     """Resize longer dim to target_size, pad shorter dim with zeros."""
@@ -75,23 +79,19 @@ def aspect_pad_to_square(arr: np.ndarray, target_size: int):
     return out, pad_axis
 
 
-# ---------------------------------------------------------------------------
-# JPEG -> normalized array
-# ---------------------------------------------------------------------------
+# JPEG -> normalised array
 
 def load_normalized(jpeg_path: Path) -> np.ndarray:
     pil = Image.open(jpeg_path).convert("L")
     arr = np.array(pil).astype(np.float32) / 255.0      # already [0, 1]
-    # Match VinDr per-image min-max norm in case any image isn't full-range
+    # Match VinDr per-image min-max norm in case any image is not full-range
     lo, hi = float(arr.min()), float(arr.max())
     if hi - lo > 1e-6:
         arr = (arr - lo) / (hi - lo)
     return arr.astype(np.float32)
 
 
-# ---------------------------------------------------------------------------
 # Batched SD-VAE encoding
-# ---------------------------------------------------------------------------
 
 @torch.no_grad()
 def encode_batch(vae, arrs: list, device, dtype) -> np.ndarray:
@@ -103,9 +103,7 @@ def encode_batch(vae, arrs: list, device, dtype) -> np.ndarray:
     return latents.to(torch.float16).cpu().numpy()
 
 
-# ---------------------------------------------------------------------------
 # Main
-# ---------------------------------------------------------------------------
 
 def main():
     p = argparse.ArgumentParser()
@@ -183,7 +181,7 @@ def main():
         aspect_pad=pad_axes_arr,
     )
 
-    # Cast to fp32 for stats reporting (avoids the fp16 overflow we hit on VinDr)
+    # Cast to fp32 for stats reporting (statistics computed in fp16 can overflow)
     lat_fp32 = latents_arr.astype(np.float32)
     print(f"\nWrote {out_path}")
     print(f"  Shape: {latents_arr.shape}  "
@@ -195,9 +193,9 @@ def main():
           f"mean={lat_fp32.mean():.3f} std={lat_fp32.std():.3f} "
           f"min={lat_fp32.min():.3f} max={lat_fp32.max():.3f}")
     print(f"  Angle ranges: "
-          f"PT [{angles_arr[:,0].min():.1f}, {angles_arr[:,0].max():.1f}], "
-          f"MT [{angles_arr[:,1].min():.1f}, {angles_arr[:,1].max():.1f}], "
-          f"TL [{angles_arr[:,2].min():.1f}, {angles_arr[:,2].max():.1f}]")
+          f"major curve (col 0) [{angles_arr[:,0].min():.1f}, {angles_arr[:,0].max():.1f}], "
+          f"col 1 [{angles_arr[:,1].min():.1f}, {angles_arr[:,1].max():.1f}], "
+          f"col 2 [{angles_arr[:,2].min():.1f}, {angles_arr[:,2].max():.1f}]")
 
 
 if __name__ == "__main__":

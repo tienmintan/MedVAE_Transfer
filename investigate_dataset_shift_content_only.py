@@ -1,21 +1,21 @@
 """
-investigate_dataset_shift_content_only.py
+investigate_dataset_shift_content_only.py: test whether the VinDr/BoostNet latent shift persists with padding excluded.
 
-Follow-up diagnostic to investigate_dataset_shift.py.
+Follow-up diagnostic to investigate_dataset_shift.py, which measures:
+  (1) Per-channel mean offsets between VinDr and BoostNet latents.
+  (2) The per-channel histograms of each corpus, which can show a bimodal
+      "spike + bulk" structure, with a sharp spike at the SD-VAE encoding
+      of black (zero) input pixels. BoostNet is aspect-padded more
+      heavily than VinDr (1:2.8 native -> square = ~65% padding by area),
+      so its spike is expected to be larger.
 
-The first investigation found:
-  (1) Per-channel mean offsets between VinDr and BoostNet latents (up to
-      0.36 pooled-std units on ch1).
-  (2) Bimodal "spike + bulk" structure in each corpus's per-channel
-      histograms, with a sharp spike at the SD-VAE encoding of black
-      (zero) input pixels. BoostNet's spike is much more pronounced
-      than VinDr's because BoostNet is aspect-padded more aggressively
-      (1:2.8 native → square = ~65% padding by area).
+This script tests whether the per-channel offsets disappear when the
+padding positions are excluded from the statistics.
 
-This script tests whether the per-channel offsets disappear if we exclude
-the padding pixels from the statistics computation. If they do, the
-"distribution shift" between corpora is primarily an artefact of
-differing padding fractions, not anatomical/imaging differences.
+Interpretation:
+  offsets disappear -> the "distribution shift" between corpora is primarily
+      an artefact of differing padding fractions, not anatomical/imaging
+      differences.
 
 Approach:
   1. Identify each corpus's "padding" latent positions by detecting
@@ -24,8 +24,12 @@ Approach:
      described in find_spike_location().
   2. Apply the same content/padding split to both corpora.
   3. Recompute per-channel stats over content positions only.
-  4. Compare against the original (pooled) stats from the first
-     investigation.
+  4. Compare against the whole-latent stats, computed as in
+     investigate_dataset_shift.py.
+
+Inputs:  VinDr and BoostNet SD-VAE latent .npz files (4 channels).
+Outputs: a before/after table printed to stdout; a figure of whole-latent
+         and content-only histograms per channel (--out-fig).
 
 Usage:
     python investigate_dataset_shift_content_only.py \\
@@ -43,8 +47,8 @@ import matplotlib.pyplot as plt
 
 
 def find_spike_location(latents: np.ndarray, n_bins: int = 200) -> np.ndarray:
-    """Find the per-channel mode (most common value) — this is where the
-    padding spike lives.
+    """Find the per-channel mode (most common value), which is where the
+    padding spike lies.
 
     Returns: (C,) array of mode locations.
     """
@@ -64,14 +68,14 @@ def find_spike_location(latents: np.ndarray, n_bins: int = 200) -> np.ndarray:
 
 def classify_padding_positions(latents: np.ndarray, spike: np.ndarray,
                                  tolerance: float = 0.5) -> np.ndarray:
-    """For each latent position in each sample, decide if it's "padding"
+    """For each latent position in each sample, decide if it is "padding"
     by checking if all four channels match the spike vector within
     tolerance pooled-std units.
 
     A position is padding iff |latent[c] - spike[c]| < tolerance * std[c]
     for every channel c.
 
-    Returns: (N, H, W) bool array — True where the position is padding.
+    Returns: (N, H, W) bool array; True where the position is padding.
     """
     N, C, H, W = latents.shape
     # Compute per-channel std for the tolerance calculation
@@ -82,7 +86,7 @@ def classify_padding_positions(latents: np.ndarray, spike: np.ndarray,
     spike_b = spike.reshape(1, C, 1, 1)
     std_b   = per_ch_std.reshape(1, C, 1, 1)
     within = np.abs(latents.astype(np.float64) - spike_b) < (tolerance * std_b)
-    # Padding only if ALL channels are within the spike
+    # Padding only if all channels are within the spike
     is_padding = within.all(axis=1)   # (N, H, W)
     return is_padding
 
@@ -91,7 +95,7 @@ def per_channel_stats_masked(latents: np.ndarray, content_mask: np.ndarray) -> d
     """Compute per-channel mean and std over content positions only.
 
     latents: (N, C, H, W)
-    content_mask: (N, H, W) bool, True where the position is CONTENT
+    content_mask: (N, H, W) bool, True where the position is content
                   (i.e., not padding)
 
     Returns: dict with c0_mean, c0_std, etc.
@@ -119,7 +123,7 @@ def print_table(vindr_stats_full, boost_stats_full,
                  pooled_std_full):
     """Print before/after comparison table."""
     print("\n" + "=" * 90)
-    print("CONTENT-ONLY DIAGNOSTIC: do per-channel offsets persist when padding is excluded?")
+    print("Content-only diagnostic: do per-channel offsets persist when padding is excluded?")
     print("=" * 90)
 
     print(f"\nDetected padding fraction:")
@@ -127,7 +131,7 @@ def print_table(vindr_stats_full, boost_stats_full,
     print(f"  BoostNet: {boost_padding_frac * 100:>5.1f}% of latent positions")
     print(f"  (Expected: BoostNet > VinDr, since BoostNet is more aggressively aspect-padded.)")
 
-    print(f"\n{'Channel':<10} {'WHOLE-LATENT stats':<45} {'CONTENT-ONLY stats':<45}")
+    print(f"\n{'Channel':<10} {'Whole-latent stats':<45} {'Content-only stats':<45}")
     print(f"{'':<10} {'VinDr (μ, σ)':<22} {'BoostNet (μ, σ)':<22}"
           f" {'VinDr (μ, σ)':<22} {'BoostNet (μ, σ)':<22}")
     print("-" * 90)
@@ -155,8 +159,8 @@ def print_table(vindr_stats_full, boost_stats_full,
               f"{d_cont:.4f} ({d_cont_norm:.3f}σ)  "
               f"{ratio:.2f}×")
 
-    # Verdict
-    print(f"\n--- VERDICT ---")
+    # Result
+    print(f"\n--- Result ---")
     max_diff_full = max(
         abs(vindr_stats_full[f"c{c}_mean"] - boost_stats_full[f"c{c}_mean"])
         for c in range(4)
@@ -173,20 +177,20 @@ def print_table(vindr_stats_full, boost_stats_full,
     print(f"  Reduction:     {reduction:.0f}%")
 
     if max_diff_cont < 0.10:
-        print(f"\n  ✓ Content-only offsets are small. Original distribution shift")
-        print(f"    was DRIVEN BY padding fraction differences, not anatomy.")
-        print(f"    Fix: equalise padding fractions during preprocessing.")
+        print(f"\n  Result: content-only offsets are small ({max_diff_cont:.3f} pooled SD, threshold 0.10). The whole-latent shift")
+        print(f"    is driven by padding fraction differences, not anatomy.")
+        print(f"    Remedy: equalise padding fractions during preprocessing.")
     elif reduction > 50:
-        print(f"\n  ◐ Content-only offsets reduced by >50%, but not fully eliminated.")
-        print(f"    Padding fraction is the DOMINANT cause but not the only one;")
+        print(f"\n  Result: content-only offsets reduced by {reduction:.0f}% (more than 50%), but not eliminated.")
+        print(f"    Padding fraction is the dominant cause but not the only one;")
         print(f"    some anatomical/imaging difference remains.")
-        print(f"    Fix: equalise padding + per-channel standardisation.")
+        print(f"    Remedy: equalise padding + per-channel standardisation.")
     else:
-        print(f"\n  ✗ Content-only offsets remain substantial.")
+        print(f"\n  Result: content-only offsets remain substantial ({max_diff_cont:.3f} pooled SD; reduction {reduction:.0f}%).")
         print(f"    Padding fraction is not the dominant cause; anatomical")
         print(f"    or imaging differences between corpora persist.")
-        print(f"    Fix: per-channel standardisation is needed; padding")
-        print(f"    equalisation likely insufficient on its own.")
+        print(f"    Remedy: per-channel standardisation is needed; padding")
+        print(f"    equalisation is likely insufficient on its own.")
     print("=" * 90)
 
 
@@ -218,7 +222,7 @@ def make_figure(vindr_lats, boost_lats,
                  color="steelblue", density=True)
         ax.hist(b_full, bins=bins, alpha=0.6, label="BoostNet",
                  color="orange", density=True)
-        ax.set_title(f"ch{c} — whole latent (includes padding)", fontsize=10)
+        ax.set_title(f"ch{c}: whole latent (includes padding)", fontsize=10)
         ax.set_xlabel("activation"); ax.set_ylabel("density")
         ax.legend(fontsize=8)
 
@@ -237,12 +241,12 @@ def make_figure(vindr_lats, boost_lats,
                  color="steelblue", density=True)
         ax.hist(b_content, bins=bins, alpha=0.6, label="BoostNet",
                  color="orange", density=True)
-        ax.set_title(f"ch{c} — content only (padding excluded)", fontsize=10)
+        ax.set_title(f"ch{c}: content only (padding excluded)", fontsize=10)
         ax.set_xlabel("activation"); ax.set_ylabel("density")
         ax.legend(fontsize=8)
 
     fig.suptitle(
-        f"VinDr vs BoostNet — content-only distribution comparison\n"
+        f"VinDr vs BoostNet: content-only distribution comparison\n"
         f"Detected padding: VinDr {vindr_padding_frac*100:.0f}%, "
         f"BoostNet {boost_padding_frac*100:.0f}% of latent positions",
         fontsize=12, weight="bold", y=0.995,
@@ -255,7 +259,7 @@ def make_figure(vindr_lats, boost_lats,
 
 
 def per_channel_stats_full(latents: np.ndarray) -> dict:
-    """Per-channel stats over the whole latent (matches the original
+    """Per-channel stats over the whole latent (matches
     investigate_dataset_shift.py)."""
     latents = latents.astype(np.float64)
     C = latents.shape[1]
@@ -284,7 +288,7 @@ def main():
 
     rng = np.random.default_rng(args.seed)
 
-    # ---- Load latents ----
+    # --- Load latents ---
     print("Loading VinDr latents...")
     vindr_data = np.load(args.vindr_latents, allow_pickle=True)
     vindr_lats = vindr_data["latents"]
@@ -306,28 +310,28 @@ def main():
             boost_lats = boost_lats[mask]
             print(f"  Filtered to train+val: {len(boost_lats)} samples")
 
-    # ---- Find spike locations per corpus ----
+    # --- Find spike locations per corpus ---
     print("\nDetecting padding spike locations (per corpus)...")
     vindr_spike = find_spike_location(vindr_lats)
     boost_spike = find_spike_location(boost_lats)
     print(f"  VinDr   spike (per channel): {vindr_spike}")
     print(f"  BoostNet spike (per channel): {boost_spike}")
 
-    # We use the average of the two as the canonical padding signature,
+    # The average of the two is used as the canonical padding signature,
     # since they should be very close (both encoding "black pixel" through
     # the same SD-VAE).
     canonical_spike = (vindr_spike + boost_spike) / 2
     spike_diff = np.abs(vindr_spike - boost_spike)
     print(f"  Per-channel disagreement: {spike_diff}")
     if spike_diff.max() > 0.5:
-        print(f"  ⚠ Spike locations disagree noticeably between corpora.")
+        print(f"  WARNING: spike locations differ by up to {spike_diff.max():.2f} between corpora (threshold 0.5).")
         print(f"    Using per-corpus spikes for masking.")
         use_per_corpus_spike = True
     else:
-        print(f"  ✓ Spike locations match. Using canonical spike.")
+        print(f"  Check passed: spike locations agree within 0.5. Using canonical spike.")
         use_per_corpus_spike = False
 
-    # ---- Classify padding positions ----
+    # --- Classify padding positions ---
     print(f"\nClassifying padding positions (tolerance={args.tolerance}σ)...")
     if use_per_corpus_spike:
         vindr_padding_mask = classify_padding_positions(
@@ -345,17 +349,17 @@ def main():
     print(f"  VinDr   padding fraction: {vindr_padding_frac*100:.1f}%")
     print(f"  BoostNet padding fraction: {boost_padding_frac*100:.1f}%")
     print(f"  (Expected: BoostNet > VinDr; if BoostNet ≈ 50-65%, geometry"
-          f" matches our aspect-ratio prediction.)")
+          f" matches the aspect-ratio prediction.)")
 
     vindr_content_mask = ~vindr_padding_mask
     boost_content_mask = ~boost_padding_mask
 
-    # ---- Compute stats ----
-    print("\nComputing stats over WHOLE LATENTS (for reference)...")
+    # --- Compute stats ---
+    print("\nComputing stats over whole latents (for reference)...")
     vindr_stats_full = per_channel_stats_full(vindr_lats)
     boost_stats_full = per_channel_stats_full(boost_lats)
 
-    print("Computing stats over CONTENT-ONLY positions...")
+    print("Computing stats over content-only positions...")
     vindr_stats_content = per_channel_stats_masked(
         vindr_lats, vindr_content_mask)
     boost_stats_content = per_channel_stats_masked(
@@ -366,7 +370,7 @@ def main():
     pooled_std = float(pooled.std())
     del pooled
 
-    # ---- Print + plot ----
+    # --- Print and plot ---
     print_table(vindr_stats_full, boost_stats_full,
                  vindr_stats_content, boost_stats_content,
                  vindr_padding_frac, boost_padding_frac,

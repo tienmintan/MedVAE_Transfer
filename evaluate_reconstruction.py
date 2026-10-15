@@ -1,8 +1,8 @@
 """
-evaluate_reconstruction.py
+evaluate_reconstruction.py: masked PSNR/MS-SSIM comparison of pretrained and finetuned MedVAE reconstructions on the BoostNet test split.
 
 Quantitative reconstruction comparison on the BoostNet test split, with
-PROPER MASKING to exclude the zero-padded regions added by load_2d_finetune_aspect.
+masking to exclude the zero-padded regions added by load_2d_finetune_aspect.
 
 Why masking matters: the aspect-preserving loader pads tall spinal X-rays
 to a square, then resizes to 384x384. About 65% of the resulting frame is
@@ -11,8 +11,13 @@ because the model trivially reconstructs the constant padding. Masking
 restricts the metrics to pixels inside the actual image content.
 
 Reports both:
-  * unmasked: as a sanity check / for legacy comparison
-  * masked: the honest number to report
+  * unmasked: whole canvas including padding (sanity check);
+  * masked: content region only (used for all reported values).
+
+Inputs:  --csv (image_uuid, split); JPEG images in --img-dir; the finetuned
+         checkpoint (--finetuned-ckpt).
+Outputs: <output-dir>/reconstruction_metrics.csv and per_image_metrics.csv;
+         a summary and paired deltas printed to stdout.
 
 Usage:
   python evaluate_reconstruction.py \\
@@ -43,7 +48,7 @@ def load_finetuned_weights(mvae: MVAE, ckpt_path: Path) -> None:
     if all(k.startswith("model.") for k in sd):
         sd = {k[len("model."):]: v for k, v in sd.items()}
     missing, unexpected = mvae.model.load_state_dict(sd, strict=False)
-    print(f"  loaded {ckpt_path}")
+    print(f"  Loaded {ckpt_path}")
     print(f"    missing keys:    {len(missing)} | unexpected keys: {len(unexpected)}")
 
 
@@ -56,10 +61,10 @@ def make_content_mask(x: torch.Tensor, threshold: float = -0.8) -> torch.Tensor:
 
     The aspect-preserving loader pads with zero in source-image space, then
     ScaleIntensity + Normalize map [0, 1] -> [-1, 1]. Padded pixels end up
-    at -1.0 in the final tensor (verified empirically: ~57% of pixels sit
-    below -0.99 on a representative test image).
+    at -1.0 in the final tensor (the first-image sanity print in evaluate()
+    reports the resulting content fraction).
 
-    We threshold at -0.99 to identify content pixels.
+    Thresholding at `threshold` (default -0.8) identifies content pixels.
 
     Returns: (1, 1, H, W) bool mask, True for content.
     """
@@ -83,12 +88,11 @@ def masked_ms_ssim(x_hat: torch.Tensor, x: torch.Tensor, mask: torch.Tensor,
                    ms_ssim_metric) -> float:
     """Crop to the bounding box of the content and run MS-SSIM there.
 
-    MS-SSIM uses local 11x11 windows and a Gaussian pyramid; you can't
-    cleanly mask out individual pixels. The honest workaround is to crop
-    to the tightest bounding box of the content region and evaluate inside
-    that crop. The cropped region is mostly-content (small residual padding
-    near corners is acceptable; it's still vastly more honest than
-    evaluating the full padded frame).
+    MS-SSIM uses local 11x11 windows and a Gaussian pyramid, so individual
+    pixels cannot be masked out. The workaround is to crop to the tightest
+    bounding box of the content region and evaluate inside that crop. The
+    cropped region is mostly content (some residual padding remains near the
+    corners, much less than in the full padded frame).
     """
     # mask is (1, 1, H, W). Find rows/cols that contain any content.
     m2d = mask.squeeze(0).squeeze(0)
@@ -139,11 +143,11 @@ def evaluate(mvae: MVAE, image_paths: list, device: torch.device) -> dict:
         x_hat = dec.unsqueeze(0).unsqueeze(0).clamp(-1, 1)
         mask = make_content_mask(x).to(device)
 
-        # Unmasked (legacy / sanity-check numbers)
+        # Unmasked: whole-canvas values (padding included), as a sanity check
         psnr_full.reset(); msssim_full.reset()
         psnr_unmasked.append(psnr_full(x_hat, x).item())
         msssim_unmasked.append(msssim_full(x_hat, x).item())
-        # Masked (honest numbers)
+        # Masked: content region only (used for reported values)
         psnr_masked.append(masked_psnr(x_hat, x, mask))
         msssim_masked.append(masked_ms_ssim(x_hat, x, mask, msssim_crop))
         coverage.append(mask.float().mean().item())
@@ -231,10 +235,10 @@ def main() -> None:
     print("\n=== Summary ===")
     print(summary.to_string(index=False))
 
-    # Paired comparisons on masked metrics (the honest ones).
+    # Paired comparisons on masked metrics (content region only).
     psnr_gain = ft_metrics["psnr_masked"] - base_metrics["psnr_masked"]
     ssim_gain = ft_metrics["msssim_masked"] - base_metrics["msssim_masked"]
-    print(f"\nPaired delta on MASKED metrics (finetuned − pretrained):")
+    print(f"\nPaired delta on masked metrics (finetuned - pretrained):")
     print(f"  PSNR    Δ = {psnr_gain.mean():+.3f} ± {psnr_gain.std(ddof=1):.3f}  "
           f"(finetuned wins on {(psnr_gain > 0).sum()}/{len(psnr_gain)} images)")
     print(f"  MS-SSIM Δ = {ssim_gain.mean():+.4f} ± {ssim_gain.std(ddof=1):.4f}  "

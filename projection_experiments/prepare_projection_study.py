@@ -4,6 +4,26 @@ Run from the MedVAE repository root. Existing caches are read only. The new
 directory must be empty; an interrupted preparation can be restarted in a new
 directory. Fixed-cache mode preserves historical encoder features while checking
 their consistency with fresh encodings separately from projection correctness.
+
+For each configuration, --spot-checks images per split are re-encoded; the
+projection formula on the API's own raw latent and encode().mode() are checked
+against the API output, and the historical raw cache is checked under
+--raw-cache-policy. For multi-channel configurations, the existing projected
+cache is reused (--projected-reuse auto) only if every split passes the
+original comparison; otherwise the projected caches are recomputed and both
+projected tasks are refitted. A failed check writes numerical_failure.json.
+
+Inputs:  --raw-dir and --existing-projected-dir (latents_{config}_{split}.npz),
+         --split-csv, --img-dir ({uuid}.jpg) and
+         references/{raw,projected}_frontier_per_image.csv next to this script.
+Outputs: <out-dir>/manifest.json (status "ready" when complete) and
+         <out-dir>/caches/{projected_keep,raw_mean,projected_mean}/latents_{config}_{split}.npz;
+         the raw_keep variant points at the existing raw caches.
+
+Usage:
+  python prepare_projection_study.py --raw-dir <dir> --existing-projected-dir <dir> \
+      --split-csv <csv> --img-dir <dir> --out-dir <new empty dir> \
+      [--raw-cache-policy strict|fixed] [--projected-reuse auto|never]
 """
 import argparse
 import gc
@@ -26,14 +46,14 @@ def _prepare_impl(args):
 
     out = args.out_dir.resolve()
     require(not out.exists() or not any(out.iterdir()),
-            f"Use a new empty study directory; refusing to overwrite {out}")
+            f"Study directory is not empty, so nothing was overwritten; a new empty directory is required: {out}")
     expected = split_ids(args.split_csv)
     references = Path(__file__).parent / "references"
     import pandas as pd
     for name in ("raw_frontier_per_image.csv", "projected_frontier_per_image.csv"):
         ref = pd.read_csv(references / name, dtype={"image_uuid": str})
         require(set(ref.image_uuid) == set(expected["test"]),
-                f"Test IDs differ from the report reference: {name}")
+                f"Test IDs differ from the reference file: {name}")
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
     raw_policy = getattr(args, "raw_cache_policy", "strict")
     reuse_policy = getattr(args, "projected_reuse", "auto")
@@ -71,7 +91,7 @@ def _prepare_impl(args):
                     align_to(label_reference[split], raw)
                     if split != "test":
                         require(np.array_equal(label_reference[split]["uuids"], raw["uuids"]),
-                                f"Cross-config {split} row order differs; verify existing-run comparability before reuse")
+                                f"Cross-config {split} row order differs; existing runs may not be comparable")
                 else: label_reference[split] = {k: raw[k].copy() for k in ("uuids", "cobb", "landmarks")}
                 raw_hash = sha256(raw_file)
                 record = dict(config=config, split=split, n=len(raw["uuids"]), spot_checks=[])
@@ -89,7 +109,7 @@ def _prepare_impl(args):
                         record["spot_checks"].append(spot)
                         manifest["active_check"] = dict(config=config, split=split, **spot)
                         atomic_json(out / "manifest.json", manifest)
-                        # Check the API on its OWN returned raw latent, separately
+                        # Check the API on its own returned raw latent, separately
                         # from reproducibility against a historical cached latent.
                         enforce(reports["formula_vs_api_same_fresh_z"],
                                 f"{config}/{split}/{raw['uuids'][idx]} projection formula on API z")
@@ -97,7 +117,7 @@ def _prepare_impl(args):
                                 f"{config}/{split}/{raw['uuids'][idx]} encode mode versus API raw")
                         enforce(decision, f"{config}/{split}/{raw['uuids'][idx]} historical cache consistency ({raw_policy})")
                         if not reports["fresh_raw_vs_cached_raw"]["passed"]:
-                            print(f"{config}/{split}/{raw['uuids'][idx]}: original elementwise check FAILED; "
+                            print(f"WARNING: {config}/{split}/{raw['uuids'][idx]}: original elementwise check failed; "
                                   f"fixed-cache consistency passed (RMS/SD={decision['rms_over_cached_sd']:.3g}, "
                                   f"max/SD={decision['max_over_cached_sd']:.3g}). Historical raw values retained.", flush=True)
                     chunks = []
@@ -135,11 +155,11 @@ def _prepare_impl(args):
                 manifest["projected_reuse_decisions"][config] = reuse_decision
                 reuse = reuse_decision["reuse"]
                 if reuse: manifest["reference_reuse"]["projected_keep"].append(config)
-                print(f"{config}: {'REUSE existing projected results' if reuse else 'REFIT both projected tasks (20 fits)'}; "
+                print(f"{config}: {'reusing existing projected results' if reuse else 'refitting both projected tasks (20 fits)'}; "
                       f"{reuse_decision['reason']}", flush=True)
             for split, data in pending.items():
                 raw, raw_file, raw_hash = data["raw"], data["raw_file"], data["raw_hash"]
-                # Select one source for ALL splits. If refitting, all three use P(cached z).
+                # Select one source for all splits. If refitting, all three use P(cached z).
                 # If reusing, preserve the exact aligned features used by the old heads.
                 projected = data["existing"]["latents"] if reuse else data["calculated_projected"]
                 sources = {"raw_keep": raw["latents"], "projected_keep": projected}

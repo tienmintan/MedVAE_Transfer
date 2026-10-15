@@ -1,44 +1,49 @@
 """
-extract_latents_multichannel.py — give the 3-channel models something to encode.
+extract_latents_multichannel.py: build non-redundant 3-channel inputs (original + two CLAHE variants) and extract latents for the multi-channel MedVAE configurations.
 
-THE CLAIM BEING TESTED. We found that adding latent channels never helps
-(`4_1`->`4_3` +0.11 deg, `8_1`->`8_4` +0.16 deg) and explained it as: the input
-was grayscale REPLICATED across 3 identical channels, so the extra latent
-channels had no additional information to encode -- they were spending capacity
-on redundancy.
+Hypothesis tested: extra latent channels add little for this task because the
+input is greyscale replicated across 3 identical channels, so the extra latent
+channels have no additional information to encode and spend capacity on
+redundancy.
 
-That explanation makes a testable prediction: give the channels genuinely
-different content and the channel axis should start to matter. This builds
+That explanation makes a testable prediction: with different content in each
+channel, the channel axis should start to matter. This script builds
 non-redundant 3-channel inputs and re-extracts:
 
-    channel 0 : the original grayscale radiograph
-    channel 1 : CLAHE, moderate  (tile 8,  clip 2.0)  -- local contrast
-    channel 2 : CLAHE, aggressive (tile 16, clip 4.0) -- finer structure
+    channel 0 : the original greyscale radiograph
+    channel 1 : CLAHE, moderate  (tile 8,  clip 2.0), local contrast
+    channel 2 : CLAHE, aggressive (tile 16, clip 4.0), finer structure
 
 CLAHE (Contrast Limited Adaptive Histogram Equalisation) equalises contrast in
 small tiles rather than globally, so faint structure in dark regions becomes
 visible without saturating bright regions; the clip limit caps the enhancement
-so noise is not amplified. It is the standard contrast method for radiographs,
-and it is exactly the kind of fine endplate detail our mechanism says
-compression destroys -- so enhancing it before encoding is a plausible
-mitigation as well as a test.
+so noise is not amplified. It is the standard contrast method for radiographs.
+It enhances the kind of fine endplate detail that compression is hypothesised
+to remove, so enhancing it before encoding is also a plausible mitigation.
 
-EITHER OUTCOME IS INFORMATIVE
-  * channels now help  -> confirms the redundancy explanation, AND gives a free
-    accuracy improvement at no extra storage cost;
-  * channels still do not help -> the channel axis is genuinely inert for this
-    task, and the "spend the budget on spatial resolution" advice strengthens.
+Interpretation:
+  channels now help -> confirms the redundancy explanation, with an accuracy
+      gain at no extra storage cost.
+  channels still do not help -> the channel axis carries little information
+      for this task, which supports spending the storage budget on spatial
+      resolution.
+--mode clahe-replicated provides the control that separates the effect of
+CLAHE from the effect of channel diversity.
 
-Run:
+Inputs:  --csv (image_uuid, split, angle_* columns); JPEG images in
+         --img-dir; --landmarks-dir; --train-lookup / --test-lookup.
+Outputs: <out-dir>/latents_<config>_{train,val,test}.npz.
+
+Usage:
   python extract_latents_multichannel.py \
       --csv ./medvae/data/boostnet_with_angles.csv \
       --img-dir ./medvae/data/boostnet \
-      --landmarks-dir ~/MedVAE/data/boostnet_labeldata/labels \
+      --landmarks-dir ./data/boostnet_labeldata/labels \
       --train-lookup ./landmark_row_lookup_train_fixed.csv \
       --test-lookup ./landmark_row_lookup_test_fixed.csv \
       --configs medvae_4_3_2d medvae_8_4_2d \
       --out-dir ./latents_clahe
-  python extract_latents_multichannel.py --smoke
+  python extract_latents_multichannel.py --smoke      # synthetic-data self-test
 """
 import argparse
 from pathlib import Path
@@ -52,9 +57,7 @@ CONFIG_LABELS = {"medvae_4_3_2d": "4_3", "medvae_8_4_2d": "8_4"}
 CLAHE_PARAMS = [(8, 2.0), (16, 4.0)]
 
 
-# ==========================================================================
-# CLAHE (numpy implementation, so no OpenCV dependency)
-# ==========================================================================
+# --- CLAHE (numpy implementation, so no OpenCV dependency) ---
 def clahe(img, tiles=8, clip=2.0, nbins=256):
     """Contrast Limited Adaptive Histogram Equalisation.
 
@@ -107,16 +110,19 @@ def build_channels(gray01, mode="nonredundant"):
     """(H,W) in [0,1] -> (3,H,W).
 
     mode='nonredundant'  : [original, CLAHE moderate, CLAHE aggressive]
-        The experiment — channels carry genuinely different content.
+        The experimental condition: channels carry different content.
 
     mode='clahe-replicated' : [CLAHE moderate] x 3
-        The CONTROL. CLAHE improves contrast generally, so if the
+        The control condition. CLAHE improves contrast generally, so if the
         non-redundant run improves, the gain could come from better
-        preprocessing rather than from channel diversity. This arm applies the
-        same CLAHE but replicates it, so the ONLY difference from the
-        non-redundant arm is whether the channels differ:
+        preprocessing rather than from channel diversity. This condition
+        applies the same CLAHE but replicates it, so the only difference from
+        the non-redundant condition is whether the channels differ:
             control ~ non-redundant  => the gain is CLAHE, channels still inert
             control ~ replicated raw => the gain is channel diversity
+
+    mode='raw-replicated' : [original] x 3
+        Replicated greyscale with no CLAHE (the reference input).
     """
     if mode == "clahe-replicated":
         tiles, clip = CLAHE_PARAMS[0]
@@ -131,9 +137,9 @@ def build_channels(gray01, mode="nonredundant"):
 
 
 def channel_redundancy(x3):
-    """Mean pairwise correlation between channels. Replicated grayscale gives
-    1.00; genuinely different content gives noticeably less. This is the
-    diagnostic that the experiment is doing what it claims."""
+    """Mean pairwise correlation between channels. Replicated greyscale gives
+    1.00; different content gives noticeably less. This checks that the
+    channels differ as intended."""
     flat = x3.reshape(x3.shape[0], -1)
     cors = []
     for a in range(len(flat)):
@@ -142,7 +148,7 @@ def channel_redundancy(x3):
     return float(np.mean(cors)), [float(c) for c in cors]
 
 
-# ==========================================================================
+# --- Entry point ---
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--csv", type=Path)
@@ -155,7 +161,8 @@ def main():
     ap.add_argument("--mode", default="nonredundant",
                     choices=["nonredundant", "clahe-replicated", "raw-replicated"],
                     help="nonredundant = the experiment; clahe-replicated = the "
-                         "control isolating CLAHE from channel diversity")
+                         "control isolating CLAHE from channel diversity; "
+                         "raw-replicated = replicated greyscale with no CLAHE")
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--preview", type=Path, default=None,
                     help="save a PNG comparing the three channels for one image")
@@ -232,10 +239,10 @@ def run(args):
             for _, r in sub.iterrows():
                 u = str(r["image_uuid"])
                 if u not in u2r:
-                    print(f"  WARN no landmark row for {u}"); continue
+                    print(f"  WARNING: no landmark row for {u}; this image is skipped."); continue
                 p = Path(args.img_dir) / f"{u}.jpg"
-                # aspect-pad exactly as the standard pipeline does, then take
-                # the grayscale plane and build the three channels from it
+                # aspect-pad as the standard pipeline does, then take the
+                # greyscale plane and build the three channels from it
                 base = load_2d_finetune_aspect(str(p), merge_channels=True)   # (1,H,W) in ~[-1,1]
                 g01 = ((base[0].numpy() + 1.0) / 2.0).clip(0, 1)
                 x3 = build_channels(g01, mode=args.mode)
@@ -251,7 +258,7 @@ def run(args):
             np.savez_compressed(dst, latents=np.stack(lat).astype(np.float32),
                                 uuids=np.array(uu), cobb=np.stack(cobb),
                                 landmarks=np.stack(lmk))
-            print(f"  wrote {dst.name}  latents={np.stack(lat).shape}  n={len(uu)}")
+            print(f"  Wrote {dst.name}  latents={np.stack(lat).shape}  n={len(uu)}")
         del mvae
         if device == "cuda":
             torch.cuda.empty_cache()
@@ -259,19 +266,19 @@ def run(args):
     if red_stats:
         m = float(np.mean(red_stats))
         print(f"\nchannel redundancy check: mean pairwise correlation = {m:.3f}")
-        print("   (replicated grayscale would be 1.000; lower means the channels")
-        print("    genuinely carry different content, which is the point)")
+        print("   (replicated greyscale would be 1.000; lower values mean the channels")
+        print("    carry different content)")
         if m > 0.98:
-            print("   !! WARNING: channels are still nearly identical — CLAHE is not")
-            print("      adding information. Check the parameters before trusting a null.")
+            print(f"   WARNING: mean channel correlation is {m:.3f} (threshold 0.98); the channels are nearly")
+            print("      identical, so CLAHE adds little information and a null result may not test the redundancy explanation.")
 
-    print(f"\nNow run the frontier on these latents and compare against the "
-          f"replicated-grayscale run:\n"
+    print(f"\nNext: train on these latents with train_frontier.py and compare with the "
+          f"replicated-greyscale run:\n"
           f"  python train_frontier.py --latents-dir {out} --tasks cobb "
           f"--configs {' '.join(args.configs)} --seeds 0 1 2 3 4 5 6 7 8 9")
 
 
-# ==========================================================================
+# --- Synthetic-data self-test ---
 def smoke():
     rng = np.random.default_rng(0)
     # a synthetic radiograph-like image: dark background, bright structure,
@@ -292,7 +299,7 @@ def smoke():
     def local_sd(a):
         return float(a[85:100, 15:45].std())
     print(f"local sd in the faint region: {local_sd(img):.4f} -> {local_sd(out):.4f} "
-          f"({'increased' if local_sd(out) > local_sd(img) else 'NOT increased'})")
+          f"({'increased' if local_sd(out) > local_sd(img) else 'not increased'})")
 
     x3 = build_channels(img)
     m, cors = channel_redundancy(x3)
@@ -301,12 +308,12 @@ def smoke():
 
     rep = np.repeat(img[None], 3, 0)
     mrep, _ = channel_redundancy(rep)
-    print(f"replicated-grayscale control: mean correlation {mrep:.3f} (expect 1.000)")
+    print(f"replicated-greyscale control: mean correlation {mrep:.3f} (expect 1.000)")
 
     ok = (out.shape == img.shape and 0 <= out.min() and out.max() <= 1
           and local_sd(out) > local_sd(img)
           and m < 0.999 and abs(mrep - 1.0) < 1e-6)
-    print("\nSMOKE:", "PASS" if ok else "FAIL")
+    print("\nSelf-test:", "PASS" if ok else "FAIL")
 
 
 if __name__ == "__main__":

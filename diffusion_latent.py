@@ -1,49 +1,58 @@
 """
-diffusion_latent.py — landmark-conditioned latent diffusion for spine radiographs.
+diffusion_latent.py: landmark-conditioned latent diffusion for spine radiographs.
 
-GOAL. Generate genuinely NEW spine anatomy with EXACT labels, to attack the data
-limit that augmentation only partly addresses (geometry gives ~15% but is
-clinically implausible; intensity-only gives ~4%).
+Generates new spine anatomy with exact labels, to address the data limit that
+augmentation only partly addresses (geometric augmentation is clinically
+implausible; intensity-only augmentation gives a smaller gain).
 
-DESIGN, and why each piece is chosen:
+Design, and the reason for each choice:
 
-  * Generate in MEDVAE LATENT SPACE (1x96x96), not pixel space. 9x smaller than
-    a 288x288 image, trainable on this dataset, and thematically coherent — we
-    generate in the representation this thesis characterises.
-    HONEST CAVEAT: we showed MedVAE discards fine endplate detail, so generated
-    images inherit that loss. Samples cannot contain detail the encoder cannot
-    represent. This is a real limitation to report, not a bug.
+  * Generate in MedVAE latent space (1x96x96), not pixel space. 9x smaller than
+    a 288x288 image, trainable on this dataset, and the same representation
+    that the other analyses characterise.
+    Caveat: MedVAE discards fine endplate detail, so generated images inherit
+    that loss. Samples cannot contain detail the encoder cannot represent.
+    This is a limitation of the approach, not a bug.
 
-  * CONDITION ON LANDMARK HEATMAPS. The model is told where the 68 corners are,
-    so the sampled landmarks ARE the label — no annotation, no label noise, and
+  * Condition on landmark heatmaps. The model is told where the 68 corners are,
+    so the sampled landmarks are the label: no annotation, no label noise, and
     no circularity from labelling synthetic data with a trained detector.
 
-  * SAMPLE SHAPES FROM A PCA STATISTICAL SHAPE MODEL fitted to the real
+  * Sample shapes from a PCA statistical shape model fitted to the real
     training landmarks. Sampling within +/-2 SD of the observed distribution
     gives new curve magnitudes and apex positions that stay anatomically
-    plausible — new spines, not new textures on old spines.
+    plausible: new spines, not new textures on old spines.
 
-  * TRAIN ON THE AUGMENTED LATENTS (2454, not 409). The generator needs data too.
+  * Train on the augmented latents (2454, not 409). The generator needs data too.
 
-VALIDATION BEFORE USE (`--mode validate`), in order of severity:
-  1. MEMORISATION — nearest-neighbour distance from each sample to the training
+Validation before use (`--mode validate`), in order of severity:
+  1. Memorisation: nearest-neighbour distance from each sample to the training
      set, against the train-train baseline. If samples sit much closer to
      training points than training points sit to each other, the model is
      copying and the "new data" is illusory.
-  2. CONDITION FIDELITY — run the real-data landmark detector on generated
+  2. Condition fidelity: run the real-data landmark detector on generated
      samples. If predicted landmarks match the conditioning landmarks, the
-     conditioning works and the labels are trustworthy.
-  3. DISTRIBUTION — per-channel latent statistics vs real latents.
+     conditioning works and the labels are reliable.
+  3. Distribution: per-channel latent statistics vs real latents.
 
-KILL CRITERIA. Stop and write up what you have if: samples do not decode to
-spine-like images; nearest-neighbour analysis shows memorisation; or condition
-fidelity is no better than a mean-shape predictor.
+Validation criteria: the generated data is not usable if samples do not decode
+to spine-like images, nearest-neighbour analysis shows memorisation, or
+condition fidelity is no better than a mean-shape predictor.
 
-Run:
+Inputs:  --latents-dir (latents_{config}_{split}.npz with latents, landmarks
+         and uuids) and --img-dir (images, for the aspect ratio used to map
+         landmarks to canvas coordinates).
+Outputs: in --out-dir, by mode: diffusion.pt (train), generated.npz (sample),
+         overfit.npz (overfit), conditioning_scaling.csv/.png (scaling),
+         alignment_check.png (align), synthetic_utility.csv (utility),
+         label_quality.png (showlabels), generated_samples.png (decode);
+         the other modes print to stdout.
+
+Usage:
   python diffusion_latent.py --mode train --latents-dir ./latents_aug \
       --config medvae_4_1_2d --out-dir ./outputs/diffusion --epochs 400
   python diffusion_latent.py --mode sample --out-dir ./outputs/diffusion --n 500
-  python diffusion_latent.py --smoke
+  python diffusion_latent.py --smoke      # synthetic-data self-test
 """
 import argparse
 import math
@@ -55,22 +64,20 @@ N_LM = 68
 N_VERT = 17
 
 
-# ==========================================================================
-# conditioning: landmarks -> heatmap channels
-# ==========================================================================
+# --- Conditioning: landmarks -> heatmap channels ---
 def to_canvas_centered(lm136, aspect):
-    """Map ORIGINAL-image landmarks to a CENTRE-padded square canvas.
+    """Map original-image landmarks to a centre-padded square canvas.
 
     Empirically (see --mode align) MedVAE's loader pads symmetrically: the
-    content is centred with equal bars on both sides, NOT pasted top-left.
-    So the centre is preserved and only the SCALE changes:
+    content is centred with equal bars on both sides, not pasted top-left.
+    So the centre is preserved and only the scale changes:
 
         x_canvas = 0.5 + (x_orig - 0.5) * (W/H)      for tall images
         y_canvas = 0.5 + (y_orig - 0.5) * (H/W)      for wide images
 
     The raw convention gets the centre right but stretches the spine across the
     full canvas width; the top-left convention gets the scale right but pushes
-    everything into the padding. Both were wrong."""
+    everything into the padding. Neither matches the loader."""
     out = lm136.copy()
     if aspect <= 1.0:                       # tall: width is the short side
         out[:N_LM] = 0.5 + (lm136[:N_LM] - 0.5) * aspect
@@ -80,16 +87,21 @@ def to_canvas_centered(lm136, aspect):
 
 
 def to_canvas(lm136, aspect):
-    """Map landmarks from ORIGINAL-image normalisation to ASPECT-PADDED CANVAS
-    normalisation.
+    """Map landmarks from original-image normalisation to aspect-padded canvas
+    normalisation (top-left convention).
 
-    THIS IS ESSENTIAL AND WAS MISSING. The pipeline scales each image so
-    max(W,H) fills a square canvas and pastes it top-left. Landmarks are stored
-    normalised to the ORIGINAL image, so for a tall (1:2) radiograph the spine
-    occupies only the left ~half of the canvas — while an unmapped condition map
-    draws it across the FULL width. The conditioning was therefore ~2x too wide
-    and misaligned with the latent, and the model could not follow it even in
-    principle.
+    This convention assumes the pipeline scales each image so max(W,H) fills a
+    square canvas and pastes it top-left. Landmarks are stored normalised to
+    the original image, so for a tall (1:2) radiograph the spine occupies only
+    the left ~half of the canvas, while an unmapped condition map draws it
+    across the full width. Without this mapping the conditioning is ~2x too
+    wide and misaligned with the latent, and the model cannot follow it even
+    in principle.
+
+    MedVAE's loader centres the content instead (see to_canvas_centered and
+    --mode align), so this top-left mapping is used only as one of the
+    candidates that --mode align compares; training and sampling use
+    to_canvas_centered.
 
     aspect = W/H. For W < H (the usual case): x_canvas = x_orig * (W/H),
     y_canvas = y_orig. For W > H the roles swap."""
@@ -105,13 +117,12 @@ def render_condition(lm136, size=96, sigma=3.0, n_ch=5):
     """(136,) normalised landmarks -> (n_ch, size, size) condition maps.
 
     Channels 0-3: Gaussian heatmaps split by corner index (TL/TR/BL/BR), so the
-    model can place a correctly-ORIENTED vertebra rather than a blob.
+    model can place a correctly oriented vertebra rather than a blob.
     Channel 4:    filled vertebra bodies (each quad rasterised solid).
 
     The dense body channel matters. With only sparse corner Gaussians most of
-    the condition map is zero, giving the network very little to latch onto —
-    which is one reason an earlier version of this model ignored its
-    conditioning entirely."""
+    the condition map is zero, giving the network very little to latch onto,
+    which can lead a model to ignore its conditioning entirely."""
     xs, ys = lm136[:N_LM], lm136[N_LM:]
     out = np.zeros((n_ch, size, size), dtype=np.float32)
     gy, gx = np.mgrid[0:size, 0:size].astype(np.float32)
@@ -143,7 +154,7 @@ def load_aspects(uuids, img_dir):
     since augmentation preserves the frame."""
     from PIL import Image
     if img_dir is None:
-        raise SystemExit("--img-dir is REQUIRED: landmarks must be mapped to "
+        raise SystemExit("--img-dir is required: landmarks must be mapped to "
                          "aspect-padded canvas coordinates before rendering the "
                          "condition, otherwise it is misaligned with the latent.")
     cache, out = {}, []
@@ -164,16 +175,14 @@ def load_aspects(uuids, img_dir):
     return np.array(out, dtype=np.float32)
 
 
-# ==========================================================================
-# statistical shape model — for sampling NEW plausible anatomy
-# ==========================================================================
+# --- Statistical shape model, for sampling new plausible anatomy ---
 class ShapeModel:
     """PCA over the 68 landmark coordinates of real training spines.
 
     Sampling within the observed distribution yields new curve magnitudes and
-    apex positions that remain anatomically plausible — the point being to add
-    anatomy the dataset does not contain, without leaving the manifold of real
-    scoliotic spines."""
+    apex positions that remain anatomically plausible, adding anatomy the
+    dataset does not contain without leaving the manifold of real scoliotic
+    spines."""
 
     def __init__(self, lm, n_comp=20):
         self.mu = lm.mean(0)
@@ -192,12 +201,10 @@ class ShapeModel:
         return self.mu + ((lm - self.mu) @ self.comps.T) @ self.comps
 
 
-# ==========================================================================
-# diffusion schedule
-# ==========================================================================
+# --- Diffusion schedule ---
 def cosine_betas(T, s=0.008):
-    """Nichol & Dhariwal cosine schedule — better than linear for small images,
-    it spends less of the trajectory in pure noise."""
+    """Nichol & Dhariwal cosine schedule: better than linear for small images,
+    as it spends less of the trajectory in pure noise."""
     t = np.linspace(0, T, T + 1, dtype=np.float64) / T
     a = np.cos((t + s) / (1 + s) * math.pi / 2) ** 2
     a = a / a[0]
@@ -215,17 +222,17 @@ class Schedule:
         self.sqrt_1mabar = np.sqrt(1.0 - self.abar)
 
 
-# ==========================================================================
+# --- Denoising U-Net ---
 def build_unet(in_ch, cond_ch, base=64, cross_attn=False, n_tokens=64):
-    """cross_attn=False -> conditioning is CONCATENATED at every resolution.
+    """cross_attn=False -> conditioning is concatenated at every resolution.
     cross_attn=True     -> the condition is encoded to a set of tokens and
-                           injected by CROSS-ATTENTION at each resolution.
+                           injected by cross-attention at each resolution.
 
     Why cross-attention might help: concatenation gives every spatial position
-    the condition value AT that position, so the network must learn long-range
+    the condition value at that position, so the network must learn long-range
     correspondence through convolution alone. Cross-attention lets any position
-    query ANY part of the condition, which is the standard mechanism in
-    text-to-image diffusion and is designed for exactly this kind of spatially
+    query any part of the condition, which is the standard mechanism in
+    text-to-image diffusion and is designed for this kind of spatially
     non-local conditioning.
 
     Why it might not: the diagnosed limit is generalising conditioning from ~400
@@ -316,7 +323,7 @@ def build_unet(in_ch, cond_ch, base=64, cross_attn=False, n_tokens=64):
                 self.x1 = CrossAttn(base, cdim)
                 self.x2 = CrossAttn(base * 2, cdim)
                 self.x3 = CrossAttn(base * 2, cdim)
-            # conditioning is injected at EVERY resolution, not only at the
+            # conditioning is injected at every resolution, not only at the
             # input: after two downsamples an input-only condition is heavily
             # diluted, which lets the model ignore it.
             self.inp = nn.Conv2d(in_ch + cond_ch, base, 3, padding=1)
@@ -355,7 +362,7 @@ def build_unet(in_ch, cond_ch, base=64, cross_attn=False, n_tokens=64):
     return UNet()
 
 
-# ==========================================================================
+# --- Mode: train ---
 def train(args):
     import torch
 
@@ -377,10 +384,10 @@ def train(args):
     aspects = load_aspects(d["uuids"], args.img_dir)
     print(f"aspect ratios W/H: median {np.median(aspects):.3f}, "
           f"range [{aspects.min():.3f},{aspects.max():.3f}]")
-    # CENTRED is the empirically verified convention (--mode align): MedVAE's
-    # loader pads symmetrically, so the centre is preserved and only the scale
-    # changes. Measured mean intensity at the landmark positions:
-    #   CENTRED +0.12 | RAW -0.24 | TOP-LEFT -0.83 | background -0.63
+    # The centred convention is the one verified empirically (--mode align):
+    # MedVAE's loader pads symmetrically, so the centre is preserved and only
+    # the scale changes. --mode align reports the mean intensity at the
+    # landmark positions under each convention.
     lm_canvas = np.stack([to_canvas_centered(l, a) for l, a in zip(lm, aspects)])
     cond = np.stack([render_condition(l, size=size, sigma=args.sigma,
                                       n_ch=args.cond_ch) for l in lm_canvas])
@@ -413,7 +420,7 @@ def train(args):
             x0, c = X[idx], C[idx]
             t = torch.randint(0, sch.T, (len(idx),), device=device)
             # classifier-free guidance: drop the condition on a fraction of
-            # samples so the model also learns the UNCONDITIONAL score. At
+            # samples so the model also learns the unconditional score. At
             # sampling time the two are combined to amplify adherence to the
             # condition. Without this the model is free to ignore it.
             if args.p_uncond > 0:
@@ -431,7 +438,7 @@ def train(args):
             print(f"  epoch {ep+1:>4}/{args.epochs}  loss {tot/n:.4f}", flush=True)
 
     lo, hi = float(lat.min()), float(lat.max())
-    print(f"standardised data range [{lo:.2f}, {hi:.2f}] — used to clamp x0 at sampling")
+    print(f"standardised data range [{lo:.2f}, {hi:.2f}]; used to clamp x0 at sampling")
     torch.save({"state": net.state_dict(), "mu": mu, "sd": sd, "size": size,
                 "x0_lo": lo, "x0_hi": hi, "p_uncond": args.p_uncond,
                 "in_ch": lat.shape[1], "cond_ch": args.cond_ch, "base": args.base,
@@ -442,12 +449,12 @@ def train(args):
                 "canvas_convention": "centered",
                 "cross_attn": bool(args.cross_attn), "n_tokens": args.n_tokens},
                out / "diffusion.pt")
-    print(f"\nsaved {out}/diffusion.pt")
-    print("\nNext: sample, then VALIDATE before using anything:")
+    print(f"\nSaved {out}/diffusion.pt")
+    print("\nNext:")
     print(f"  python diffusion_latent.py --mode sample --out-dir {out} --n 500")
 
 
-# ==========================================================================
+# --- Mode: sample ---
 def sample(args):
     import torch
 
@@ -465,30 +472,32 @@ def sample(args):
     sm.mu, sm.comps, sm.sd = ck["shape_mu"], ck["shape_comps"], ck["shape_sd"]
     new_lm = sm.sample(rng, args.n, clip=args.clip)
     # sample an aspect ratio from the real distribution, then map the sampled
-    # landmarks into canvas coordinates exactly as training did
+    # landmarks into canvas coordinates as training did
     tr_aspects = ck.get("aspects")
     if tr_aspects is None:
-        raise SystemExit("checkpoint predates the canvas fix — retrain with --img-dir")
+        raise SystemExit("checkpoint has no stored aspect ratios, so the condition cannot be "
+                         "mapped to canvas coordinates; retraining with --img-dir is required")
     if ck.get("canvas_convention") != "centered":
         raise SystemExit(
-            "this checkpoint was trained with a superseded canvas convention "
-            "(conditioning was misaligned with the latent). Retrain — see "
-            "--mode align for the evidence.")
+            "this checkpoint was trained with a canvas convention other than 'centered' "
+            "(the conditioning is misaligned with the latent). Retraining is required; "
+            "--mode align shows the alignment check.")
     asp = rng.choice(np.asarray(tr_aspects), size=args.n)
     cond = np.stack([render_condition(to_canvas_centered(l, a), size=ck["size"],
                                       sigma=ck["sigma"], n_ch=ck["cond_ch"])
                      for l, a in zip(new_lm, asp)])
     print(f"  landmarks mapped to canvas coords (aspect median {np.median(asp):.3f})")
-    print(f"sampling {args.n} latents conditioned on NEW shapes "
+    print(f"Sampling {args.n} latents conditioned on new shapes "
           f"(+/-{args.clip} SD of the real distribution)")
     if args.guidance > 1.0:
         if ck.get("p_uncond", 0) <= 0:
-            print("  !! guidance requested but the model was trained WITHOUT "
-                  "condition dropout — retrain with --p-uncond 0.15 first")
+            print("  WARNING: guidance was requested, but the model was trained without "
+                  "condition dropout (p_uncond <= 0). Guided samples may be unreliable; "
+                  "retraining with --p-uncond 0.15 may help.")
         print(f"  classifier-free guidance scale {args.guidance}")
 
     # DDIM: deterministic, far fewer steps than ancestral sampling.
-    # x0 MUST be clamped. At large t, abar ~ 1e-9, so x0 = (x - sqrt(1-abar)*eps)
+    # x0 has to be clamped. At large t, abar ~ 1e-9, so x0 = (x - sqrt(1-abar)*eps)
     # / sqrt(abar) divides by ~5e-5 and amplifies any error in the predicted
     # noise by ~2e4. Without clamping the trajectory diverges and samples come
     # out orders of magnitude outside the data range.
@@ -526,8 +535,9 @@ def sample(args):
           f"mean 0, sd 1, range [{ck.get('x0_lo', float('nan')):.2f},"
           f"{ck.get('x0_hi', float('nan')):.2f}])")
     if abs(z.std() - 1.0) > 0.5:
-        print("  !! sample sd is far from 1 — the sampler has diverged. Do NOT use "
-              "these; reduce --steps or tighten --clamp-margin.")
+        print(f"  WARNING: standardised sample SD is {z.std():.2f} (expected about 1.0, "
+              "tolerance 0.5). The sampler has likely diverged and these latents are "
+              "probably invalid. Reducing --steps or --clamp-margin may help.")
     lat = z * ck["sd"] + ck["mu"]                            # de-standardise
     np.savez_compressed(out / "generated.npz",
                         latents=lat.astype(np.float32),
@@ -537,13 +547,13 @@ def sample(args):
                         ddim_steps=np.int32(args.steps),
                         sample_sd=np.float32(z.std()),
                         uuids=np.array([f"gen_{i:05d}" for i in range(len(lat))]))
-    print(f"\nwrote {out}/generated.npz  latents={lat.shape}")
-    print("\n!! VALIDATE BEFORE USING:")
+    print(f"\nWrote {out}/generated.npz  latents={lat.shape}")
+    print("\nNext:")
     print(f"  python diffusion_latent.py --mode validate --out-dir {out} "
           f"--latents-dir <real latents dir> --config {ck['config']}")
 
 
-# ==========================================================================
+# --- Mode: validate ---
 def validate(args):
     out = Path(args.out_dir)
     g = np.load(out / "generated.npz", allow_pickle=True)
@@ -553,7 +563,7 @@ def validate(args):
     R = r["latents"].reshape(len(r["latents"]), -1)
     print(f"generated {G.shape}, real {R.shape}\n")
 
-    print("1) DISTRIBUTION  <- gates everything below")
+    print("1) Distribution  (a prerequisite for the checks below)")
     print(f"   real      mean {R.mean():+.4f}  sd {R.std():.4f}  "
           f"range [{R.min():+.2f},{R.max():+.2f}]")
     print(f"   generated mean {G.mean():+.4f}  sd {G.std():.4f}  "
@@ -563,21 +573,21 @@ def validate(args):
     print(f"   sd ratio {sd_ratio:.2f}, range ratio {rng_ratio:.2f} "
           f"(both should be ~1)")
     if 1.3 < sd_ratio < 2.0:
-        print("   ~ OVER-DISPERSED: samples spread ~%.2fx more than real data." % sd_ratio)
-        print("     Memorisation/novelty numbers below are CONFOUNDED — over-dispersed")
-        print("     samples sit farther from everything. Fix dispersion first:")
-        print("     more --steps, longer training, or a tighter --clamp-margin.")
+        print("   WARNING: generated/real sd ratio is %.2f (over-dispersed above 1.3)." % sd_ratio)
+        print("     The memorisation and novelty results below are confounded: over-dispersed")
+        print("     samples sit farther from everything. More --steps, longer training or a")
+        print("     tighter --clamp-margin may reduce the dispersion.")
     if not (0.5 < sd_ratio < 2.0 and rng_ratio < 3.0):
         print("\n" + "=" * 66)
-        print("   FAIL — the generated latents are not in the data distribution.")
-        print("   The sampler has diverged; the samples are not spine latents at all.")
-        print("   Everything below is MEANINGLESS: a 'novelty' or 'no memorisation'")
-        print("   verdict here just means the samples are far from everything,")
-        print("   including from real data. Fix sampling before reading on.")
+        print("   FAIL: the generated latents are outside the data distribution.")
+        print("   The sampler has diverged; the samples are not spine latents.")
+        print("   The checks below would be invalid: a 'novelty' or 'no memorisation'")
+        print("   verdict here would only mean that the samples are far from everything,")
+        print("   including from real data. The remaining checks are therefore skipped.")
         print("=" * 66)
         return
 
-    print("\n2) MEMORISATION (the critical check)")
+    print("\n2) Memorisation (the critical check)")
     rng = np.random.default_rng(0)
     sub = R[rng.choice(len(R), min(600, len(R)), replace=False)]
 
@@ -598,36 +608,36 @@ def validate(args):
     print(f"   real      -> nearest real : median {np.median(d_real):.3f}")
     print(f"   ratio {ratio:.2f}")
     if ratio < 0.5:
-        print("   !! MEMORISING — samples sit much closer to training points than")
-        print("      training points sit to each other. The 'new data' is illusory.")
+        print("   WARNING: ratio is below 0.5; samples sit much closer to training points than")
+        print("      training points sit to each other. The model is likely memorising, so the 'new data' is illusory.")
     elif ratio < 0.9:
-        print("   ~ partial memorisation; treat gains with suspicion")
+        print("   WARNING: ratio is below 0.9, indicating partial memorisation; gains should be interpreted with caution.")
     elif ratio > 5.0:
-        print("   !! ratio is very large — samples may be far from the data manifold")
-        print("      rather than genuinely novel. Check the distribution gate above.")
+        print("   WARNING: ratio is above 5.0; samples may be far from the data manifold")
+        print("      rather than novel. The distribution check above is relevant here.")
     else:
-        print("   OK — samples are not closer to the training set than it is to itself")
+        print("   Check passed: samples are not closer to the training set than it is to itself")
 
-    print("\n3) SHAPE NOVELTY")
+    print("\n3) Shape novelty")
     gl, rl = g["landmarks"], r["landmarks"]
     dl = nn_dist(gl[:min(300, len(gl))], rl)
     dr = nn_dist(rl[:300], rl, exclude_self=True)
     print(f"   generated shape -> nearest real shape: median {np.median(dl):.4f}")
     print(f"   real shape      -> nearest real shape: median {np.median(dr):.4f}")
     print(f"   ratio {np.median(dl)/max(np.median(dr),1e-9):.2f}  "
-          "(>~1 means genuinely new anatomy)")
+          "(>~1 means new anatomy)")
 
-    print("\n4) CONDITION FIDELITY — run separately:")
-    print("   train a landmark head on REAL latents, predict on generated.npz,")
+    print("\n4) Condition fidelity: run separately:")
+    print("   train a landmark head on real latents, predict on generated.npz,")
     print("   and compare against the conditioning landmarks. If the detector")
-    print("   recovers them, the conditioning works and the labels are sound.")
+    print("   recovers them, the conditioning works and the labels are reliable.")
 
 
-# ==========================================================================
+# --- Diagnostics: reference detector and conditioned sampling ---
 def _train_detector(Xtr, Ltr, device, epochs=100, seed=0):
-    """seed MUST be settable: hardcoding it made every 'multi-seed' arm identical,
-    which hid the run-to-run variation that decides whether a 3% difference is
-    real or noise."""
+    """seed is a parameter so that multi-seed conditions differ: a fixed seed
+    would make every seed identical and hide the run-to-run variation needed to
+    judge whether a small difference is real or noise."""
     import torch, torch.nn as nn
     torch.manual_seed(seed)
     net = nn.Sequential(
@@ -666,7 +676,7 @@ def _lm_err(pred, true):
 
 
 def _sample_given(ck, net_d, cond, device, steps, guidance, clamp_margin, seed=0):
-    """DDIM sample conditioned on a GIVEN condition tensor."""
+    """DDIM sample conditioned on a given condition tensor."""
     import torch
     sch = Schedule(ck["T"])
     x0_lo = ck.get("x0_lo", -8.0) - clamp_margin
@@ -700,20 +710,20 @@ def _sample_given(ck, net_d, cond, device, steps, guidance, clamp_margin, seed=0
 def diagnose(args):
     """Why is fidelity low when the samples look right?
 
-    Three explanations make DIFFERENT predictions, so they can be separated:
+    Three explanations make different predictions, so they can be separated:
 
-      H1  DETECTOR TRANSFER FAILURE. The detector is trained on real latents.
+      H1  Detector transfer failure. The detector is trained on real latents.
           If generated latents are off-manifold it may collapse toward the mean
-          shape whatever the input -- which looks exactly like ignored
-          conditioning. Signature: prediction SPREAD on generated << on real.
+          shape whatever the input, which looks like ignored conditioning.
+          Signature: prediction spread on generated << on real.
 
-      H2  SHAPE SAMPLES OUT OF DISTRIBUTION. We condition on PCA samples at
-          +/-2 SD. If those shapes are unrenderable the model may fall back to a
-          generic spine. Signature: conditioning on REAL landmarks scores much
-          better than conditioning on sampled ones.
+      H2  Shape samples out of distribution. The model is conditioned on PCA
+          samples at +/-2 SD. If those shapes are unrenderable the model may
+          fall back to a generic spine. Signature: conditioning on real
+          landmarks scores much better than conditioning on sampled ones.
 
-      H3  GENUINE CONDITIONING FAILURE. Signature: neither of the above; and
-          the predicted spine position does not track the conditioned position.
+      H3  Conditioning failure. Signature: neither of the above; and the
+          predicted spine position does not track the conditioned position.
     """
     import torch
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -730,7 +740,7 @@ def diagnose(args):
     Xte, Lte = te["latents"].astype(np.float32), te["landmarks"].astype(np.float32)
     asp_te = load_aspects(te["uuids"], args.img_dir)
 
-    print("training the reference detector on REAL latents…")
+    print("Training the reference detector on real latents...")
     det = _train_detector(Xtr, Ltr, device, args.fid_epochs)
 
     g = np.load(out / "generated.npz", allow_pickle=True)
@@ -739,41 +749,41 @@ def diagnose(args):
     p_real = _predict(det, Xte, device)
     p_gen = _predict(det, Xg, device)
 
-    # ---- H1: prediction spread ----
+    # H1: prediction spread
     gsd = Xg.std() / max(Xte.std(), 1e-9)
     if not (0.7 < gsd < 1.4):
-        print("\n" + "!" * 64)
-        print(f"WARNING: generated latents are {gsd:.2f}x the spread of real ones.")
-        print("The sampler has diverged, so EVERY diagnostic below is measuring")
-        print("noise. Re-sample at a lower --guidance before interpreting these.")
-        print("!" * 64)
+        print("\n" + "=" * 64)
+        print(f"WARNING: generated/real latent spread ratio is {gsd:.2f} (expected 0.7 to 1.4).")
+        print("The sampler has likely diverged, so the diagnostics below are likely")
+        print("measuring noise. Re-sampling at a lower --guidance may help.")
+        print("=" * 64)
 
     print("\n" + "=" * 64)
-    print("H1  DETECTOR TRANSFER — does the detector still discriminate?")
+    print("H1  Detector transfer: does the detector still discriminate?")
     print("=" * 64)
     sr, sg = p_real.std(0).mean(), p_gen.std(0).mean()
     st = Lte.std(0).mean()
-    print(f"   sd of predictions on REAL latents      : {sr:.5f}")
-    print(f"   sd of predictions on GENERATED latents : {sg:.5f}")
+    print(f"   sd of predictions on real latents      : {sr:.5f}")
+    print(f"   sd of predictions on generated latents : {sg:.5f}")
     print(f"   sd of the true landmarks (reference)   : {st:.5f}")
     print(f"   ratio generated/real = {sg/max(sr,1e-9):.2f}")
     if sg / max(sr, 1e-9) < 0.5:
-        print("   -> COLLAPSED: the detector outputs near-constant landmarks on")
-        print("      generated latents. This is a MEASUREMENT failure (H1): the")
+        print("   -> collapsed: the detector outputs near-constant landmarks on")
+        print("      generated latents. This is a measurement failure (H1): the")
         print("      fidelity number says little about the conditioning.")
     else:
         print("   -> the detector still varies its output on generated latents,")
         print("      so it is discriminating; H1 does not explain the low score.")
 
-    # ---- H2: condition on REAL landmarks ----
+    # H2: condition on real landmarks
     print("\n" + "=" * 64)
-    print("H2  SHAPE SAMPLES OOD — condition on REAL landmarks instead")
+    print("H2  Shape samples out of distribution: condition on real landmarks instead")
     print("=" * 64)
     n = min(args.n_diag, len(Lte))
     cond_real = np.stack([render_condition(to_canvas_centered(Lte[i], asp_te[i]),
                                            size=ck["size"], sigma=ck["sigma"],
                                            n_ch=ck["cond_ch"]) for i in range(n)])
-    print(f"   generating {n} samples conditioned on real test landmarks…")
+    print(f"   Generating {n} samples conditioned on real test landmarks...")
     Xrc = _sample_given(ck, net_d, cond_real, device, args.steps, args.guidance,
                         args.clamp_margin)
     e_rc = _lm_err(_predict(det, Xrc.astype(np.float32), device), Lte[:n])
@@ -781,31 +791,31 @@ def diagnose(args):
     e_floor = _lm_err(p_real, Lte)
     base_rc = _lm_err(np.repeat(Ltr.mean(0, keepdims=True), n, 0), Lte[:n])
     print(f"\n   real-data floor                       : {e_floor.mean():.4f}")
-    print(f"   generated, conditioned on REAL shapes : {e_rc.mean():.4f}")
-    print(f"   generated, conditioned on SAMPLED     : {e_sc.mean():.4f}")
+    print(f"   generated, conditioned on real shapes : {e_rc.mean():.4f}")
+    print(f"   generated, conditioned on sampled     : {e_sc.mean():.4f}")
     print(f"   mean-shape baseline (real conds)      : {base_rc.mean():.4f}")
-    # Report a percentage ONLY when the value lies between the baseline and the
+    # Report a percentage only when the value lies between the baseline and the
     # floor. Outside that range the "fraction of the way to the floor" formula
-    # divides by a span the value sits outside, giving meaningless numbers such
-    # as -1023%.
+    # divides by a span the value sits outside, giving uninterpretable numbers
+    # (for example, large negative percentages).
     if e_rc.mean() > base_rc.mean():
         f_rc = -1.0
-        print(f"\n   generated error ({e_rc.mean():.4f}) is WORSE than the "
+        print(f"\n   generated error ({e_rc.mean():.4f}) is worse than the "
               f"mean-shape baseline ({base_rc.mean():.4f});")
         print("   a fidelity percentage is undefined here.")
     else:
         f_rc = (base_rc.mean() - e_rc.mean()) / max(base_rc.mean() - e_floor.mean(), 1e-9)
-        print(f"\n   fidelity with REAL conditioning: {100*f_rc:.0f}%")
+        print(f"\n   fidelity with real conditioning: {100*f_rc:.0f}%")
     if f_rc > 0.4:
-        print("   -> the mechanism WORKS on real shapes; the PCA sampler is the")
-        print("      problem (H2). Tighten --clip or reduce --n-comp.")
+        print("   -> the mechanism works on real shapes; the PCA sampler is the")
+        print("      problem (H2). A tighter --clip or a smaller --n-comp may help.")
     else:
         print("   -> real conditioning is no better, so the sampler is not the")
         print("      issue; H2 does not explain the low score.")
 
-    # ---- H3: does output position track conditioned position? ----
+    # H3: does output position track conditioned position?
     print("\n" + "=" * 64)
-    print("H3  RESPONSE — does the spine MOVE when the condition moves?")
+    print("H3  Response: does the spine move when the condition moves?")
     print("=" * 64)
     cx_cond = Lg[:, :N_LM].mean(1)
     cx_pred = p_gen[:, :N_LM].mean(1)
@@ -815,35 +825,35 @@ def diagnose(args):
     print(f"   corr(conditioned x-centroid, predicted x-centroid) = {r:+.3f}")
     print(f"   corr(conditioned y-centroid, predicted y-centroid) = {ry:+.3f}")
     if abs(r) < 0.2 and abs(ry) < 0.2:
-        print("   -> NO response: the generated spine does not move with the")
-        print("      condition. Genuine conditioning failure (H3).")
+        print("   -> no response: the generated spine does not move with the")
+        print("      condition. This indicates a conditioning failure (H3).")
     else:
-        print("   -> the output DOES track the condition, so conditioning is")
+        print("   -> the output does track the condition, so conditioning is")
         print("      partially working even though absolute error is high.")
     print("\n" + "=" * 64)
 
 
-# ==========================================================================
+# --- Mode: overfit ---
 def overfit(args):
-    """Can the model reproduce a HANDFUL of conditioned samples exactly?
+    """Can the model reproduce a handful of conditioned samples exactly?
 
-    This is the cleanest remaining test, and it partitions the failure space:
+    This test partitions the failure space:
 
-      * PASSES (recovers the 8 conditioned shapes well) -> the conditioning
+      * Passes (recovers the 8 conditioned shapes well) -> the conditioning
         mechanism is mechanically sound. The failure is then about
-        GENERALISING conditioning from ~400 spines, which points to the
-        conditioning ARCHITECTURE (concatenation is weak; cross-attention is
-        the standard fix).
+        generalising conditioning from ~400 spines, which points to the
+        conditioning architecture (concatenation is weak; cross-attention is
+        the standard alternative).
 
-      * FAILS (cannot fit even 8 pairs) -> conditioning is broken mechanically
-        (plumbing, capacity, or the condition simply carries no usable
-        gradient). No amount of data or guidance would have helped, and the
-        bug is findable in an afternoon.
+      * Fails (cannot fit even 8 pairs) -> conditioning is broken mechanically
+        (plumbing, capacity, or the condition carries no usable gradient).
+        More data or guidance would not help, and the fault lies in the
+        implementation.
 
-    Overfitting is DESIRABLE here — we are testing capability, not
-    generalisation, so memorisation is exactly the intended outcome. A model
-    that cannot memorise 8 conditioned pairs cannot possibly learn conditioning
-    from 2452 of them.
+    Overfitting is desirable here: the test measures capability, not
+    generalisation, so memorisation is the intended outcome. A model that
+    cannot memorise 8 conditioned pairs cannot learn conditioning from 2452
+    of them.
     """
     import torch
 
@@ -855,7 +865,7 @@ def overfit(args):
     lat, lm, uu = (d["latents"].astype(np.float32),
                    d["landmarks"].astype(np.float32), d["uuids"])
 
-    # pick k spines with maximally DIFFERENT shapes, so "followed the
+    # pick k spines with maximally different shapes, so "followed the
     # condition" is distinguishable from "produced a generic spine"
     k = args.n_overfit
     rng = np.random.default_rng(0)
@@ -873,7 +883,7 @@ def overfit(args):
     picked = np.array(picked)
     X, L, U = lat[picked], lm[picked], uu[picked]
     spread = np.abs(L - L.mean(0, keepdims=True)).mean()
-    print(f"selected {k} maximally-distinct spines; mean |shape - mean shape| "
+    print(f"Selected {k} maximally distinct spines; mean |shape - mean shape| "
           f"= {spread:.4f}")
 
     mu, sd = float(X.mean()), float(X.std())
@@ -917,10 +927,10 @@ def overfit(args):
     gen = _sample_given(ck, net, cond, device, args.steps, args.guidance,
                         args.clamp_margin)
 
-    # a detector trained on REAL latents, as in --mode fidelity
+    # a detector trained on real latents, as in --mode fidelity
     tr = np.load(Path(args.latents_dir) / f"latents_{args.config}_train.npz",
                  allow_pickle=True)
-    print("\ntraining the reference detector on REAL latents…")
+    print("\nTraining the reference detector on real latents...")
     det = _train_detector(tr["latents"].astype(np.float32),
                           tr["landmarks"].astype(np.float32), device, args.fid_epochs)
 
@@ -932,19 +942,19 @@ def overfit(args):
                              k, 0), L)
 
     print("\n" + "=" * 64)
-    print("OVERFIT TEST — can the model reproduce these k conditioned spines?")
+    print("Overfit test: can the model reproduce these k conditioned spines?")
     print("=" * 64)
-    print(f"   detector on the ORIGINAL {k} latents : {e_orig.mean():.4f}  <- floor")
-    print(f"   detector on the GENERATED {k}        : {e_gen.mean():.4f}")
+    print(f"   detector on the original {k} latents : {e_orig.mean():.4f}  <- floor")
+    print(f"   detector on the generated {k}        : {e_gen.mean():.4f}")
     print(f"   mean-shape baseline                  : {base.mean():.4f}")
     if e_gen.mean() < base.mean():
         frac = (base.mean() - e_gen.mean()) / max(base.mean() - e_orig.mean(), 1e-9)
         print(f"\n   recovers {100*frac:.0f}% of the way from baseline to floor")
     else:
         frac = -1.0
-        print("\n   WORSE than the mean-shape baseline")
+        print("\n   worse than the mean-shape baseline")
 
-    # does each generated sample match ITS OWN condition better than the others?
+    # does each generated sample match its own condition better than the others?
     # this is the sharpest form of the question and is immune to the absolute
     # error scale.
     M = np.zeros((k, k))
@@ -952,39 +962,39 @@ def overfit(args):
         for j in range(k):
             M[i, j] = _lm_err(p_gen[i:i + 1], L[j:j + 1])[0]
     correct = int((M.argmin(1) == np.arange(k)).sum())
-    print(f"\n   MATCHING: for each generated sample, is its own condition the")
+    print(f"\n   Matching: for each generated sample, is its own condition the")
     print(f"   closest of all {k}?  {correct}/{k} correct "
           f"(chance = {100.0/k:.0f}%)")
 
     print("\n" + "=" * 64)
     if frac > 0.6 or correct >= max(2, int(0.6 * k)):
-        print("VERDICT: the conditioning mechanism WORKS.")
+        print("Verdict: the conditioning mechanism works.")
         print("  The model can follow conditioning when it is not asked to")
         print("  generalise, so the mechanism, coordinate convention, heatmap")
         print("  rendering and guidance are all sound. The failure at full scale")
-        print("  is about LEARNING A GENERALISABLE conditioning map from ~400")
+        print("  is about learning a generalisable conditioning map from ~400")
         print("  distinct spines.")
-        print("\n  NOTE: this does NOT by itself imply cross-attention is the fix.")
+        print("\n  Note: this does not by itself imply that cross-attention would fix it.")
         print("  The diagnosed limit is data-scale generalisation; a stronger")
-        print("  conditioning mechanism could equally overfit harder. Run")
-        print("  --mode scaling to measure WHERE adherence collapses.")
+        print("  conditioning mechanism could equally overfit harder. --mode")
+        print("  scaling measures where adherence collapses.")
     else:
-        print("VERDICT: conditioning FAILS even on k samples.")
+        print("Verdict: conditioning fails even on k samples.")
         print("  The model cannot reproduce conditioned images it has seen")
-        print("  hundreds of times. This is a MECHANICAL failure -- plumbing,")
-        print("  capacity, or a condition that carries no usable gradient --")
+        print("  hundreds of times. This is a mechanical failure (plumbing,")
+        print("  capacity, or a condition that carries no usable gradient),")
         print("  not a data-scale problem. Neither more data nor guidance nor")
-        print("  cross-attention would have helped.")
+        print("  cross-attention would help.")
     print("=" * 64)
 
     np.savez_compressed(out / "overfit.npz", generated=gen.astype(np.float32),
                         original=X, landmarks=L, uuids=U, match_matrix=M)
-    print(f"\nwrote {out}/overfit.npz")
+    print(f"\nWrote {out}/overfit.npz")
 
 
-# ==========================================================================
+# --- Mode: scaling ---
 def _binom_tail(x, n, p):
-    """P(X >= x) under Binomial(n, p) — is the match rate above chance?"""
+    """P(X >= x) under Binomial(n, p): is the match rate above chance?"""
     from math import comb
     return float(sum(comb(n, i) * p ** i * (1 - p) ** (n - i) for i in range(x, n + 1)))
 
@@ -1009,13 +1019,13 @@ def _fit_and_score(lat, lm, asp, args, device, det, mean_shape, seed=0):
     sq1 = torch.tensor(sch.sqrt_1mabar, device=device)
     opt = torch.optim.AdamW(net.parameters(), lr=args.lr, weight_decay=0.0)
 
-    # Two ways to make the sweep fair, and they answer DIFFERENT questions:
+    # Two ways to balance the sweep, which answer different questions:
     #
     #   scale_mode="steps"     : total gradient steps constant. Larger k then
-    #       gets FEWER exposures per sample, so a decline confounds data
-    #       diversity with undertraining. This was the first sweep's flaw.
+    #       gets fewer exposures per sample, so a decline confounds data
+    #       diversity with undertraining.
     #
-    #   scale_mode="exposures" : exposures PER SAMPLE constant, so total steps
+    #   scale_mode="exposures" : exposures per sample constant, so total steps
     #       grow with k. Removes the undertraining confound, at the cost of
     #       much more compute at large k. This isolates data diversity.
     bs = min(args.batch_size, k)
@@ -1044,10 +1054,9 @@ def _fit_and_score(lat, lm, asp, args, device, det, mean_shape, seed=0):
           "T": args.T, "size": size, "mu": mu, "sd": sd,
           "x0_lo": float(Xs.min()), "x0_hi": float(Xs.max())}
 
-    # Score on the MOST DISTINCT spines in the subset, not the first m.
+    # Score on the most distinct spines in the subset, not the first m.
     # Random spines sit close to the mean shape, which collapses the
-    # baseline-to-floor range and makes the fidelity metric meaningless
-    # (this is why the first sweep reported "<0%" almost everywhere).
+    # baseline-to-floor range and makes the fidelity metric uninterpretable.
     m = min(args.scale_eval, k)
     dist = np.abs(lm - lm.mean(0, keepdims=True)).mean(1)
     sel = np.argsort(dist)[::-1][:m]
@@ -1072,34 +1081,33 @@ def _fit_and_score(lat, lm, asp, args, device, det, mean_shape, seed=0):
 
 
 def scaling(args):
-    """How does conditioning generalisation scale with the number of DISTINCT spines?
+    """How does conditioning generalisation scale with the number of distinct spines?
 
-    DESIGN (two earlier versions of this sweep were confounded; this fixes both):
+    Design:
 
-      1. EXPOSURES, not steps. Every k trains for the SAME number of exposures
-         per sample (default 6000, matching the overfit run that scored 8/8).
-         Holding total *steps* constant instead means large k is undertrained,
-         which is what broke sweep #1.
+      1. Exposures, not steps. Every k trains for the same number of exposures
+         per sample (default 6000, matching the overfit run). Holding total
+         *steps* constant instead leaves large k undertrained.
 
-      2. FIXED evaluation sets. A held-out set of spines is reserved up front and
-         NEVER trained on at any k, so every k is scored on identical shapes.
-         Scoring each k on "its own most distinct spines" made the baseline drift
-         from 0.089 to 0.188 across k, which is what broke sweep #2.
+      2. Fixed evaluation sets. A held-out set of spines is reserved up front and
+         never trained on at any k, so every k is scored on identical shapes.
+         Scoring each k on "its own most distinct spines" would make the
+         baseline drift across k.
 
-      3. NESTED training subsets. The k=8 set is contained in k=16, which is
+      3. Nested training subsets. The k=8 set is contained in k=16, which is
          contained in k=32, and so on. This removes the sampling variance that
          would otherwise dominate a 7-point curve.
 
-      4. HELD-IN and HELD-OUT are both measured.
+      4. Held-in and held-out are both measured.
            held-in  : can the model bind conditioning to shapes it trained on?
-                      (capacity / memorisation — the overfit test at every k)
-           held-out : does the conditioning map GENERALISE to new shapes?
-                      (the question that actually matters)
-         The GAP between them is the generalisation story. If held-in stays high
+                      (capacity / memorisation: the overfit test at every k)
+           held-out : does the conditioning map generalise to new shapes?
+                      (the main question)
+         The gap between them measures generalisation. If held-in stays high
          while held-out stays at chance, the model memorises conditioning rather
          than learning it, and more data of this kind will not fix it.
 
-    Primary metric is the own-condition MATCH RATE with a binomial p-value.
+    Primary metric is the own-condition match rate with a binomial p-value.
     Fidelity is reported but is fragile: it depends on how far the evaluation
     shapes sit from the mean shape.
     """
@@ -1122,14 +1130,14 @@ def scaling(args):
     lat, lm, uu = lat[keep], lm[keep], uu[keep]
     asp = load_aspects(uu, args.img_dir)
     N = len(lat)
-    print(f"{N} DISTINCT source spines (augmented copies excluded)")
+    print(f"{N} distinct source spines (augmented copies excluded)")
 
     rng = np.random.default_rng(0)
     perm = rng.permutation(N)
     n_ho = args.scale_heldout
     ho = perm[:n_ho]                      # reserved: never trained on, at any k
     pool = perm[n_ho:]                    # nested training subsets drawn in order
-    print(f"reserved {n_ho} spines as a FIXED held-out set (never trained on)")
+    print(f"Reserved {n_ho} spines as a fixed held-out set (never trained on)")
 
     ks = sorted({k for k in args.scale_ks if k <= len(pool)} | {len(pool)})
     m_in = min(args.scale_eval, ks[0])    # held-in eval size: same spines at every k
@@ -1137,7 +1145,7 @@ def scaling(args):
     print(f"held-in eval: the first {m_in} pool spines (identical across k)")
     print(f"exposures per sample: {args.scale_exposures} at every k\n")
 
-    print("training the shared reference detector on real latents…")
+    print("Training the shared reference detector on real latents...")
     det = _train_detector(lat, lm, device, args.fid_epochs)
     mean_shape = lm.mean(0, keepdims=True)
 
@@ -1206,15 +1214,15 @@ def scaling(args):
               "T": args.T, "size": size, "mu": mu, "sd": sd,
               "x0_lo": float(Xs.min()), "x0_hi": float(Xs.max())}
 
-        xi, mi, pi, fi, egi, ebi = score(net, ck, pool[:m_in])   # held-IN
-        xo, mo, po, fo, ego, ebo = score(net, ck, ho)            # held-OUT
+        xi, mi, pi, fi, egi, ebi = score(net, ck, pool[:m_in])   # held-in
+        xo, mo, po, fo, ego, ebo = score(net, ck, ho)            # held-out
         rows.append({"k": k, "steps": total,
                      "in_match": xi / mi, "in_x": xi, "in_n": mi, "in_p": pi,
                      "in_fidelity": fi, "in_err": egi, "in_base": ebi,
                      "out_match": xo / mo, "out_x": xo, "out_n": mo, "out_p": po,
                      "out_fidelity": fo, "out_err": ego, "out_base": ebo})
-        print(f"        held-IN  {xi:>2}/{mi} ({100*xi/mi:3.0f}%) p={pi:8.2e}"
-              f"   held-OUT {xo:>2}/{mo} ({100*xo/mo:3.0f}%) p={po:8.2e}", flush=True)
+        print(f"        held-in  {xi:>2}/{mi} ({100*xi/mi:3.0f}%) p={pi:8.2e}"
+              f"   held-out {xo:>2}/{mo} ({100*xo/mo:3.0f}%) p={po:8.2e}", flush=True)
         del net
         if str(device).startswith("cuda"):
             torch.cuda.empty_cache()
@@ -1224,9 +1232,9 @@ def scaling(args):
     df.to_csv(out / "conditioning_scaling.csv", index=False)
 
     print("\n" + "=" * 72)
-    print("RESULTS  (chance = 1/n; * marks p < 0.05)")
+    print("Results  (chance = 1/n; * marks p < 0.05)")
     print("=" * 72)
-    print(f"{'k':>5}{'steps':>9}{'held-IN':>14}{'p':>11}{'held-OUT':>14}{'p':>11}")
+    print(f"{'k':>5}{'steps':>9}{'held-in':>14}{'p':>11}{'held-out':>14}{'p':>11}")
     for r in rows:
         si = "*" if r["in_p"] < 0.05 else " "
         so = "*" if r["out_p"] < 0.05 else " "
@@ -1249,41 +1257,45 @@ def scaling(args):
         fig.tight_layout()
         fig.savefig(out / "conditioning_scaling.png", dpi=140, bbox_inches="tight")
         plt.close(fig)
-        print(f"\nwrote {out}/conditioning_scaling.png")
+        print(f"\nWrote {out}/conditioning_scaling.png")
     except Exception as e:
         print(f"(plot skipped: {e})")
 
     print("\n" + "=" * 72)
-    print("READING THE CURVE")
+    print("Interpretation")
     print("=" * 72)
-    print("  held-IN high, held-OUT at chance, at every k")
-    print("     -> the model MEMORISES conditioning rather than learning it.")
+    print("  held-in high, held-out at chance, at every k")
+    print("     -> the model memorises conditioning rather than learning it.")
     print("        More data of this kind will not help; the conditioning signal")
     print("        is being used as an index into training examples.")
-    print("  held-OUT rising with k")
-    print("     -> generalisation IS improving with anatomical diversity; the")
+    print("  held-out rising with k")
+    print("     -> generalisation is improving with anatomical diversity; the")
     print("        slope says how much more data would be needed.")
     print("  both at chance")
     print("     -> undertrained at this exposure count, or the run differs from")
-    print("        the overfit test in some other way. Check held-IN at k=8")
-    print("        against the overfit result (8/8) before reading anything else.")
-    print(f"\nwrote {out}/conditioning_scaling.csv")
+    print("        the overfit test in some other way. Held-in at k=8 can be")
+    print("        compared with the overfit result before the rest is interpreted.")
+    print(f"\nWrote {out}/conditioning_scaling.csv")
 
 
-# ==========================================================================
+# --- Mode: align ---
 def align(args):
-    """Determine EMPIRICALLY where landmarks sit in the latent's canvas.
+    """Determine empirically where landmarks sit in the latent's canvas.
 
-    Everything about conditioning depends on this, and it must be measured, not
-    assumed. Two candidate conventions are overlaid on a decoded REAL latent:
+    Conditioning depends on this, so it is measured rather than assumed. Three
+    candidate conventions are overlaid on decoded real latents
+    (alignment_check.png) and scored by the mean image intensity at the
+    landmark positions:
 
-      RAW    : landmarks scaled directly across the full canvas
-      CANVAS : landmarks scaled by the aspect ratio (assumes the image is
-               scaled so max(W,H) fills the canvas and pasted top-left)
+      RAW      : landmarks scaled directly across the full canvas
+      TOP-LEFT : landmarks scaled by the aspect ratio, image pasted top-left
+                 (to_canvas)
+      CENTRED  : landmarks scaled by the aspect ratio, image centred
+                 (to_canvas_centered)
 
-    Whichever lands on the actual spine is the correct convention. If NEITHER
-    does, the encoder's preprocessing differs from both and conditioning cannot
-    be aligned without reading that loader.
+    Whichever lands on the actual spine is the correct convention. If none
+    does, the encoder's preprocessing differs from all three and conditioning
+    cannot be aligned without reading that loader.
     """
     import torch
     import matplotlib
@@ -1357,35 +1369,35 @@ def align(args):
         bg.append(float(pic.mean()))
     scores = {"RAW": np.mean(raw_v), "TOP-LEFT": np.mean(tl_v),
               "CENTRED": np.mean(ct_v)}
-    print(f"\nmean image intensity AT the landmark positions (spine is bright):")
+    print(f"\nMean image intensity at the landmark positions (spine is bright):")
     for k, v in scores.items():
         print(f"   {k:<9}: {v:+.4f}")
     print(f"   {'background':<9}: {np.mean(bg):+.4f}  <- reference")
     best = max(scores, key=scores.get)
     print(f"\n   -> {best} samples the brightest pixels, so it is the convention")
-    print(f"      that actually tracks the spine.")
+    print(f"      that tracks the spine.")
     if max(scores.values()) < np.mean(bg) + 0.05:
-        print("   !! NEITHER is clearly on the spine — the encoder's preprocessing")
-        print("      differs from both assumptions. Read load_2d_finetune_aspect.")
-    print(f"\nwrote {out}/alignment_check.png — confirm visually.")
+        print("   WARNING: no convention samples clearly brighter than the background (margin 0.05).")
+        print("      The encoder's preprocessing likely differs from these assumptions; load_2d_finetune_aspect defines it.")
+    print(f"\nWrote {out}/alignment_check.png for visual confirmation.")
 
 
-# ==========================================================================
+# --- Mode: fidelity ---
 def fidelity(args):
-    """CONDITION FIDELITY — the check that decides whether the labels are real.
+    """Condition fidelity: checks whether the sampled labels match the generated images.
 
-    Train a landmark detector on REAL latents only, then run it on the
+    Train a landmark detector on real latents only, then run it on the
     generated latents and compare its predictions against the landmarks the
-    samples were CONDITIONED on. Three reference points make the number
+    samples were conditioned on. Three reference points make the number
     interpretable:
 
-      * detector error on REAL held-out data      -> the achievable floor
-      * detector error on GENERATED data          -> what we are measuring
+      * detector error on real held-out data      -> the achievable floor
+      * detector error on generated data          -> the measurement
       * mean-shape predictor on the conditions    -> the trivial baseline
 
     If generated error is near the real floor, the conditioning works and the
-    sampled landmarks are trustworthy labels. If it is near the mean-shape
-    baseline, the model ignored the conditioning and the labels are fiction --
+    sampled landmarks are reliable labels. If it is near the mean-shape
+    baseline, the model ignored the conditioning and the labels are invalid;
     training on this data would inject systematic label noise.
     """
     import torch
@@ -1450,59 +1462,58 @@ def fidelity(args):
     e_base = err(mean_shape, Lg)
 
     print("\n" + "=" * 62)
-    print("CONDITION FIDELITY")
+    print("Condition fidelity")
     print("=" * 62)
-    print(f"  detector on REAL held-out   : {e_real.mean():.4f}  <- achievable floor")
-    print(f"  detector on GENERATED       : {e_gen.mean():.4f}  <- the measurement")
+    print(f"  detector on real held-out   : {e_real.mean():.4f}  <- achievable floor")
+    print(f"  detector on generated       : {e_gen.mean():.4f}  <- the measurement")
     print(f"  mean-shape on the conditions: {e_base.mean():.4f}  <- trivial baseline")
     span = max(e_base.mean() - e_real.mean(), 1e-9)
     frac = (e_base.mean() - e_gen.mean()) / span
     if e_gen.mean() > e_base.mean():
-        print(f"\n  generated error is WORSE than the trivial baseline; a "
+        print(f"\n  generated error is worse than the trivial baseline; a "
               f"'fraction of the way to the floor' figure is undefined.")
     else:
         print(f"\n  generated recovers {100*frac:.0f}% of the way from the trivial")
         print(f"  baseline to the real-data floor")
     if frac > 0.7:
-        print("\n  STRONG — the conditioning works; sampled landmarks are usable labels.")
+        print("\n  Result: strong; the conditioning works and the sampled landmarks are usable labels.")
     elif frac > 0.4:
-        print("\n  PARTIAL — conditioning is followed loosely. Labels carry noise;")
+        print("\n  Result: partial; conditioning is followed loosely. Labels carry noise;")
         print("  any downstream gain may be offset by the label error introduced.")
     else:
-        print("\n  WEAK — the model largely ignored the conditioning. The sampled")
-        print("  landmarks are NOT valid labels for these images. Do not train on them.")
+        print("\n  WARNING: fidelity is weak (at most 0.4 of the way from baseline to floor). The model")
+        print("  largely ignored the conditioning, so the sampled landmarks are likely invalid labels for these images.")
     print("\n  Caveat: the detector was trained on real latents, so generated error")
     print("  also reflects any domain gap between real and generated latents.")
 
 
-# ==========================================================================
+# --- Mode: utility ---
 def utility(args):
-    """Are the synthetic labels USABLE? Two questions, answered in order.
+    """Are the synthetic labels usable? Two questions, answered in order.
 
-    Q1  FILTERING. Label quality varies a lot per sample (we have seen 0.055 to
-        0.14 in the same batch). If the best fraction is near the real-data
+    Q1  Filtering. Label quality can vary considerably per sample within one
+        batch. If the best fraction is near the real-data
         reference, rejection sampling gives a usable subset even when the
         average is poor. This reports the error distribution by percentile.
 
-    Q2  UTILITY -- the test that actually matters. Train a landmark detector on
-        SYNTHETIC data only and evaluate it on the REAL test set. If the labels
-        are wrong, the detector learns wrong associations and fails. If they are
-        broadly right, it should transfer. This sidesteps the proxy problem
-        entirely: for a generated image there is no ground truth, so every
-        earlier measurement compared the conditioning against a DETECTOR rather
-        than against truth. Downstream transfer needs no such proxy.
+    Q2  Utility (the main test). Train a landmark detector on synthetic data
+        only and evaluate it on the real test set. If the labels are wrong, the
+        detector learns wrong associations and fails. If they are broadly
+        right, it should transfer. This avoids the proxy problem: for a
+        generated image there is no ground truth, so the other measurements
+        compare the conditioning against a detector rather than against truth.
+        Downstream transfer needs no such proxy.
 
-    Arms reported:
+    Conditions reported:
         real-only          : trained on real train latents        (upper reference)
         synthetic-all      : trained on every generated sample
         synthetic-filtered : trained on the best `--keep-frac` by detector agreement
-        real + synthetic   : augmentation setting -- the realistic use case
+        real + synthetic   : augmentation setting (the realistic use case)
 
-    HONEST CAVEAT on filtering: keeping samples a detector already agrees with
+    Caveat on filtering: keeping samples a detector already agrees with
     selects for anatomy that detector finds easy, which is likely typical rather
-    than unusual anatomy -- the opposite of what a data-limited task needs. The
-    selection bias is reported alongside the gain so it can be judged, not
-    assumed away.
+    than unusual anatomy; the opposite of what a data-limited task needs. The
+    selection bias is reported alongside the gain so that it can be judged.
     """
     import torch
 
@@ -1515,8 +1526,9 @@ def utility(args):
         gd, ssd = float(g["guidance"]), float(g.get("sample_sd", np.float32(1.0)))
         print(f"generated samples: guidance={gd}, standardised sd={ssd:.3f}")
         if gd > 4.0 or abs(ssd - 1.0) > 0.3:
-            raise SystemExit("these samples come from a diverged run — re-sample "
-                             "at --guidance 3.0 first")
+            raise SystemExit("these samples appear to come from a diverged run (guidance above 4.0 "
+                             "or standardised sd more than 0.3 from 1.0); re-sampling at "
+                             "--guidance 3.0 is required")
 
     tr = np.load(Path(args.latents_dir) / f"latents_{args.config}_train.npz", allow_pickle=True)
     va = np.load(Path(args.latents_dir) / f"latents_{args.config}_val.npz", allow_pickle=True)
@@ -1527,15 +1539,15 @@ def utility(args):
     print(f"real train {Xtr.shape}, val {Xva.shape}, test {Xte.shape}, "
           f"generated {Xg.shape}\n")
 
-    # ---------- Q1: how does label quality distribute? ----------
+    # Q1: how is label quality distributed?
     print("=" * 68)
-    print("Q1  LABEL QUALITY DISTRIBUTION")
+    print("Q1  Label quality distribution")
     print("=" * 68)
-    print("training the reference detector on real latents…")
+    print("Training the reference detector on real latents...")
     ref = _train_detector(Xtr, Ltr, device, args.fid_epochs)
     agree = _lm_err(_predict(ref, Xg, device), Lg)          # detector-vs-condition
     real_ref = _lm_err(_predict(ref, Xte, device), Lte).mean()
-    print(f"\n   detector error on REAL test data: {real_ref:.4f}  <- the reference")
+    print(f"\n   detector error on real test data: {real_ref:.4f}  <- the reference")
     print(f"\n   {'percentile':>12}{'agreement':>12}{'vs real ref':>14}")
     for q in (10, 25, 50, 75, 90):
         v = float(np.percentile(agree, q))
@@ -1552,22 +1564,22 @@ def utility(args):
 
     # selection bias: are the kept shapes less extreme than the rest?
     dev = np.abs(Lg - Ltr.mean(0, keepdims=True)).mean(1)
-    print(f"\n   SELECTION BIAS CHECK — distance from the mean shape:")
+    print(f"\n   Selection bias check: distance from the mean shape:")
     print(f"     kept    {dev[keep].mean():.4f}")
     print(f"     dropped {dev[order[k_keep:]].mean():.4f}")
     print(f"     real    {np.abs(Ltr - Ltr.mean(0, keepdims=True)).mean(1).mean():.4f}")
     if dev[keep].mean() < 0.9 * dev[order[k_keep:]].mean():
-        print("     -> filtering favours TYPICAL anatomy; the unusual spines a")
+        print("     -> filtering favours typical anatomy; the unusual spines a")
         print("        data-limited task most needs are preferentially discarded.")
     else:
         print("     -> no strong bias toward typical anatomy")
 
-    # ---------- Q2: does training on it actually work? ----------
+    # Q2: does training on it work?
     print("\n" + "=" * 68)
-    print("Q2  DOWNSTREAM UTILITY  (the test that matters)")
+    print("Q2  Downstream utility  (the main test)")
     print("=" * 68)
-    print("no proxy needed here: a detector trained on synthetic data is judged")
-    print("on REAL test data with REAL labels.\n")
+    print("No proxy is needed here: a detector trained on synthetic data is judged")
+    print("on real test data with real labels.\n")
 
     arms = [
         ("real only", Xtr, Ltr),
@@ -1605,9 +1617,9 @@ def utility(args):
 
     r0 = df[df.arm == "real only"].test_err.iloc[0]
     print("\n" + "=" * 68)
-    print("VERDICT")
+    print("Verdict")
     print("=" * 68)
-    # paired test on the SAME test images — a 3% difference is small relative to
+    # paired test on the same test images: a small difference can be within
     # seed noise, so a difference of means is not sufficient evidence
     from scipy import stats as _st
     ref_pi = per_image["real only"]
@@ -1630,27 +1642,27 @@ def utility(args):
     syn = df[df.arm == "synthetic all"].test_err.iloc[0]
     print(f"\n   synthetic-only vs the trivial baseline: {syn:.4f} vs {base:.4f}")
     if syn < 0.9 * base:
-        print("   -> training on synthetic data alone DOES learn something real;")
+        print("   -> training on synthetic data alone does learn something;")
         print("      the labels carry usable signal even if they are imprecise.")
     else:
         print("   -> synthetic-only is no better than guessing the mean shape;")
         print("      the labels do not carry usable spatial information.")
-    print(f"\nwrote {out}/synthetic_utility.csv")
+    print(f"\nWrote {out}/synthetic_utility.csv")
 
 
-# ==========================================================================
+# --- Mode: showlabels ---
 def showlabels(args):
-    """SEE how wrong the labels are — decode generated latents and overlay both
-    the CONDITIONING landmarks (what we asked for) and the DETECTOR's
-    landmarks (what was actually drawn).
+    """Visualise label error: decode generated latents and overlay both the
+    conditioning landmarks (the requested shape) and the detector's landmarks
+    (what was drawn).
 
-    Why this is worth looking at rather than only reading the fidelity number:
-    the number says "3% of the way from baseline to floor", which is abstract.
-    The picture shows whether the spine is in roughly the right place with the
-    wrong curve, or somewhere else entirely — and those imply different things.
+    The image complements the fidelity number, which is a single, abstract
+    fraction of the way from baseline to floor. The picture shows whether the
+    spine is in roughly the right place with the wrong curve, or somewhere else
+    entirely, and those imply different things.
 
-    Real images are shown in the same format as a reference, so you can see
-    what a CORRECTLY labelled pair looks like under the identical pipeline.
+    Real images are shown in the same format as a reference, showing what a
+    correctly labelled pair looks like under the identical pipeline.
     """
     import torch
     import matplotlib
@@ -1663,9 +1675,10 @@ def showlabels(args):
     Xg, Lg = g["latents"].astype(np.float32), g["landmarks"].astype(np.float32)
     asp_g = g["aspects"] if "aspects" in g.files else np.full(len(Xg), 0.5, np.float32)
 
-    # WHICH samples are these? A guidance sweep overwrites generated.npz on every
-    # iteration, so the file can easily hold the LAST (often diverged) run rather
-    # than the good one. Check before drawing conclusions from the picture.
+    # Which samples are these? A guidance sweep overwrites generated.npz on every
+    # iteration, so the file can hold the last run, which may have diverged,
+    # rather than the intended one. The stored guidance and sample sd are
+    # printed so that the figure can be read with this in mind.
     gd = float(g["guidance"]) if "guidance" in g.files else None
     ssd = float(g["sample_sd"]) if "sample_sd" in g.files else None
     if gd is not None:
@@ -1673,17 +1686,17 @@ def showlabels(args):
               f"{int(g['ddim_steps']) if 'ddim_steps' in g.files else '?'} DDIM steps"
               + (f", standardised sd={ssd:.3f}" if ssd is not None else ""))
         if gd > 4.0 or (ssd is not None and abs(ssd - 1.0) > 0.3):
-            print("\n" + "!" * 68)
-            print("WARNING: these samples come from a DIVERGED or high-guidance run.")
-            print("The decoded images will look washed out and the landmark errors")
-            print("will be inflated. Re-sample at --guidance 3.0 before interpreting")
-            print("this figure:")
+            print("\n" + "=" * 68)
+            print("WARNING: guidance is above 4.0 or the standardised sd is more than 0.3 from 1.0;")
+            print("these samples are likely from a diverged or high-guidance run. The decoded")
+            print("images will look washed out and the landmark errors will be inflated.")
+            print("Re-sampling at --guidance 3.0 gives samples suitable for this figure:")
             print(f"   python diffusion_latent.py --mode sample --out-dir {out} "
                   f"--n 500 --steps 500 --guidance 3.0")
-            print("!" * 68 + "\n")
+            print("=" * 68 + "\n")
     else:
-        print("NOTE: this generated.npz predates guidance logging — if a guidance "
-              "sweep wrote to this directory, it may hold the last (diverged) run.")
+        print("Note: this generated.npz does not record its guidance setting; if a guidance "
+              "sweep wrote to this directory, it may hold the last run, which may have diverged.")
 
     tr = np.load(Path(args.latents_dir) / f"latents_{args.config}_train.npz", allow_pickle=True)
     te = np.load(Path(args.latents_dir) / f"latents_{args.config}_test.npz", allow_pickle=True)
@@ -1691,7 +1704,7 @@ def showlabels(args):
     asp_te = load_aspects(te["uuids"], args.img_dir)
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    print("training the reference detector on REAL latents…")
+    print("Training the reference detector on real latents...")
     det = _train_detector(tr["latents"].astype(np.float32),
                           tr["landmarks"].astype(np.float32), device, args.fid_epochs)
 
@@ -1748,22 +1761,22 @@ def showlabels(args):
     er = _lm_err(Pte, Lte[:len(Pte)])
     print(f"\nmean |asked - found|:  generated {eg.mean():.4f}   real {er.mean():.4f}")
     print(f"in pixels on a {S}px canvas: generated ~{eg.mean()*S:.0f}px, real ~{er.mean()*S:.0f}px")
-    print("\nLOOK AT THE FIGURE. The question is not 'is there error' but WHAT KIND:")
+    print("\nInterpretation of the figure (what kind of error, not whether there is error):")
     print("  * red near green, wrong curve shape -> conditioning loosely followed")
     print("  * red forming a generic centred spine regardless of green -> ignored")
     print("  * red scattered/nonsensical -> the detector is failing, not the model")
-    print(f"\nwrote {out}/label_quality.png")
+    print(f"\nWrote {out}/label_quality.png")
 
 
-# ==========================================================================
+# --- Mode: decode ---
 def decode(args):
     """Decode generated latents through MedVAE and save a comparison figure.
 
-    THIS IS THE KILL-CRITERION CHECK. Distribution statistics cannot tell
-    "structurally correct but noisy" from "structured noise that is not a
-    spine". Only looking can. Real reconstructions are shown alongside so the
-    comparison is against what MedVAE can actually produce, not against the
-    original radiograph."""
+    This is the first validation criterion (do samples decode to spine-like
+    images?). Distribution statistics cannot tell "structurally correct but
+    noisy" from "structured noise that is not a spine"; visual inspection can.
+    Real reconstructions are shown alongside so the comparison is against what
+    MedVAE can produce, not against the original radiograph."""
     import torch
     import matplotlib
     matplotlib.use("Agg")
@@ -1792,7 +1805,7 @@ def decode(args):
                         return o.float().cpu().numpy()
                 except Exception:
                     continue
-        raise RuntimeError("could not decode — check the MedVAE API")
+        raise RuntimeError("could not decode; the MedVAE API may differ from the entry points tried")
 
     n = min(args.n_show, len(gen))
     gimg = dec(gen[:n])
@@ -1819,18 +1832,18 @@ def decode(args):
     fig.savefig(out / "generated_samples.png", dpi=130, bbox_inches="tight")
     plt.close(fig)
 
-    print(f"decoded {n} samples -> {out}/generated_samples.png")
+    print(f"Decoded {n} samples -> {out}/generated_samples.png")
     print(f"  generated pixel range [{gimg.min():+.2f},{gimg.max():+.2f}]")
     if real is not None:
         print(f"  real      pixel range [{real.min():+.2f},{real.max():+.2f}]")
-    print("\nLOOK AT THE FIGURE. Ask:")
+    print("\nQuestions for the figure:")
     print("  * is there a recognisable vertebral column?")
     print("  * does the curve follow the conditioning shape?")
     print("  * are ribs/pelvis plausible, or is it textured noise?")
-    print("If it is not spine-like, STOP — no downstream number will be meaningful.")
+    print("If it is not spine-like, the downstream results are likely invalid.")
 
 
-# ==========================================================================
+# --- Synthetic-data self-test ---
 def smoke():
     rng = np.random.default_rng(0)
 
@@ -1878,7 +1891,7 @@ def smoke():
               f"(expect (2, 1, 96, 96))")
         ok_net = tuple(y.shape) == (2, 1, 96, 96)
     except ImportError:
-        print("   torch unavailable — skipping UNet check")
+        print("   torch unavailable; skipping the UNet check")
         ok_net = True
 
 
@@ -1901,14 +1914,14 @@ def smoke():
                              if k in n2b.state_dict()}, strict=False)
         with torch.no_grad():
             d = float((n2(x, t, c) - n2b(x, t, c)).abs().mean())
-        print(f"   cross-attn contribution at init: {d:.2e} (zero-init => ~0)")
+        print(f"   cross-attn contribution at init: {d:.2e} (zero-init -> ~0)")
         ok_x = tuple(y2.shape) == (2, 1, 96, 96) and p2 > p1
     except ImportError:
-        print("   torch unavailable — verify on the A100")
+        print("   torch unavailable; skipping the cross-attention check")
         ok_x = True
 
     ok = mono and peak_ok and cx2 > cx1 + 5 and in_range and ok_net and ok_x
-    print("\nSMOKE:", "PASS" if ok else "FAIL")
+    print("\nSelf-test:", "PASS" if ok else "FAIL")
 
 
 def main():
@@ -1920,7 +1933,7 @@ def main():
                     default="train")
     ap.add_argument("--latents-dir", type=Path)
     ap.add_argument("--img-dir", type=Path,
-                    help="REQUIRED for training: needed to map landmarks into "
+                    help="required for training: used to map landmarks into "
                          "aspect-padded canvas coordinates")
     ap.add_argument("--config", default="medvae_4_1_2d")
     ap.add_argument("--out-dir", type=Path, default=Path("./outputs/diffusion"))
@@ -1933,7 +1946,7 @@ def main():
                     help="4 corner heatmaps + 1 filled vertebra-body channel")
     ap.add_argument("--sigma", type=float, default=3.0, help="condition heatmap sigma")
     ap.add_argument("--cross-attn", action="store_true",
-                    help="inject the condition by CROSS-ATTENTION as well as "
+                    help="inject the condition by cross-attention as well as "
                          "concatenation (the standard mechanism for non-local "
                          "conditioning in text-to-image diffusion)")
     ap.add_argument("--n-tokens", type=int, default=64,
@@ -1957,21 +1970,21 @@ def main():
                     help="fraction of generated samples to keep when filtering by "
                          "detector agreement")
     ap.add_argument("--util-seeds", nargs="+", type=int, default=[0, 1, 2],
-                    help="seeds per arm in the utility test")
+                    help="seeds per condition in the utility test")
     ap.add_argument("--n-overfit", type=int, default=8,
                     help="how many pairs to overfit")
     ap.add_argument("--overfit-epochs", type=int, default=300)
     ap.add_argument("--inner", type=int, default=20,
-                    help="noise draws per epoch (few samples => noise-dominated gradient)")
+                    help="noise draws per epoch (few samples -> noise-dominated gradient)")
     ap.add_argument("--scale-ks", nargs="+", type=int,
                     default=[8, 16, 32, 64, 128, 256],
                     help="training-set sizes to sweep (full size is appended)")
     ap.add_argument("--scale-exposures", type=int, default=6000,
                     help="exposures per sample, identical at every k. 6000 matches "
-                         "the overfit run that achieved 8/8; 600 was ~10x "
-                         "undertrained and produced an uninterpretable sweep.")
+                         "the overfit run (300 epochs x 20 noise draws); much smaller "
+                         "values leave large k undertrained.")
     ap.add_argument("--scale-heldout", type=int, default=16,
-                    help="spines reserved from ALL training sets, used as the "
+                    help="spines reserved from all training sets, used as the "
                          "fixed held-out evaluation set at every k")
     ap.add_argument("--scale-eval", type=int, default=16,
                     help="samples scored per k")
@@ -1985,7 +1998,7 @@ def main():
         smoke()
     elif args.mode == "train":
         if not args.latents_dir:
-            raise SystemExit("--latents-dir required for training")
+            raise SystemExit("--latents-dir is required for training")
         train(args)
     elif args.mode == "sample":
         sample(args)
@@ -1993,35 +2006,35 @@ def main():
         decode(args)
     elif args.mode == "scaling":
         if not (args.latents_dir and args.img_dir):
-            raise SystemExit("--latents-dir and --img-dir required for scaling")
+            raise SystemExit("--latents-dir and --img-dir are required for scaling")
         scaling(args)
     elif args.mode == "overfit":
         if not (args.latents_dir and args.img_dir):
-            raise SystemExit("--latents-dir and --img-dir required for overfit")
+            raise SystemExit("--latents-dir and --img-dir are required for overfit")
         overfit(args)
     elif args.mode == "utility":
         if not args.latents_dir:
-            raise SystemExit("--latents-dir required for utility")
+            raise SystemExit("--latents-dir is required for utility")
         utility(args)
     elif args.mode == "showlabels":
         if not (args.latents_dir and args.img_dir):
-            raise SystemExit("--latents-dir and --img-dir required for showlabels")
+            raise SystemExit("--latents-dir and --img-dir are required for showlabels")
         showlabels(args)
     elif args.mode == "diagnose":
         if not (args.latents_dir and args.img_dir):
-            raise SystemExit("--latents-dir and --img-dir required for diagnose")
+            raise SystemExit("--latents-dir and --img-dir are required for diagnose")
         diagnose(args)
     elif args.mode == "align":
         if not (args.latents_dir and args.img_dir):
-            raise SystemExit("--latents-dir and --img-dir required for align")
+            raise SystemExit("--latents-dir and --img-dir are required for align")
         align(args)
     elif args.mode == "fidelity":
         if not args.latents_dir:
-            raise SystemExit("--latents-dir required for fidelity")
+            raise SystemExit("--latents-dir is required for fidelity")
         fidelity(args)
     else:
         if not args.latents_dir:
-            raise SystemExit("--latents-dir required for validation")
+            raise SystemExit("--latents-dir is required for validation")
         validate(args)
 
 

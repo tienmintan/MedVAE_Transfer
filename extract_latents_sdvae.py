@@ -1,27 +1,30 @@
 """
-extract_latents_sdvae.py
+extract_latents_sdvae.py: extract BoostNet latents with Stable Diffusion's VAE as the encoder.
 
-Extract latents from BoostNet spine X-rays using Stable Diffusion's VAE
-(stabilityai/sd-vae-ft-mse) as the encoder. Parallel to extract_latents_whole.py
-but with SD-VAE in place of MedVAE.
+Uses stabilityai/sd-vae-ft-mse. Parallel to extract_latents_whole.py but with
+SD-VAE in place of MedVAE.
 
-The (a) experiment: test whether SD-VAE — which was trained with proper KL
-regularisation specifically for use as a diffusion backbone — produces a
-better-conditioned latent target than MedVAE for our Cobb-conditioned
-diffusion task. The reconstruction sanity check showed mean PSNR ~36 dB
-with visually clean recons, so the domain gap is manageable.
+Tests whether SD-VAE, which was trained with KL regularisation specifically
+for use as a diffusion backbone, produces a better-conditioned latent target
+than MedVAE for the Cobb-conditioned diffusion task. The size of the domain
+gap is assessed by the SD-VAE reconstruction sanity check
+(sdvae_reconstruction_check.py).
 
 Pipeline per image:
-  1. Open at native resolution, grayscale.
+  1. Open at native resolution, greyscale.
   2. Resize to 768x256 (H x W; aspect ratio ~1:3, close to BoostNet's
-     native 1:2.8; both dims multiple of 32 for clean U-Net downsampling).
-  3. Repeat grayscale across 3 RGB channels (SD-VAE expects 3-channel input).
+     native 1:2.8; both dims multiple of 32 so U-Net downsampling divides
+     without remainder).
+  3. Repeat greyscale across 3 RGB channels (SD-VAE expects 3-channel input).
   4. Scale to [-1, 1] (SD-VAE convention).
   5. Single forward pass through encoder. Produces (4, 96, 32) latent.
   6. Save one .npz per split keyed by image_uuid.
 
 Schema matches extract_latents_whole.py: `latents` and `uuids` arrays per
 split file, so train_diffusion.py works without modification.
+
+Inputs:  --csv (image_uuid, split); JPEG images in --img-dir.
+Outputs: <out-dir>/latents_{train,val,test}.npz (compressed).
 
 Usage:
     python extract_latents_sdvae.py \\
@@ -41,7 +44,7 @@ from tqdm import tqdm
 from diffusers import AutoencoderKL
 
 
-H_FIX, W_FIX = 768, 256       # (H, W) — multiples of 32, aspect ratio ~1:3
+H_FIX, W_FIX = 768, 256       # (H, W); multiples of 32, aspect ratio ~1:3
 DOWNSAMPLE = 8                 # SD-VAE has 8x spatial compression
 LATENT_H, LATENT_W = H_FIX // DOWNSAMPLE, W_FIX // DOWNSAMPLE       # 96, 32
 LATENT_CHANNELS = 4
@@ -63,9 +66,9 @@ def encode_one(vae, image_path: Path, device: torch.device,
     inp = (inp * 2.0) - 1.0                                            # [-1, 1]
     inp = inp.to(device=device, dtype=dtype)
 
-    # `.latent_dist.mode()` returns the Gaussian posterior mean — the
-    # deterministic latent used at inference, matching what we did for
-    # MedVAE via posterior.mode().
+    # `.latent_dist.mode()` returns the Gaussian posterior mean, the
+    # deterministic latent used at inference; this matches the MedVAE
+    # extraction, which uses posterior.mode().
     latent = vae.encode(inp).latent_dist.mode()         # (1, 4, 96, 32)
     return latent.float().squeeze(0).cpu().numpy()
 

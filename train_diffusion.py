@@ -1,17 +1,15 @@
 """
-train_diffusion.py
-
-Train a conditional latent diffusion model in SD-VAE or MedVAE latent space.
+train_diffusion.py: train a Cobb-conditioned latent diffusion model in SD-VAE or MedVAE latent space.
 
 Two data modes supported:
 
-  v1 (original): --latents-dir + --labels-csv
+  v1 schema: --latents-dir + --labels-csv
       Expects a directory with latents_train.npz / latents_val.npz files
       (separate per-split, no angles inside), joined with a CSV of Cobb
       angles by image_uuid. This is what extract_latents_whole.py and
-      friends produce.
+      similar scripts produce.
 
-  v2 (unified): --latents-files file1.npz file2.npz ...
+  v2 schema (unified): --latents-files file1.npz file2.npz ...
       Each file has latents / image_ids / splits / angles (optional) /
       aspect_pad in a single .npz. Multiple files are concatenated.
       boostnet_test entries are dropped from training automatically.
@@ -25,10 +23,14 @@ Two training modes supported:
 
   Unconditional (--unconditional): bypass Cobb conditioning. Every sample
       uses the null embedding. Used for the unconditional pretraining
-      phase on the pooled VinDr+BoostNet corpus.
+      stage on the pooled VinDr+BoostNet corpus.
 
 Use --resume-from to load model + EMA weights from a previous checkpoint.
-Optimizer and LR schedule are reset (fresh warmup for the new phase).
+Optimizer and LR schedule are reset (fresh warmup for the new stage).
+
+Outputs (in --out-dir): final.pt (model, EMA, Cobb and latent
+standardisation stats, hyperparameters), samples_epoch_NNNN.npz (periodic
+samples, un-standardised), history.csv, config.json.
 
 Two-stage pipeline (the recommended usage for the VinDr-extended pipeline):
 
@@ -62,9 +64,7 @@ from torch.utils.data import Dataset, DataLoader
 from diffusion_model import UNet, GaussianDiffusion, EMA
 
 
-# ----------------------------------------------------------------------------
-# Data
-# ----------------------------------------------------------------------------
+# --- Data ---
 
 class CobbLatentDataset(Dataset):
     """Latents + standardised Cobb angles, joined by uuid.
@@ -87,10 +87,10 @@ class CobbLatentDataset(Dataset):
         z = torch.from_numpy(self.latents[idx]).float()
         c = torch.from_numpy(self.cobb_std[idx]).float()
 
-        # Horizontal flip augmentation in latent space — width axis is the
+        # Horizontal flip augmentation in latent space: the width axis is the
         # lateral (left-right) anatomical axis, so flipping is a valid
-        # augmentation. Cobb magnitudes are sign-invariant (we always
-        # measure the absolute angle), so labels are unchanged.
+        # augmentation. Cobb magnitudes are sign-invariant (the absolute
+        # angle is always measured), so labels are unchanged.
         if torch.rand(1).item() < self.hflip_p:
             z = torch.flip(z, dims=[-1])
 
@@ -122,10 +122,10 @@ def load_data(latents_dir: Path, labels_csv: Path):
 
     print(f"Train + val pooled: {len(pooled_latents)} samples")
     print(f"  Latent shape per sample: {pooled_latents.shape[1:]}")
-    print(f"  Angle range: PT [{pooled_angles[:,0].min():.1f}, "
-          f"{pooled_angles[:,0].max():.1f}], MT "
+    print(f"  Angle range: major curve (col 0) [{pooled_angles[:,0].min():.1f}, "
+          f"{pooled_angles[:,0].max():.1f}], col 1 "
           f"[{pooled_angles[:,1].min():.1f}, {pooled_angles[:,1].max():.1f}], "
-          f"TL [{pooled_angles[:,2].min():.1f}, {pooled_angles[:,2].max():.1f}]")
+          f"col 2 [{pooled_angles[:,2].min():.1f}, {pooled_angles[:,2].max():.1f}]")
 
     return pooled_latents, pooled_angles
 
@@ -137,12 +137,12 @@ def load_data_from_files(files: list, require_angles: bool):
       latents    : (N, C, H, W)
       image_ids  : (N,) strings
       splits     : (N,) strings (e.g. "boostnet_train", "vindr_train", ...)
-      angles     : (N, 3) — optional; required if require_angles=True
+      angles     : (N, 3), optional; required if require_angles=True
 
     All "boostnet_test" entries are filtered out (held back for downstream
     evaluation). Everything else is used for training.
 
-    For files without angles (e.g. the unlabeled VinDr pool used during
+    For files without angles (e.g. the unlabelled VinDr pool used during
     unconditional pretraining), angles are filled with zeros and a
     ValueError is raised if require_angles=True.
 
@@ -184,19 +184,17 @@ def load_data_from_files(files: list, require_angles: bool):
                     for s in sorted(set(pooled_splits.tolist()))))
     if require_angles:
         print(f"  Angle range: "
-              f"PT [{pooled_angles[:,0].min():.1f}, "
+              f"major curve (col 0) [{pooled_angles[:,0].min():.1f}, "
               f"{pooled_angles[:,0].max():.1f}], "
-              f"MT [{pooled_angles[:,1].min():.1f}, "
+              f"col 1 [{pooled_angles[:,1].min():.1f}, "
               f"{pooled_angles[:,1].max():.1f}], "
-              f"TL [{pooled_angles[:,2].min():.1f}, "
+              f"col 2 [{pooled_angles[:,2].min():.1f}, "
               f"{pooled_angles[:,2].max():.1f}]")
 
     return pooled_latents, pooled_angles
 
 
-# ----------------------------------------------------------------------------
-# Periodic sample generation (visual sanity check during training)
-# ----------------------------------------------------------------------------
+# --- Periodic sample generation (visual sanity check during training) ---
 
 @torch.no_grad()
 def generate_samples(model, diffusion, ema, sampling_angles: torch.Tensor,
@@ -213,29 +211,27 @@ def generate_samples(model, diffusion, ema, sampling_angles: torch.Tensor,
     return samples.detach().cpu()
 
 
-# ----------------------------------------------------------------------------
-# Training loop
-# ----------------------------------------------------------------------------
+# --- Training loop ---
 
 def main():
     p = argparse.ArgumentParser()
-    # Data sources — two mutually exclusive modes
+    # Data sources: two mutually exclusive modes
     p.add_argument("--latents-dir", type=Path, default=None,
-                   help="Old schema: directory with latents_train.npz + "
+                   help="v1 schema: directory with latents_train.npz + "
                         "latents_val.npz files (joined with --labels-csv). "
                         "Use --latents-files instead for the v2 schema.")
     p.add_argument("--labels-csv", type=Path, default=None,
                    help="Required with --latents-dir.")
     p.add_argument("--latents-files", type=Path, nargs="+", default=None,
-                   help="New unified schema: one or more .npz files each "
+                   help="v2 (unified) schema: one or more .npz files each "
                         "containing latents/image_ids/splits/angles. "
                         "Multiple files are pooled. boostnet_test entries "
                         "are dropped automatically.")
     # Training mode
     p.add_argument("--unconditional", action="store_true",
-                   help="Ignore Cobb angles entirely — use null embedding "
+                   help="Ignore Cobb angles entirely; use null embedding "
                         "for every sample. Required for the unconditional "
-                        "pretraining phase on data without Cobb labels.")
+                        "pretraining stage on data without Cobb labels.")
     p.add_argument("--resume-from", type=Path, default=None,
                    help="Path to a checkpoint to resume from. Model and EMA "
                         "weights are loaded; optimizer and LR schedule are "
@@ -263,7 +259,7 @@ def main():
                    help="Diffusion target parameterization. 'eps' predicts "
                         "noise directly (standard DDPM). 'v' predicts the "
                         "v-target from Salimans & Ho 2022, which is more "
-                        "numerically stable across timesteps — recommended "
+                        "numerically stable across timesteps; recommended "
                         "for heterogeneous data and small-data regimes.")
     p.add_argument("--channels", type=int, nargs="+",
                    default=[64, 128, 256, 256])
@@ -279,7 +275,7 @@ def main():
         p.error("Must provide either --latents-files (v2) or "
                 "--latents-dir + --labels-csv (v1).")
     if args.latents_files is not None and args.latents_dir is not None:
-        p.error("Provide either --latents-files OR --latents-dir, not both.")
+        p.error("Provide either --latents-files or --latents-dir, not both.")
     if args.latents_dir is not None and args.labels_csv is None:
         p.error("--latents-dir requires --labels-csv.")
 
@@ -288,7 +284,7 @@ def main():
     device = torch.device(args.device)
     args.out_dir.mkdir(parents=True, exist_ok=True)
 
-    # ---------- Data ----------
+    # --- Data ---
     if args.latents_files is not None:
         print(f"Loading from v2 schema files:")
         latents, angles = load_data_from_files(
@@ -305,7 +301,7 @@ def main():
     print(f"Cobb angle mean: {cobb_mean.round(2)}")
     print(f"Cobb angle std:  {cobb_std.round(2)}")
 
-    # Latent standardisation — scalar mean and std across the full training set.
+    # Latent standardisation: scalar mean and std across the full training set.
     # Cast to fp32 before computing to avoid fp16 overflow on large pools.
     latents_fp32 = latents.astype(np.float32)
     latent_mean = float(latents_fp32.mean())
@@ -335,7 +331,7 @@ def main():
                         num_workers=2, pin_memory=True, drop_last=True)
     print(f"Dataloader: {len(loader)} batches per epoch")
 
-    # ---------- Model + diffusion process ----------
+    # --- Model + diffusion process ---
     model = UNet(in_channels=latents.shape[1],
                  channels=tuple(args.channels),
                  embed_dim=args.embed_dim).to(device)
@@ -348,8 +344,8 @@ def main():
     print(f"Diffusion parameterization: {args.parameterization}")
 
     # If resuming, load model + EMA weights from checkpoint. Optimizer and
-    # LR schedule are deliberately NOT loaded — we want a fresh learning-rate
-    # warmup for the fine-tuning phase.
+    # LR schedule are not loaded, so the fine-tuning stage starts with a
+    # fresh learning-rate warmup.
     if resume_ckpt is not None:
         # Verify architecture compatibility
         ckpt_hp = resume_ckpt["hyperparams"]
@@ -368,11 +364,11 @@ def main():
         print(f"  Loaded model + EMA weights from checkpoint "
               f"(was at epoch {resume_ckpt.get('epoch', '?')})")
         if resume_ckpt.get("was_unconditional", False):
-            print(f"  Checkpoint was trained unconditionally — Cobb "
+            print(f"  Checkpoint was trained unconditionally; Cobb "
                   f"embedding starts from initialisation for this run.")
         del resume_ckpt   # Free memory
 
-    # ---------- Optimisation ----------
+    # --- Optimisation ---
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr,
                                   betas=(0.9, 0.999), weight_decay=0.0)
 
@@ -380,15 +376,15 @@ def main():
     def lr_lambda(step):
         if step < args.warmup_steps:
             return step / max(1, args.warmup_steps)
-        return 1.0   # constant after warmup; cosine is overkill at this scale
+        return 1.0   # constant after warmup; a cosine schedule is unnecessary at this scale
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
 
     autocast_dtype = torch.bfloat16 if args.mixed_precision else torch.float32
 
-    # ---------- Fixed sampling angles for periodic visualisation ----------
-    # In unconditional mode, the conditioning is ignored at sample time so
-    # we just use zeros. In conditional mode, two anchor points (mild +
-    # severe scoliosis) let us visually check whether conditioning works.
+    # --- Fixed sampling angles for periodic visualisation ---
+    # In unconditional mode, the conditioning is ignored at sample time, so
+    # zeros are used. In conditional mode, two anchor points (mild + severe
+    # scoliosis) allow a visual check of whether conditioning works.
     if args.unconditional:
         sample_angles_raw = np.array([[0.0, 0.0, 0.0],
                                        [0.0, 0.0, 0.0]], dtype=np.float32)
@@ -407,15 +403,15 @@ def main():
     # In unconditional mode, every sample is treated as "no conditioning"
     # (drop probability = 1). The Cobb embedding MLP receives gradient zero
     # (its output is masked away) and stays at initialisation, which is the
-    # desired behaviour for the unconditional pretrain phase.
+    # desired behaviour for the unconditional pretraining stage.
     effective_cond_drop_prob = 1.0 if args.unconditional else args.cond_drop_prob
     if args.unconditional:
-        print(f"Mode: UNCONDITIONAL — always using null embedding "
+        print(f"Mode: unconditional; always using null embedding "
               f"(cond_drop_prob forced to 1.0)")
     else:
-        print(f"Mode: CONDITIONAL — cond_drop_prob={effective_cond_drop_prob}")
+        print(f"Mode: conditional; cond_drop_prob={effective_cond_drop_prob}")
 
-    # ---------- Training loop ----------
+    # --- Training loop ---
     print(f"\nTraining for {args.epochs} epochs...")
     history = []
     global_step = 0
@@ -448,7 +444,7 @@ def main():
             print(f"  [epoch {epoch:3d}] loss={avg_loss:.4f}  "
                   f"lr={optimizer.param_groups[0]['lr']:.2e}")
 
-        # ---------- Periodic sample generation ----------
+        # --- Periodic sample generation ---
         if args.sample_every > 0 and (epoch % args.sample_every == 0
                                        or epoch == args.epochs):
             samples = generate_samples(
@@ -466,7 +462,7 @@ def main():
                   f"(standardised stats: mean={samples.mean():.3f} "
                   f"std={samples.std():.3f})")
 
-    # ---------- Save final checkpoint ----------
+    # --- Save final checkpoint ---
     ckpt = {
         "epoch":             args.epochs,
         "model":             model.state_dict(),

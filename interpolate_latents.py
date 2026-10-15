@@ -1,30 +1,33 @@
 """
-interpolate_latents.py
+interpolate_latents.py: generate synthetic training latents by interpolating between pairs of real latents.
 
-Generate synthetic latents via linear interpolation between pairs of real
-training latents. Mixup-style data augmentation in MedVAE's latent space:
+Mixup-style data augmentation in MedVAE's latent space:
 
-    z_synth = (1 - α) · z_a + α · z_b
-    y_synth = (1 - α) · y_a + α · y_b
+    z_synth = (1 - α) * z_a + α * z_b
+    y_synth = (1 - α) * y_a + α * y_b
 
 where (z_a, y_a) and (z_b, y_b) are random pairs from the real training set
-and α ~ Beta(0.4, 0.4) — biased toward the endpoints so interpolations are
-typically closer to one of the source samples (the standard mixup paper's
-recommendation).
+and α ~ Beta(0.4, 0.4), which is biased toward the endpoints so
+interpolations are typically closer to one of the source samples (the
+standard mixup paper's recommendation).
 
-This bypasses the diffusion approach entirely. The rationale:
+This is an alternative to diffusion-based synthesis. The rationale:
   - VAE latent spaces are approximately locally linear; interpolation
     between nearby real samples should produce plausible intermediate
     representations.
   - Cobb angles are continuous and angles between two scoliosis severities
     are semantically meaningful, so label interpolation is well-defined.
-  - No training instability to debug — pure deterministic operation on
-    existing data.
+  - No training instability to debug: interpolation is a deterministic
+    operation on existing data.
 
 Output schema matches extract_latents.py (combined train+val+test in a
-single .npz with `latents`, `angles`, `splits`, `uuids`), so the existing
+single .npz with `latents`, `angles`, `splits`, `uuids`), so
 train_cobb_regressor.py can consume it directly. Synthetic samples are
 tagged with the "train" split and unique uuids prefixed with "interp_".
+
+Inputs:  --input .npz from extract_latents.py.
+Outputs: --output .npz containing the real samples plus --n-synth synthetic
+         train samples; summary statistics printed to stdout.
 
 Usage:
     # Generate 500 synthetic training samples, augmenting the 4x baseline
@@ -79,7 +82,7 @@ def main() -> None:
     print(f"  Split counts: " + ", ".join(
         f"{s}={(splits == s).sum()}" for s in ["train", "val", "test"]))
 
-    # Restrict pair sampling to TRAIN ONLY — never leak val/test into synthesis
+    # Restrict pair sampling to the train split so no val/test data enters synthesis
     train_mask = (splits == "train")
     train_lat = latents[train_mask]
     train_ang = angles[train_mask]
@@ -93,7 +96,7 @@ def main() -> None:
     if args.diverse_pairs:
         # For each synthetic sample: pick first index uniformly, then pick
         # second index biased toward samples with very different Cobb angle.
-        # We use distance in angle-space as the sampling weight.
+        # Distance in angle space is used as the sampling weight.
         idx_a = rng.integers(0, n_train, size=args.n_synth)
         idx_b = np.empty(args.n_synth, dtype=np.int64)
         for i in range(args.n_synth):
@@ -134,9 +137,9 @@ def main() -> None:
     print(f"  mean={synth_lat.mean():.3f} std={synth_lat.std():.3f}")
     print(f"  (real train: mean={train_lat.mean():.3f} std={train_lat.std():.3f})")
     print(f"Synthetic angle stats:")
-    print(f"  Range PT: [{synth_ang[:,0].min():.1f}, {synth_ang[:,0].max():.1f}]")
-    print(f"  Range MT: [{synth_ang[:,1].min():.1f}, {synth_ang[:,1].max():.1f}]")
-    print(f"  Range TL: [{synth_ang[:,2].min():.1f}, {synth_ang[:,2].max():.1f}]")
+    print(f"  Range, major curve (col 0): [{synth_ang[:,0].min():.1f}, {synth_ang[:,0].max():.1f}]")
+    print(f"  Range, col 1:               [{synth_ang[:,1].min():.1f}, {synth_ang[:,1].max():.1f}]")
+    print(f"  Range, col 2:               [{synth_ang[:,2].min():.1f}, {synth_ang[:,2].max():.1f}]")
     print(f"  α distribution: mean={alpha.mean():.3f} std={alpha.std():.3f}")
 
     # Concatenate with real samples

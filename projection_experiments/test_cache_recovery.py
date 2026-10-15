@@ -35,7 +35,7 @@ def project(values): return (values * np.float32(.5) + values) * np.float32(2)
 
 class RecoveryChecks(unittest.TestCase):
     def test_uploaded_current_diagnosis_passes_fixed_but_not_strict(self):
-        # Both current-mode reports from the user's diagnosis, not invented outputs.
+        # Both current-mode reports are taken from a recorded diagnosis run, not synthetic values.
         for sd, rms, maximum in ((6.980359812730266, .0003213561708085434, .017161846160888672),
                                  (9.75750309404694, .00029491225276095397, .011945247650146484)):
             report = dict(passed=False, expected_sd=sd, rms=rms, max_abs=maximum)

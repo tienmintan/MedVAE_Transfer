@@ -1,15 +1,19 @@
 """
-recon_check.py — read-only reconnaissance for the compression-frontier direction.
+recon_check.py: read-only inventory of reconstruction tooling, compression configurations and landmark labels.
 
-Run on the workstation:  python recon_check.py
-It writes nothing and trains nothing. It just reports what exists, so we
-can plan the frequency/structure-loss analysis against reality rather than
-guesses.
+Writes nothing and trains nothing; it reports what exists on the workstation,
+as input to the frequency/structure-loss analysis (freq_loss_*.py).
 
-Three things it checks:
-  1. Reconstruction capability — can we encode AND decode with MedVAE?
-  2. Compression configs — which model variants and latent files exist?
-  3. Landmark labels — where are they, what format, what coordinate convention?
+It checks:
+  1. Reconstruction capability: can MedVAE both encode and decode?
+  2. Compression configurations: which model variants and latent files exist?
+  3. Landmark labels: location, format and coordinate convention.
+
+Inputs:  files under ROOT (~/MedVAE/MedVAE) and the HuggingFace cache
+         (paths set in the module).
+Outputs: none; the report is printed to stdout.
+
+Usage:  python recon_check.py
 """
 
 import os
@@ -29,10 +33,8 @@ def hr(title):
     print("=" * 70)
 
 
-# ---------------------------------------------------------------------------
 # 1. Reconstruction capability
-# ---------------------------------------------------------------------------
-hr("1. RECONSTRUCTION CAPABILITY (encode -> decode -> image)")
+hr("1. Reconstruction capability (encode -> decode -> image)")
 
 # Look for any script that calls a decoder
 recon_keywords = ["decode", "reconstruct", "recon", "evaluate_reconstruction"]
@@ -75,16 +77,14 @@ try:
     if hasattr(inner, "decode"):
         print("  -> .decode(z) is available: full reconstruction is possible.")
     else:
-        print("  -> No .decode found on this object; need to locate the decoder.")
+        print("  -> No .decode found on this object; the decoder has to be located elsewhere.")
 except Exception as e:
     print(f"  Could not import/instantiate MVAE here ({e}).")
-    print("  (Not fatal — just means run this probe inside your training env.)")
+    print("  (Not fatal; the probe needs to run inside the training environment.)")
 
 
-# ---------------------------------------------------------------------------
-# 2. Compression configs available
-# ---------------------------------------------------------------------------
-hr("2. COMPRESSION CONFIGS (weights + extracted latents)")
+# 2. Compression configurations available
+hr("2. Compression configurations (weights + extracted latents)")
 
 # 2a. Which HF MedVAE variants are cached locally?
 print("HuggingFace MedVAE weight files in cache:")
@@ -117,18 +117,16 @@ for f in interesting:
     except Exception as e:
         print(f"  {rel:55s}  [unreadable: {e}]")
 
-print("\nChannel-variant check (do you have 3ch / 4ch latents?):")
+print("\nChannel-variant check (are 3ch / 4ch latents present?):")
 for tag in ["4_3", "8_4", "3ch", "4ch", "4_3_2d", "8_4_2d"]:
     matches = [f for f in npz_files if tag in os.path.basename(f).lower()]
     if matches:
         print(f"  '{tag}': {len(matches)} file(s) -> {[os.path.basename(m) for m in matches[:3]]}")
-print("  (If nothing prints above, you have spatial-only configs: 4x/1ch + 8x/1ch.)")
+print("  (If nothing is listed above, only spatial configurations are present: 4x/1ch + 8x/1ch.)")
 
 
-# ---------------------------------------------------------------------------
 # 3. Landmark labels
-# ---------------------------------------------------------------------------
-hr("3. LANDMARK LABELS (format + coordinate convention)")
+hr("3. Landmark labels (format + coordinate convention)")
 
 # Search common locations and extensions
 landmark_candidates = []
@@ -142,14 +140,14 @@ if landmark_candidates:
         print(f"  {os.path.relpath(f, ROOT)}  ({os.path.getsize(f)} bytes)")
 else:
     print("No landmark/.mat/coord files found under medvae/data/.")
-    print("AASCE/BoostNet landmarks are classically .mat files — they may be")
+    print("AASCE/BoostNet landmarks are usually .mat files; they may be")
     print("in a separate download dir. Searching home dir broadly:")
     broad = glob.glob(str(Path.home() / "**" / "*landmark*"), recursive=True)[:20]
     broad += glob.glob(str(Path.home() / "**" / "*.mat"), recursive=True)[:20]
     for f in sorted(set(broad))[:20]:
         print(f"  {f}")
 
-# Inspect the structure of the first .mat or landmark CSV we find
+# Inspect the structure of the first .mat or landmark CSV found
 def inspect_mat(path):
     try:
         import scipy.io as sio
@@ -164,7 +162,7 @@ def inspect_mat(path):
                 try:
                     arr = np.asarray(v, dtype=float)
                     print(f"        min={np.nanmin(arr):.3f} max={np.nanmax(arr):.3f} "
-                          f"-> {'likely NORMALISED [0,1]' if np.nanmax(arr) <= 1.5 else 'likely PIXEL coords'}")
+                          f"-> {'likely normalised [0,1]' if np.nanmax(arr) <= 1.5 else 'likely pixel coords'}")
                 except Exception:
                     pass
             else:
@@ -192,12 +190,12 @@ for c in csvs[:1]:
 # Also check the known bbox csv for coordinate convention reference
 bbox = DATA / "boostnet.csv"
 if bbox.exists():
-    print(f"\n  Reference — boostnet.csv head (known bbox file):")
+    print(f"\n  Reference: boostnet.csv head (known bbox file):")
     for i, line in enumerate(open(bbox)):
         if i > 2:
             break
         print(f"    {line.rstrip()[:160]}")
 
-hr("DONE — paste this whole output back")
-print("This tells us: (1) whether we can reconstruct, (2) which configs span")
-print("the frontier, (3) the landmark format. Then we write the frequency analysis.")
+hr("Done")
+print("Checks covered: (1) reconstruction capability, (2) which configurations span")
+print("the compression range, (3) the landmark format.")

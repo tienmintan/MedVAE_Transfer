@@ -1,35 +1,37 @@
 """
-recon_fidelity.py — the reconstruction-fidelity axis (PSNR / SSIM / LPIPS).
+recon_fidelity.py: reconstruction fidelity (PSNR / SSIM / LPIPS) for each MedVAE configuration.
 
-WHY THIS EXISTS. Every other task in the framework derives from the same 68
-landmarks, so they are different readouts of one annotation rather than
-independent tasks. Reconstruction fidelity is computed from PIXELS ALONE — it
-is the genuinely landmark-independent axis, and it is what turns a task list
-into a framework.
+The other tasks all derive from the same 68 landmarks, so they are different
+readouts of one annotation rather than independent tasks. Reconstruction
+fidelity is computed from pixels alone, so it is a landmark-independent axis.
 
-THE POINT IT MAKES. In practice people choose a compression level by looking at
-image-quality metrics. If PSNR/SSIM degrade smoothly with total compression
-while the clinical tasks track the SPATIAL axis only, then image-quality
-metrics give the wrong answer, and a task-aware, axis-aware recommendation is
-required instead. That is the framework's contribution.
+Compression levels are often chosen by image-quality metrics. If PSNR/SSIM
+degrade smoothly with total compression while the clinical tasks track the
+spatial axis only, image-quality metrics give the wrong answer, and a
+task-aware, axis-aware recommendation is needed instead.
 
-METHOD NOTES
-  * Reconstruction is compared against the ENCODER'S OWN INPUT (the aspect-
+Method notes:
+  * Reconstruction is compared against the encoder's own input (the aspect-
     padded square), not the raw file, so padding/resizing is not counted as
     reconstruction error.
-  * Metrics are computed on the CONTENT REGION ONLY. The aspect-padded canvas
+  * Metrics are computed on the content region only. The aspect-padded canvas
     is mostly flat black; including it inflates PSNR and SSIM substantially and
-    makes every config look better than it is.
-  * 3-channel models receive replicated grayscale and return 3 channels; the
+    makes every configuration appear better than it is.
+  * 3-channel models receive replicated greyscale and return 3 channels; the
     reconstruction is averaged back to one channel before comparison.
   * LPIPS is optional (needs the `lpips` package). PSNR/SSIM are implemented
     here in torch, so the script runs without extra dependencies.
 
-Run:
+Inputs:  --csv (image_uuid and split columns), --img-dir ({uuid}.jpg) and the
+         MedVAE models named in --configs.
+Outputs: <out-dir>/recon_fidelity_per_image.csv and
+         <out-dir>/recon_fidelity_summary.csv; summary tables printed to stdout.
+
+Usage:
   python recon_fidelity.py --img-dir ./medvae/data/boostnet \
       --csv ./medvae/data/boostnet_with_angles.csv --split test \
       --out-dir ./outputs/fidelity
-  python recon_fidelity.py --smoke
+  python recon_fidelity.py --smoke      # synthetic-data self-test
 """
 import argparse
 from pathlib import Path
@@ -46,14 +48,12 @@ COMPRESSION = {"medvae_4_3_2d": 16 / 3, "medvae_4_1_2d": 16.0,
                "medvae_8_4_2d": 16.0, "medvae_8_1_2d": 64.0}
 SPATIAL = {"medvae_4_3_2d": "4x", "medvae_4_1_2d": "4x",
            "medvae_8_4_2d": "8x", "medvae_8_1_2d": "8x"}
-# clinical reference (Cobb deg MAE) for the misleading-metric comparison
+# Cobb MAE reference values (deg) for the fidelity-vs-utility comparison
 COBB_REF = {"medvae_4_3_2d": 7.783, "medvae_4_1_2d": 7.678,
             "medvae_8_4_2d": 8.550, "medvae_8_1_2d": 8.235}
 
 
-# ==========================================================================
-# metrics (torch, dependency-free)
-# ==========================================================================
+# --- Metrics (torch, dependency-free) ---
 def psnr(a, b, data_range=1.0):
     """a, b in [0,1], same shape. Returns dB."""
     mse = float(((a - b) ** 2).mean())
@@ -97,13 +97,11 @@ def boot_ci(v, seed=0, nb=10000):
     return float(v.mean()), float(np.percentile(b, 2.5)), float(np.percentile(b, 97.5))
 
 
-# ==========================================================================
-# content-region masking
-# ==========================================================================
+# --- Content-region masking ---
 def content_bbox(x, thresh=1e-3):
     """Bounding box of non-padding content in a (H,W) tensor scaled to [0,1].
     Aspect-padding fills the unused canvas with a constant; including it in the
-    metrics inflates PSNR/SSIM, so we crop to the real image first."""
+    metrics inflates PSNR/SSIM, so the metrics are computed on this crop."""
     m = (x > (x.min() + thresh))
     rows = torch.where(m.any(1))[0]
     cols = torch.where(m.any(0))[0]
@@ -117,9 +115,7 @@ def to01(x):
     return ((x + 1.0) / 2.0).clamp(0, 1)
 
 
-# ==========================================================================
-# model I/O
-# ==========================================================================
+# --- Model I/O ---
 def match_in_channels(x, n_in):
     if x.shape[1] == n_in:
         return x
@@ -161,9 +157,9 @@ def decode(mvae, z):
         except Exception as e:                       # try the next entry point
             last = e
     raise RuntimeError(
-        "could not decode the latent — none of model.decode / decode / decoder / "
-        f"decode_first_stage worked (last error: {last}). Check the MedVAE API "
-        "and adjust decode() accordingly."
+        "could not decode the latent; none of model.decode / decode / decoder / "
+        f"decode_first_stage worked (last error: {last}). The MedVAE API may "
+        "differ, and decode() may need adjusting for this version."
     )
 
 
@@ -193,7 +189,7 @@ def probe_in_channels(mvae, x1, device):
     raise RuntimeError("could not determine encoder input channels")
 
 
-# ==========================================================================
+# --- Reconstruction ---
 def run(args):
     from medvae import MVAE
     from medvae.utils.loaders import load_2d_finetune_aspect
@@ -224,7 +220,7 @@ def run(args):
             str(Path(args.img_dir) / f"{uuids[0]}.jpg"), merge_channels=True
         ).unsqueeze(0).to(device)
         n_in = probe_in_channels(mvae, probe, device)
-        print(f"[{LABEL[config]}] encoder input {n_in}ch — reconstructing…")
+        print(f"[{LABEL[config]}] encoder input {n_in}ch; reconstructing...")
 
         for u in uuids:
             p = Path(args.img_dir) / f"{u}.jpg"
@@ -236,7 +232,7 @@ def run(args):
             if xr.shape[-2:] != x1.shape[-2:]:
                 xr = F.interpolate(xr, size=x1.shape[-2:], mode="bilinear",
                                    align_corners=False)
-            # back to a single grayscale channel for comparison
+            # back to a single greyscale channel for comparison
             orig = to01(x1[0].mean(0).float().cpu())
             recon = to01(xr[0].mean(0).float().cpu())
             r0, r1, c0, c1 = content_bbox(orig)          # exclude padding
@@ -280,7 +276,7 @@ def summarise(out, out_dir):
     sdf = pd.DataFrame(summary)
     sdf.to_csv(out_dir / "recon_fidelity_summary.csv", index=False)
 
-    # ---- the framework's point: does fidelity predict clinical utility? ----
+    # Does fidelity predict clinical utility?
     print("\n=== Does image quality predict clinical utility? ===")
     print(f"{'config':<8}{'total':>8}{'spatial':>9}{'PSNR':>9}{'SSIM':>9}{'Cobb (deg)':>12}")
     print("-" * 55)
@@ -293,16 +289,16 @@ def summarise(out, out_dir):
         r_ssim = np.corrcoef(sdf["ssim"], sdf["cobb_deg"])[0, 1]
         print(f"\nacross configs: corr(PSNR, Cobb error) = {r_psnr:+.2f}, "
               f"corr(SSIM, Cobb error) = {r_ssim:+.2f}")
-        print("  (strong NEGATIVE corr => better-looking images do give better Cobb;\n"
-              "   weak/positive => image-quality metrics MISLEAD about clinical utility)")
-        print("\nThe decisive comparison is the matched pair 4_1 vs 8_4 — same total\n"
-              "compression (16x). If their PSNR/SSIM are similar but their Cobb errors\n"
-              "differ by ~0.87 deg, fidelity cannot distinguish them and a task-aware,\n"
-              "axis-aware recommendation is required.")
-    print(f"\nwrote {out_dir}/recon_fidelity_per_image.csv and _summary.csv")
+        print("  (strong negative corr -> higher image quality goes with lower Cobb error;\n"
+              "   weak/positive -> image-quality metrics are misleading about clinical utility)")
+        print("\nThe matched pair 4_1 vs 8_4 has the same total compression (16x). If\n"
+              "their PSNR/SSIM are similar but their Cobb errors differ, fidelity\n"
+              "cannot distinguish them and a task-aware, axis-aware recommendation\n"
+              "is needed.")
+    print(f"\nWrote {out_dir}/recon_fidelity_per_image.csv and _summary.csv")
 
 
-# ==========================================================================
+# --- Synthetic-data self-test ---
 def smoke():
     torch.manual_seed(0)
     x = torch.rand(64, 64)
@@ -333,7 +329,7 @@ def smoke():
           and abs(p_off - 20.0) < 0.01
           and (r0, r1, c0, c1) == (5, 25, 7, 37))
     print(f"content bbox   : {(r0, r1, c0, c1)}   (expect (5, 25, 7, 37))")
-    print("\nSMOKE:", "PASS" if ok else "FAIL")
+    print("\nSelf-test:", "PASS" if ok else "FAIL")
 
 
 def main():
@@ -352,7 +348,7 @@ def main():
     elif args.img_dir and args.csv:
         run(args)
     else:
-        raise SystemExit("need --img-dir and --csv (or --smoke)")
+        raise SystemExit("--img-dir and --csv are required (or --smoke for the synthetic-data self-test)")
 
 
 if __name__ == "__main__":

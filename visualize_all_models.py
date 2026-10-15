@@ -1,7 +1,8 @@
 """
-visualize_all_models.py
+visualize_all_models.py: combined figure comparing all reconstruction and generative models.
 
-Combined comparison figure showing the full project's model lineup in one image.
+Shows the MedVAE and SD-VAE reconstructions and the diffusion samples in one
+image.
 
 Top section (per BoostNet test image, n=3):
     | Original | MedVAE 4× pretrained | MedVAE 4× patch (tile-and-stitch) |
@@ -12,17 +13,22 @@ Bottom section (n=3 synthetic samples per generative model):
     Row 2: Conditional diffusion samples (fine-tuned on BoostNet)
 
 Display conventions:
-  - All grayscale panels share percentile-based global windowing (default 1-99%)
+  - All greyscale panels share percentile-based global windowing (default 1-99%)
     so cross-panel comparison reflects real differences, not auto-scaling.
-  - All panels are square-aspect for clean column alignment; the patch
+  - All panels are square-aspect for consistent column alignment; the patch
     tile-and-stitch output (native ~1:2.8 aspect) is aspect-padded to square
     at display time without modifying the underlying reconstruction.
   - A single colorbar on the right shows the active intensity scale.
 
 Memory management:
-  Models are loaded sequentially: MedVAE 4× pretrained → reconstruct 3 → free,
-  then MedVAE 4× patch → reconstruct 3 → free, etc. SD-VAE is loaded once and
-  reused for both BoostNet reconstruction AND diffusion sample decoding.
+  Models are loaded sequentially: MedVAE 4× pretrained -> reconstruct 3 -> free,
+  then MedVAE 4× patch -> reconstruct 3 -> free, etc. SD-VAE is loaded once and
+  reused for both BoostNet reconstruction and diffusion sample decoding.
+
+Inputs:  --csv (with split) and BoostNet images in --img-dir; optionally the
+         patch-finetuned checkpoint and unconditional/conditional diffusion
+         sample .npz files (each omitted section is skipped).
+Outputs: the figure at --out.
 
 Usage:
     python visualize_all_models.py \\
@@ -53,12 +59,10 @@ from diffusers import AutoencoderKL as SDAutoencoderKL
 from medvae.models.autoencoder_kl import AutoencoderKL as MedVAEAutoencoderKL
 
 
-# ---------------------------------------------------------------------------
-# Image preprocessing helpers
-# ---------------------------------------------------------------------------
+# --- Image preprocessing helpers ---
 
 def load_and_aspect_pad(img_path: Path, target_size: int) -> torch.Tensor:
-    """Load grayscale image, aspect-pad to square with black borders,
+    """Load greyscale image, aspect-pad to square with black borders,
     resize to target_size x target_size, normalise to [-1, 1].
 
     Returns: (1, target_size, target_size) tensor in [-1, 1].
@@ -102,9 +106,7 @@ def aspect_pad_to_square(img: np.ndarray) -> np.ndarray:
     return out
 
 
-# ---------------------------------------------------------------------------
-# Model loaders
-# ---------------------------------------------------------------------------
+# --- Model loaders ---
 
 def load_medvae_pretrained(variant: str, device: torch.device) -> MedVAEAutoencoderKL:
     """Load a pretrained MedVAE variant from HuggingFace.
@@ -128,8 +130,8 @@ def load_medvae_pretrained(variant: str, device: torch.device) -> MedVAEAutoenco
 def load_medvae_patch_finetuned(ckpt_dir: Path, device: torch.device) -> MedVAEAutoencoderKL:
     """Load the patch-finetuned MedVAE 4×/1ch model from a checkpoint directory.
 
-    Accelerate's `best.pt` is a directory of sharded weights; we load
-    pytorch_model.bin (just the AE) with strict=False.
+    Accelerate's `best.pt` is a directory of sharded weights;
+    pytorch_model.bin (the autoencoder only) is loaded with strict=False.
     """
     # Architecture from pretrained 4×/1ch
     cfg_path = hf_hub_download(repo_id="stanfordmimi/MedVAE",
@@ -154,9 +156,9 @@ def load_medvae_patch_finetuned(ckpt_dir: Path, device: torch.device) -> MedVAEA
         sd = {k[len("model."):]: v for k, v in sd.items()}
     missing, unexpected = model.load_state_dict(sd, strict=False)
     if missing:
-        print(f"  Warning: {len(missing)} missing keys when loading patch ckpt")
+        print(f"  WARNING: {len(missing)} missing keys when loading the patch checkpoint (strict=False). Patch reconstructions may be unreliable.")
     if unexpected:
-        print(f"  Warning: {len(unexpected)} unexpected keys when loading patch ckpt")
+        print(f"  WARNING: {len(unexpected)} unexpected keys when loading the patch checkpoint (strict=False); they are ignored.")
     return model
 
 
@@ -167,9 +169,7 @@ def load_sdvae(device: torch.device, dtype: torch.dtype = torch.float16) -> SDAu
     return vae
 
 
-# ---------------------------------------------------------------------------
-# Reconstruction functions
-# ---------------------------------------------------------------------------
+# --- Reconstruction functions ---
 
 @torch.no_grad()
 def reconstruct_medvae(model, img_neg1to1: torch.Tensor, device) -> np.ndarray:
@@ -278,9 +278,7 @@ def decode_diffusion_samples(latents: np.ndarray, vae, device,
     return outputs
 
 
-# ---------------------------------------------------------------------------
-# Windowing
-# ---------------------------------------------------------------------------
+# --- Windowing ---
 
 def compute_global_bounds(arrays, mode: str, low_pct: float, high_pct: float):
     if mode == "fixed":
@@ -295,9 +293,7 @@ def compute_global_bounds(arrays, mode: str, low_pct: float, high_pct: float):
         raise ValueError(f"Unknown window mode: {mode}")
 
 
-# ---------------------------------------------------------------------------
-# Plot assembly
-# ---------------------------------------------------------------------------
+# --- Plot assembly ---
 
 def build_figure(records, gen_records, vmin, vmax, out_path: Path,
                   window_mode: str, window_low: float, window_high: float):
@@ -305,7 +301,7 @@ def build_figure(records, gen_records, vmin, vmax, out_path: Path,
 
     records: list of dicts, one per test image. Each has keys:
       "uuid", "Original", and one key per reconstruction model column name.
-    gen_records: dict mapping generative-model-name → list of (H, W) arrays.
+    gen_records: dict mapping generative-model-name -> list of (H, W) arrays.
 
     Layout: two separate subplot grids stacked vertically with a horizontal
     divider line between. Each grid uses an extra leftmost "label column"
@@ -325,7 +321,7 @@ def build_figure(records, gen_records, vmin, vmax, out_path: Path,
     n_gen_rows = len(gen_model_names)
     n_gen_cols = max((len(v) for v in gen_records.values()), default=0)
 
-    # Figure sizing — each panel is ~3 inches square, plus dedicated label
+    # Figure sizing: each panel is ~3 inches square, plus dedicated label
     # column (1.6") and colorbar gutter on the right (1.0").
     panel = 3.0
     label_w = 1.6
@@ -342,7 +338,7 @@ def build_figure(records, gen_records, vmin, vmax, out_path: Path,
     fig = plt.figure(figsize=(fig_w, fig_h), constrained_layout=False)
 
     # Master layout: 3 rows (recon block, divider, gen block), 2 cols
-    # (main panel area, colorbar gutter). The label column lives INSIDE
+    # (main panel area, colorbar gutter). The label column lives inside
     # the main panel area as its leftmost gridspec column.
     height_ratios = []
     if n_recon_rows > 0:  height_ratios.append(recon_h)
@@ -357,7 +353,7 @@ def build_figure(records, gen_records, vmin, vmax, out_path: Path,
 
     last_handle = None
 
-    # =============== Reconstruction block ===============
+    # --- Reconstruction block ---
     if n_recon_rows > 0:
         recon_block = master[0, 0].subgridspec(
             nrows=n_recon_rows, ncols=n_recon_cols + 1,
@@ -390,7 +386,7 @@ def build_figure(records, gen_records, vmin, vmax, out_path: Path,
                 if i == 0:
                     ax.set_title(col_name, fontsize=11, pad=6)
 
-    # =============== Section divider + bottom header ===============
+    # --- Section divider + bottom header ---
     if n_gen_rows > 0:
         div_ax = fig.add_subplot(master[1, 0])
         div_ax.set_xlim(0, 1); div_ax.set_ylim(0, 1)
@@ -404,7 +400,7 @@ def build_figure(records, gen_records, vmin, vmax, out_path: Path,
                      transform=div_ax.transAxes)
         div_ax.axis("off")
 
-    # =============== Generation block ===============
+    # --- Generation block ---
     if n_gen_rows > 0:
         gen_block = master[2, 0].subgridspec(
             nrows=n_gen_rows, ncols=n_gen_cols + 1,
@@ -432,7 +428,7 @@ def build_figure(records, gen_records, vmin, vmax, out_path: Path,
                 else:
                     ax.axis("off")
 
-    # =============== Colorbar ===============
+    # --- Colorbar ---
     if last_handle is not None:
         cbar_master_row = len(height_ratios) - 1   # span the gen block height
         # If there's only the recon block, colorbar spans master[0, 1].
@@ -452,16 +448,16 @@ def build_figure(records, gen_records, vmin, vmax, out_path: Path,
         cbar.set_label("Normalised pixel intensity", rotation=270,
                         labelpad=15, fontsize=10)
 
-    # =============== Suptitle (top section header) ===============
+    # --- Suptitle (top section header) ---
     fig.suptitle(
         "Reconstructions: pixel-level fidelity comparison "
         "across MedVAE and SD-VAE",
         fontsize=14, weight="bold", y=0.985,
     )
 
-    # =============== Bottom caption ===============
+    # --- Bottom caption ---
     if window_mode == "percentile":
-        caption = (f"Display windowing: {window_low:.0f}th–{window_high:.0f}th "
+        caption = (f"Display windowing: {window_low:.0f}th-{window_high:.0f}th "
                     f"percentile across all panels (vmin={vmin:.3f}, "
                     f"vmax={vmax:.3f}). Same scale for every panel.")
     elif window_mode == "minmax":
@@ -478,9 +474,7 @@ def build_figure(records, gen_records, vmin, vmax, out_path: Path,
     print(f"Saved {out_path}")
 
 
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
+# --- Main ---
 
 def main():
     p = argparse.ArgumentParser()
@@ -509,9 +503,7 @@ def main():
 
     device = torch.device(args.device)
 
-    # ------------------------------------------------------------------ #
-    # Pick test images
-    # ------------------------------------------------------------------ #
+    # --- Pick test images ---
     df = pd.read_csv(args.csv)
     test_df = df[df["split"] == "test"].reset_index(drop=True)
     rng = np.random.default_rng(args.seed)
@@ -530,9 +522,7 @@ def main():
         orig_disp = (orig_neg1to1.squeeze(0).numpy() + 1.0) / 2.0
         records.append({"uuid": uuid, "Original": orig_disp})
 
-    # ------------------------------------------------------------------ #
-    # MedVAE 4× pretrained
-    # ------------------------------------------------------------------ #
+    # --- MedVAE 4× pretrained ---
     print("\n[1/5] MedVAE 4× pretrained...")
     try:
         m_pre_4x = load_medvae_pretrained("4x1", device)
@@ -546,9 +536,7 @@ def main():
         for rec in records:
             rec["MedVAE 4× pretrained"] = None
 
-    # ------------------------------------------------------------------ #
-    # MedVAE 4× patch (tile-and-stitch)
-    # ------------------------------------------------------------------ #
+    # --- MedVAE 4× patch (tile-and-stitch) ---
     if args.patch_ckpt:
         print(f"\n[2/5] MedVAE 4× patch (tile-and-stitch) from {args.patch_ckpt}...")
         try:
@@ -567,9 +555,7 @@ def main():
         for rec in records:
             rec["MedVAE 4× patch (tile-and-stitch)"] = None
 
-    # ------------------------------------------------------------------ #
-    # MedVAE 8× pretrained
-    # ------------------------------------------------------------------ #
+    # --- MedVAE 8× pretrained ---
     print("\n[3/5] MedVAE 8× pretrained...")
     try:
         m_pre_8x = load_medvae_pretrained("8x1", device)
@@ -583,9 +569,7 @@ def main():
         for rec in records:
             rec["MedVAE 8× pretrained"] = None
 
-    # ------------------------------------------------------------------ #
-    # SD-VAE — used for both BoostNet recon AND diffusion sample decode
-    # ------------------------------------------------------------------ #
+    # --- SD-VAE (used for both BoostNet recon and diffusion sample decode) ---
     print("\n[4/5] SD-VAE 512×512 (also used for diffusion decoding)...")
     sdvae = load_sdvae(device)
     try:
@@ -596,9 +580,7 @@ def main():
         for rec in records:
             rec["SD-VAE 512×512"] = None
 
-    # ------------------------------------------------------------------ #
-    # Diffusion samples (decoded through the same SD-VAE)
-    # ------------------------------------------------------------------ #
+    # --- Diffusion samples (decoded through the same SD-VAE) ---
     print("\n[5/5] Decoding diffusion samples...")
     gen_records = {}
 
@@ -635,9 +617,7 @@ def main():
     del sdvae
     torch.cuda.empty_cache()
 
-    # ------------------------------------------------------------------ #
-    # Compute global windowing bounds, render figure
-    # ------------------------------------------------------------------ #
+    # --- Compute global windowing bounds, render figure ---
     all_arrays = []
     for rec in records:
         for v in rec.values():

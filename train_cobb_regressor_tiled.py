@@ -1,21 +1,23 @@
 """
-train_cobb_regressor_tiled.py
+train_cobb_regressor_tiled.py: train a Cobb angle regressor on tile-and-stitch latent grids.
 
-Phase 3 step 2 — train a Cobb angle regressor on the patch-encoded latent
-grids produced by extract_latents_tiled.py.
+The latent grids are patch-encoded by extract_latents_tiled.py. --arch
+selects the 1D-along-spine regressor described below or a 2D stride-2
+regressor (CobbRegressor2D, the default).
 
-Architecture: 1D-along-spine.
+Architecture (1D): 1D-along-spine.
     Input: (B, Cz, 576, 192) latent grid (Cz=1 for medvae_4_1_2d)
-    1. Mean-pool across the x-axis (left-right of spine) → (B, Cz, 576)
+    1. Mean-pool across the x-axis (left-right of spine) -> (B, Cz, 576)
        Rationale: Cobb angle is a vertical curvature property. Pooling
        across x first throws away left-right detail (irrelevant for Cobb)
        while preserving the along-spine signal that matters.
-    2. 1D conv stack down the spine: 576 → 288 → 144 → 72 → 36
-       Channels 64 → 128 → 128 → 256. Stride-2 convs, BatchNorm, GELU.
-    3. Flatten and MLP head → 3 angles.
+    2. 1D conv stack down the spine: 576 -> 288 -> 144 -> 72 -> 36
+       Channels 64 -> 128 -> 128 -> 256. Stride-2 convs, BatchNorm, GELU.
+    3. Flatten and MLP head -> 3 angles.
 
-Total params: ~400k. Smaller than the previous 2D regressor (~600k) but
-better matched to the problem geometry.
+Total params (1D): about 2.65M, of which about 2.36M are in the first
+Linear layer of the MLP head (256*36 -> 256). The conv stack follows the
+vertical geometry of the problem.
 
 Training:
     - Smooth-L1 loss across all 3 angles
@@ -23,7 +25,13 @@ Training:
     - Batch 32, 200 epochs
     - Dropout 0.3
     - Early-stop on val MAE plateau (patience 30 epochs)
-    - Standardize labels by training-set mean/std for stability
+    - Standardise labels by training-set mean/std for stability
+
+Inputs:  --latents-dir with latents_{train,val,test}.npz (latents, uuids);
+         --labels-csv with image_uuid, split and the angle columns.
+Outputs: in --out-dir: best.pt, test_predictions.csv, cobb_tiled.npz
+         (same schema as the baseline cobb_pretrained.npz), history.csv,
+         config.json.
 
 Usage:
     python train_cobb_regressor_tiled.py \\
@@ -43,15 +51,13 @@ import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 
 
-# ----------------------------------------------------------------------------
-# Model
-# ----------------------------------------------------------------------------
+# --- Model ---
 
 class CobbRegressor1D(nn.Module):
-    """Latent grid → 3 Cobb angles via 1D convs along the spine axis.
+    """Latent grid -> 3 Cobb angles via 1D convs along the spine axis.
 
     Input shape: (B, Cz, H, W) where H is along-spine, W is across-spine.
-    We mean-pool across W first, then run 1D convs down H.
+    Mean-pools across W first, then runs 1D convs down H.
     """
     def __init__(self, in_channels: int = 1, dropout: float = 0.3):
         super().__init__()
@@ -65,10 +71,10 @@ class CobbRegressor1D(nn.Module):
                 nn.Dropout(dropout),
             )
 
-        self.conv1 = block(in_channels, 64)    # 576 → 288
-        self.conv2 = block(64,         128)    # 288 → 144
-        self.conv3 = block(128,        128)    # 144 → 72
-        self.conv4 = block(128,        256)    # 72 → 36
+        self.conv1 = block(in_channels, 64)    # 576 -> 288
+        self.conv2 = block(64,         128)    # 288 -> 144
+        self.conv3 = block(128,        128)    # 144 -> 72
+        self.conv4 = block(128,        256)    # 72 -> 36
         # Final spatial: 256 channels x 36 = 9216
         self.head = nn.Sequential(
             nn.Flatten(),
@@ -79,7 +85,7 @@ class CobbRegressor1D(nn.Module):
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # x: (B, Cz, H, W) → mean-pool across W → (B, Cz, H)
+        # x: (B, Cz, H, W) -> mean-pool across W -> (B, Cz, H)
         x = x.mean(dim=-1)
         x = self.conv1(x)
         x = self.conv2(x)
@@ -89,23 +95,24 @@ class CobbRegressor1D(nn.Module):
 
 
 class CobbRegressor2D(nn.Module):
-    """Latent grid → 3 Cobb angles via 2D stride-2 conv blocks, matched in
-    architecture to the previous 384x384-latent baseline regressor.
+    """Latent grid -> 3 Cobb angles via 2D stride-2 conv blocks, modelled on
+    the 384x384-latent baseline regressor (CobbRegressor in
+    train_cobb_regressor.py).
 
-    The previous baseline used 5 stride-2 blocks on a 96x96 latent
-    (96→48→24→12→6 spatial) with ~600k params. Here the input is 576x192,
-    so we add one more stride-2 stage to get to comparable final spatial
-    extent (9x3), keeping per-stage channel counts modest so total
-    parameters stay near the baseline.
+    The baseline uses 4 paired-conv blocks, each ending in MaxPool(2), on a
+    96x96 latent (96->48->24->12->6 spatial), with about 1.76M params. Here
+    the input is 576x192, so 6 stride-2 stages are used to reach a
+    comparable final spatial extent (9x3), with modest per-stage channel
+    counts; total about 1.22M params.
 
     Architecture:
-        576x192 (Cz)   stride-2 block (32 ch)  → 288x96
-                       stride-2 block (64 ch)  → 144x48
-                       stride-2 block (96 ch)  →  72x24
-                       stride-2 block (128 ch) →  36x12
-                       stride-2 block (128 ch) →  18x6
-                       stride-2 block (192 ch) →   9x3
-        flatten (9*3*192 = 5184) → Linear → 3
+        576x192 (Cz)   stride-2 block (32 ch)  -> 288x96
+                       stride-2 block (64 ch)  -> 144x48
+                       stride-2 block (96 ch)  ->  72x24
+                       stride-2 block (128 ch) ->  36x12
+                       stride-2 block (128 ch) ->  18x6
+                       stride-2 block (192 ch) ->   9x3
+        flatten (9*3*192 = 5184) -> Linear -> 3
     """
     def __init__(self, in_channels: int = 1, dropout: float = 0.3):
         super().__init__()
@@ -116,12 +123,12 @@ class CobbRegressor2D(nn.Module):
                 nn.GELU(),
                 nn.Dropout2d(dropout),
             )
-        self.conv1 = block(in_channels, 32)    # 576×192 → 288×96
-        self.conv2 = block(32,          64)    # 288×96  → 144×48
-        self.conv3 = block(64,          96)    # 144×48  → 72×24
-        self.conv4 = block(96,         128)    # 72×24   → 36×12
-        self.conv5 = block(128,        128)    # 36×12   → 18×6
-        self.conv6 = block(128,        192)    # 18×6    → 9×3
+        self.conv1 = block(in_channels, 32)    # 576×192 -> 288×96
+        self.conv2 = block(32,          64)    # 288×96  -> 144×48
+        self.conv3 = block(64,          96)    # 144×48  -> 72×24
+        self.conv4 = block(96,         128)    # 72×24   -> 36×12
+        self.conv5 = block(128,        128)    # 36×12   -> 18×6
+        self.conv6 = block(128,        192)    # 18×6    -> 9×3
         self.head = nn.Sequential(
             nn.Flatten(),
             nn.Linear(192 * 9 * 3, 128),
@@ -140,15 +147,13 @@ class CobbRegressor2D(nn.Module):
         return self.head(x)
 
 
-# ----------------------------------------------------------------------------
-# Data
-# ----------------------------------------------------------------------------
+# --- Data ---
 
 class CobbLatentDataset(Dataset):
     """Loads pre-extracted latents and Cobb angle labels.
 
-    Labels are standardized (subtract mean, divide std) for training stability;
-    predictions are un-standardized at evaluation time.
+    Labels are standardised (subtract mean, divide std) for training stability;
+    predictions are un-standardised at evaluation time.
     """
     def __init__(self, latents_npz: Path, labels_df: pd.DataFrame,
                  angle_cols: list,
@@ -160,7 +165,7 @@ class CobbLatentDataset(Dataset):
         # Align labels to UUIDs
         labels = labels_df.set_index("image_uuid").loc[self.uuids]
         self.labels = labels[self.angle_cols].values.astype(np.float32)  # (N, 3)
-        # Standardization (computed externally for the train split, reused for val/test)
+        # Standardisation (computed externally for the train split, reused for val/test)
         self.label_mean = label_mean
         self.label_std  = label_std
 
@@ -177,9 +182,7 @@ class CobbLatentDataset(Dataset):
         return z, torch.from_numpy(y_std).float(), torch.from_numpy(y).float()
 
 
-# ----------------------------------------------------------------------------
-# Train / eval loop
-# ----------------------------------------------------------------------------
+# --- Train / eval loop ---
 
 def run_epoch(model, loader, optimizer, criterion, device, label_mean, label_std,
               train: bool):
@@ -202,7 +205,7 @@ def run_epoch(model, loader, optimizer, criterion, device, label_mean, label_std
                 loss.backward()
                 optimizer.step()
             losses.append(loss.item())
-            # Un-standardize for raw-degree MAE reporting
+            # Un-standardise for raw-degree MAE reporting
             pred_raw = pred_std.detach().cpu().numpy() * label_std + label_mean
             all_pred_raw.append(pred_raw)
             all_true_raw.append(y_raw.numpy())
@@ -233,9 +236,9 @@ def main() -> None:
                             "angle_thoracolumbar"],
                    help="Names of the 3 Cobb angle columns in the labels CSV.")
     p.add_argument("--arch", choices=["1d", "2d"], default="2d",
-                   help="Regressor architecture. '2d' is the apples-to-apples "
-                        "comparison against the previous 384x384 baseline; "
-                        "'1d' is the along-spine variant.")
+                   help="Regressor architecture. '2d' is architecturally matched "
+                        "to the 384x384 baseline regressor (like-for-like "
+                        "comparison); '1d' is the along-spine variant.")
     args = p.parse_args()
 
     torch.manual_seed(args.seed)
@@ -287,8 +290,8 @@ def main() -> None:
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs)
     criterion = nn.SmoothL1Loss()
 
-    # Mean-baseline test MAE (predict train-mean for all test items): same
-    # number we computed in the previous round. Print for reference.
+    # Mean-baseline test MAE (predict the train mean for all test items),
+    # printed for reference.
     test_raw = test_ds.labels
     mean_baseline_mae = np.abs(test_raw - label_mean).mean()
     print(f"Mean-baseline test MAE: {mean_baseline_mae:.2f}°")
@@ -342,8 +345,6 @@ def main() -> None:
     print(f"  MAE all angles:       {test_mae:.3f}°")
     print(f"  Per-angle MAE:        {test_per.round(3)}")
     print(f"  Mean-baseline MAE:    {mean_baseline_mae:.2f}°")
-    print(f"  Previous best (pretrained encoder, aspect):  7.50°")
-    print(f"  Previous (aspect-finetuned encoder, aspect): 7.58°")
 
     # Save predictions for downstream Bland-Altman / paired comparison.
     # Two formats:

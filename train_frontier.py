@@ -1,50 +1,62 @@
 """
-train_frontier.py — compression-frontier task pipeline (Cobb + landmarks).
+train_frontier.py: compression-frontier task pipeline (Cobb + landmarks).
 
-Turns Direction 1 from "a single degradation curve" into a task-DEPENDENT
-frontier by training TWO tasks on the SAME aspect-padded MedVAE latents at
-two compression levels, with a backbone held identical across the whole grid.
+Trains several tasks on the same aspect-padded MedVAE latents at different
+compression levels, with a backbone held identical across the whole grid, so
+that compression tolerance can be compared between tasks rather than read from
+a single degradation curve.
 
-Design (the point of the whole thing):
-    Grid = {task: cobb, landmark} x {config: medvae_4_1_2d, medvae_8_1_2d}.
-    The backbone (LatentBackbone) is byte-for-byte identical in all four cells.
+Design:
+    Grid = {task} x {config}: by default {cobb, landmark} (--tasks) x the four
+    MedVAE configurations 4_3, 4_1, 8_4, 8_1 (--configs).
+    The backbone (LatentBackbone) is identical in every cell.
     An adaptive pool before the head means the same backbone ingests both the
-    96x96 (4x) and 48x48 (8x) latent without any architecture change. The ONLY
+    96x96 (4x) and 48x48 (8x) latent without any architecture change. The only
     things that differ across cells are:
         (a) the compression level baked into the latent, and
-        (b) the task head's output dim (3 angles vs 136 landmark coords).
-    So any difference in degradation between the two task curves is attributable
-    to the task, not to a regressor mismatch. That is what makes the
-    "task-dependent compression tolerance" claim clean.
+        (b) the task head's output dim (e.g. 3 angles, 136 landmark coords,
+            or class logits), and the input channel count of the first conv.
+    Any difference in degradation between the task curves is therefore
+    attributable to the task, not to a regressor mismatch.
 
-Honest framing (bake in from the start): with only 4x and 8x we have TWO points
-per task, not a curve. The defensible claim is *relative compression
-sensitivity per task* (how much each task's error grows from 4x->8x), not a
-"breakpoint". A true breakpoint needs intermediate compression levels.
+Scope: with only two spatial factors (4x and 8x), the spatial axis has two
+points per task, not a curve. The result is *relative compression sensitivity
+per task* (how much each task's error grows from 4x->8x), not a "breakpoint".
+A breakpoint would need intermediate compression levels.
 
 Metrics:
     cobb     -> mean absolute error in degrees (mean over the 3 angles), per image
     landmark -> mean Euclidean landmark error in image-normalised units
                 (mean over the 68 points), per image
-Both get image-level bootstrap CIs (matches the established house style), plus
-an across-seed sd as a secondary robustness number.
+    wedging  -> mean absolute error in degrees (mean over the 17 vertebrae)
+    surgical / severity / curve_pattern -> 0/1 misclassification per image
+                (mean = error rate), plus accuracy, macro-F1, AUC (binary)
+                and quadratic-weighted kappa (severity)
+All get image-level bootstrap CIs (consistent with the other analysis
+scripts), plus an across-seed sd as a secondary robustness number.
 
-Multi-seed: train --seeds models per cell, ENSEMBLE their test predictions
+Multi-seed: train --seeds models per cell, ensemble their test predictions
 (average angles / coords) for the per-image numbers, and also record each
 seed's standalone test metric for the +/- sd.
 
 Inputs: one .npz per (config, split) from extract_latents_aspect.py, each with
-    latents (N,1,H,W) float32, uuids (N,), cobb (N,3) float32, landmarks (N,136)
-    float32 (normalised [0,1], ordering A: 68 xs then 68 ys).
+    latents (N,C,H,W) float32, uuids (N,), cobb (N,3) float32, landmarks (N,136)
+    float32 (normalised [0,1], ordering A: 68 xs then 68 ys). Derived-task
+    labels come from task_labels_{split}.npz in --labels-dir.
+Outputs: <out-dir>/frontier_per_image.csv, frontier_summary.csv,
+    frontier_curve.csv, frontier_curve.png and compression_tolerance_ladder.csv;
+    matched_pair_4_1_vs_8_4.csv and clean_spatial_4_1_vs_8_1.csv when those
+    configurations are present; preds_{config}.npz with --save-preds and
+    model_{config}_{task}_seed{seed}.pt with --save-models.
 
 Usage:
-    # real run (after extraction):
+    # full run (after extraction):
     python train_frontier.py \\
         --latents-dir ./latents_aspect \\
         --out-dir     ./outputs/frontier \\
         --seeds 0 1 2
 
-    # wiring check, no MedVAE / no latents needed:
+    # synthetic-data self-test (no MedVAE / no latents needed):
     python train_frontier.py --smoke --out-dir /tmp/frontier_smoke
 """
 
@@ -64,7 +76,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-# ---- house conventions ------------------------------------------------------
+# --- Shared conventions ---
 # config -> short label and total compression ratio (f/C, f=area factor, C=channels)
 CONFIG_LABELS = {"medvae_4_3_2d": "4_3", "medvae_4_1_2d": "4_1",
                  "medvae_8_4_2d": "8_4", "medvae_8_1_2d": "8_1"}
@@ -83,17 +95,17 @@ def args_preload_limit_bytes():
 
 
 def register_config(name):
-    """Allow non-MedVAE arms (e.g. frozen DINOv2/DINOv3 features) through the
-    same grid. They have no meaningful f/C ratio, so they get a nominal 1.0 and
-    should be read as a REPRESENTATION-QUALITY reference point, not as a point
-    on the compression curve."""
+    """Allow non-MedVAE configurations (e.g. frozen DINOv2/DINOv3 features)
+    through the same grid. They have no meaningful f/C ratio, so they get a
+    nominal 1.0 and should be read as a representation-quality reference point,
+    not as a point on the compression curve."""
     if name not in CONFIG_LABELS:
         CONFIG_LABELS[name] = name.replace("facebook_", "").replace("-", "_")[:14]
         COMPRESSION[name] = 1.0
     return name
 
 # Task specification. `kind` drives the loss, the metric, and whether targets
-# are standardised. The tasks form a GRANULARITY LADDER (coarse -> fine):
+# are standardised. The tasks form a granularity ladder (coarse -> fine):
 #   surgical -> severity -> curve_pattern -> landmark -> cobb -> wedging
 # Prediction: compression tolerance decreases down the ladder.
 TASK_SPEC = {
@@ -111,9 +123,7 @@ LANDMARK_COLOR = "#B85042"  # accent
 N_LANDMARKS = 68
 
 
-# =============================================================================
-# Model: one backbone for every cell of the grid; task only changes the head.
-# =============================================================================
+# --- Model: one backbone for every cell of the grid; the task only changes the head ---
 class LatentBackbone(nn.Module):
     """(B, Cz, H, W) -> (B, feat_dim). Identical for 96x96 and 48x48 inputs.
 
@@ -167,9 +177,7 @@ class TaskModel(nn.Module):
         return self.head(self.backbone(x))
 
 
-# =============================================================================
-# Data
-# =============================================================================
+# --- Data ---
 class LatentDataset(Dataset):
     def __init__(self, latents, targets, is_class=False):
         self.x = torch.as_tensor(latents, dtype=torch.float32)
@@ -196,7 +204,7 @@ def load_split(latents_dir, config, split, labels_dir=None, exclude_implausible=
         lf = Path(labels_dir) / f"task_labels_{split}.npz"
         if lf.exists():
             L = np.load(lf, allow_pickle=True)
-            # align by uuid — never assume the row order matches
+            # align by uuid rather than assuming the row order matches
             idx = {str(u): i for i, u in enumerate(L["uuids"])}
             order = np.array([idx[str(u)] for u in out["uuids"] if str(u) in idx])
             keep = np.array([i for i, u in enumerate(out["uuids"]) if str(u) in idx])
@@ -234,9 +242,7 @@ def targets_for(task, data):
     return data[src]
 
 
-# =============================================================================
-# Metrics
-# =============================================================================
+# --- Metrics ---
 def cobb_per_image_error(pred, true):
     # pred/true: (N, 3) in degrees -> (N,) MAE over the 3 angles
     return np.abs(pred - true).mean(axis=1)
@@ -273,7 +279,7 @@ def extra_metrics(task, logits, true):
     out = {}
     pred = logits.argmax(1)
     out["accuracy"] = float((pred == true).mean())
-    # majority-class baseline — an error rate only means something against this
+    # majority-class baseline: an error rate is interpreted against this
     vals, counts = np.unique(true, return_counts=True)
     out["majority_baseline"] = float(counts.max() / len(true))
     try:
@@ -299,9 +305,7 @@ def bootstrap_ci(values, n_boot=10000, seed=0):
     return float(v.mean()), float(np.percentile(boot, 2.5)), float(np.percentile(boot, 97.5))
 
 
-# =============================================================================
-# Train one model (one task, one config, one seed)
-# =============================================================================
+# --- Train one model (one task, one config, one seed) ---
 def train_one(task, train, val, in_ch, *, seed, epochs, batch_size, lr,
               weight_decay, patience, device):
     torch.manual_seed(seed)
@@ -339,13 +343,13 @@ def train_one(task, train, val, in_ch, *, seed, epochs, batch_size, lr,
         def unstd(y):
             return y * sd + mu
 
-    # ---- batching ---------------------------------------------------------
+    # Batching
     # Large feature tensors (e.g. frozen DINO at 768x32x32 = 3 MB/image, ~1.3 GB
     # for the train split) are dominated by DataLoader collation: every batch
     # stacks 32 multi-MB tensors in Python, then copies to GPU. Preloading the
     # whole split onto the GPU once and indexing it directly removes that
-    # entirely — typically an order of magnitude faster for these features, and
-    # numerically identical.
+    # overhead; this is typically an order of magnitude faster for these
+    # features, and numerically identical.
     ytr_std = std(ytr)
     tr_bytes = int(np.prod(train["latents"].shape)) * 4
     use_gpu_resident = (str(device).startswith("cuda")
@@ -437,9 +441,7 @@ def predict(model, mu, sd, latents, device):
     return out * sd + mu
 
 
-# =============================================================================
-# Run the full grid
-# =============================================================================
+# --- Run the full grid ---
 def run_grid(splits_by_config, tasks, configs, *, seeds, device, models_dir=None, **train_kw):
     """splits_by_config[config] = {'train':..,'val':..,'test':..}.
     Returns per-image rows and a summary dict keyed by (config, task)."""
@@ -516,12 +518,12 @@ def run_grid(splits_by_config, tasks, configs, *, seeds, device, models_dir=None
 
 def ladder_table(summary, tasks, configs, anchor=None):
     """The compression-tolerance ladder: for each task, how much does error
-    grow along the SPATIAL axis?
+    grow along the spatial axis?
 
-    IMPORTANT: anchored on the clean 1-channel pair (4_1 -> 8_1) by default,
-    NOT on the lowest total compression. `4_3` has the least total compression
-    but is a 3-channel model fed replicated grayscale, and it is not the best
-    config for several tasks — anchoring there conflates the spatial and
+    Anchored by default on the 1-channel pair (4_1 -> 8_1), not on the lowest
+    total compression. `4_3` has the least total compression but is a
+    3-channel model fed replicated greyscale, and it is not the best
+    configuration for several tasks; anchoring there conflates the spatial and
     channel axes and makes tasks appear to *improve* under compression."""
     order = [t for t in LADDER if t in tasks]
     if len(order) < 2:
@@ -529,7 +531,7 @@ def ladder_table(summary, tasks, configs, anchor=None):
     if anchor is not None:
         light, heavy = anchor
     elif "medvae_4_1_2d" in configs and "medvae_8_1_2d" in configs:
-        light, heavy = "medvae_4_1_2d", "medvae_8_1_2d"       # clean spatial pair
+        light, heavy = "medvae_4_1_2d", "medvae_8_1_2d"       # 1-channel spatial pair
     elif len(configs) < 2:
         return None                                           # nothing to compare
     else:
@@ -539,7 +541,7 @@ def ladder_table(summary, tasks, configs, anchor=None):
         return None
     rows = []
     print(f"\n=== Compression-tolerance ladder ({CONFIG_LABELS[light]} -> "
-          f"{CONFIG_LABELS[heavy]}, clean spatial axis) ===")
+          f"{CONFIG_LABELS[heavy]}, 1-channel spatial axis) ===")
     print("  coarse tasks first; prediction is that % degradation grows downward")
     hdr = (f"{'task':<15}{'unit':>10}{CONFIG_LABELS[light]:>11}"
            f"{CONFIG_LABELS[heavy]:>11}{'rel %':>9}{'CI overlap?':>13}")
@@ -553,16 +555,16 @@ def ladder_table(summary, tasks, configs, anchor=None):
         # do the two CIs overlap? if so the change is not distinguishable
         overlap = not (sa["error_hi"] < sb["error_lo"] or sb["error_hi"] < sa["error_lo"])
         print(f"{t:<15}{TASK_SPEC[t]['unit']:>10}{a:>11.4f}{b:>11.4f}{rel:>8.1f}%"
-              f"{('yes — n.s.' if overlap else 'no'):>13}")
+              f"{('yes (n.s.)' if overlap else 'no'):>13}")
         rows.append({"task": t, "unit": TASK_SPEC[t]["unit"], "anchor_light": CONFIG_LABELS[light],
                      "anchor_heavy": CONFIG_LABELS[heavy], "err_light": a, "err_heavy": b,
                      "rel_pct": rel, "ci_overlap": overlap})
-    print("  NOTE: where the CIs overlap, the change is not distinguishable from noise.")
+    print("  Note: where the CIs overlap, the change is not distinguishable from noise.")
     return pd.DataFrame(rows)
 
 
 def frontier_table(summary, tasks, configs):
-    """Per (task, config): raw error + error relative to the LIGHTEST config,
+    """Per (task, config): raw error + error relative to the lightest config,
     plus the total compression ratio. The compression-curve read-out."""
     order = sorted(configs, key=lambda c: COMPRESSION[c])
     light = order[0]
@@ -604,15 +606,15 @@ def paired_config_test(df_per_image, tasks, a_cfg, b_cfg, title, note):
         print(tab.to_string(index=False))
         if len(tab) > 1:
             alpha = 0.05 / len(tab)
-            print(f"  NOTE: {len(tab)} tasks tested — Bonferroni threshold is "
-                  f"p < {alpha:.4f}. Treat single-task p-values above that as "
+            print(f"  Note: {len(tab)} tasks tested; Bonferroni threshold is "
+                  f"p < {alpha:.4f}. Single-task p-values above that are "
                   f"suggestive only.")
     return tab
 
 
 def matched_pair_test(df_per_image, tasks):
     """4_1 vs 8_4 (both 16x total): does the more-spatially-compressed 8_4
-    hurt each task MORE than 4_1 at equal total compression?"""
+    hurt each task more than 4_1 at equal total compression?"""
     return paired_config_test(
         df_per_image, tasks, *MATCHED_PAIR,
         "Matched-compression test: 4_1 vs 8_4 (both 16x)",
@@ -620,21 +622,19 @@ def matched_pair_test(df_per_image, tasks):
 
 
 def clean_spatial_test(df_per_image, tasks):
-    """4_1 vs 8_1: BOTH are native 1-channel models, so this varies ONLY the
-    spatial factor — no channel-count or input-replication confound. This is
-    the comparison that licenses a 'spatial compression' interpretation."""
+    """4_1 vs 8_1: both are native 1-channel models, so this varies only the
+    spatial factor, with no channel-count or input-replication confound. This
+    comparison supports a 'spatial compression' interpretation."""
     return paired_config_test(
         df_per_image, tasks, "medvae_4_1_2d", "medvae_8_1_2d",
         "Clean spatial test: 4_1 vs 8_1 (both 1-channel)",
         "positive delta = 8_1 worse; ONLY the spatial factor differs (no confound)")
 
 
-# =============================================================================
-# Figure: compression curve — error vs total compression ratio, per task,
-# normalised to the lightest config so both tasks share one axis. The two 16x
-# configs (4_1, 8_4) appear at the same x, so their vertical gap is the
-# spatial-vs-channel effect.
-# =============================================================================
+# --- Figure: compression curve ---
+# Error vs total compression ratio, per task, normalised to the lightest
+# config so both tasks share one axis. The two 16x configs (4_1, 8_4) appear
+# at the same x, so their vertical gap is the spatial-vs-channel effect.
 def make_figure(summary, tasks, configs, out_path):
     order = sorted(configs, key=lambda c: COMPRESSION[c])
     xs = [COMPRESSION[c] for c in order]
@@ -667,9 +667,7 @@ def make_figure(summary, tasks, configs, out_path):
     plt.close(fig)
 
 
-# =============================================================================
-# Synthetic smoke data (no MedVAE, no latents) — verifies the whole pipeline.
-# =============================================================================
+# --- Synthetic data for the self-test (no MedVAE, no latents; exercises the whole pipeline) ---
 def synthetic_splits(seed=0):
     rng = np.random.default_rng(seed)
     CH = {"medvae_4_3_2d": 3, "medvae_4_1_2d": 1, "medvae_8_4_2d": 4, "medvae_8_1_2d": 1}
@@ -677,7 +675,7 @@ def synthetic_splits(seed=0):
     for config in CONFIG_ORDER:
         H = 96 if config.split("_")[1] == "4" else 48
         C = CH.get(config, 1)
-        # more total compression -> noisier Cobb signal (crude, for smoke only)
+        # more total compression -> noisier Cobb signal (crude, for the self-test only)
         noise = 0.2 + 0.01 * COMPRESSION[config]
         sp = {}
         for split, n in [("train", 120), ("val", 30), ("test", 40)]:
@@ -696,7 +694,7 @@ def synthetic_splits(seed=0):
     return out
 
 
-# =============================================================================
+# --- Entry point ---
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--latents-dir", type=Path)
@@ -708,7 +706,7 @@ def main():
                          "severity/curve_pattern/wedging)")
     ap.add_argument("--progress", type=int, default=0, metavar="N",
                     help="print a line every N epochs and after each seed "
-                         "(e.g. 25). Recommended for large feature tensors.")
+                         "(e.g. 25). Useful for large feature tensors.")
     ap.add_argument("--preload-limit-gb", type=float, default=8.0,
                     help="preload a split onto the GPU if it fits under this "
                          "(avoids DataLoader collation; big speedup for DINO)")
@@ -722,7 +720,7 @@ def main():
     ap.add_argument("--weight-decay", type=float, default=1e-4)
     ap.add_argument("--patience", type=int, default=25)
     ap.add_argument("--smoke", action="store_true",
-                    help="Run on synthetic data (no MedVAE/latents) to check wiring.")
+                    help="Synthetic-data self-test (no MedVAE/latents); checks the wiring.")
     ap.add_argument("--save-preds", action="store_true",
                     help="Also dump ensemble test predictions per config for the "
                          "Cobb-from-landmarks mechanism analysis.")
@@ -738,13 +736,13 @@ def main():
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     if args.smoke:
-        print("SMOKE MODE: synthetic data, tiny budget.")
+        print("Self-test: synthetic data, small training budget.")
         splits = synthetic_splits()
         args.epochs = min(args.epochs, 12)
         args.seeds = args.seeds[:2]
     else:
         if args.latents_dir is None:
-            raise SystemExit("--latents-dir required (or use --smoke)")
+            raise SystemExit("--latents-dir is required (or --smoke for the synthetic-data self-test)")
         splits = {c: {s: load_split(args.latents_dir, c, s,
                                     labels_dir=args.labels_dir,
                                     exclude_implausible=args.exclude_implausible)
@@ -769,7 +767,7 @@ def main():
                 out["pred_cobb"] = preds[(config, "cobb")].astype(np.float32)
             p = args.out_dir / f"preds_{config}.npz"
             np.savez_compressed(p, **out)
-            print(f"saved predictions -> {p.name}")
+            print(f"Saved predictions -> {p.name}")
 
     df_pi.to_csv(args.out_dir / "frontier_per_image.csv", index=False)
     df_sum = pd.DataFrame(list(summary.values()))

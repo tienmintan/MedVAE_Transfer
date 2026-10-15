@@ -3,6 +3,19 @@
 All contrasts are paired by image identifier. Positive changes mean higher
 error in B. Families are fixed in the code, including not-yet-completed tests;
 missing cells never reduce the Bonferroni denominator.
+
+Before analysis, prepared-cache hashes, reference-file hashes and completed-run
+outputs are checked against their recorded SHA-256 values.
+
+Inputs:  --study-dir (manifest.json, prepared caches and completed runs) and
+         the reference CSVs in references/.
+Outputs: in <study-dir>/analysis: all_per_image.csv, all_summary.csv,
+         paired_comparisons.csv, relative_task_changes.csv,
+         pending_comparisons.csv, analysis_plan.json and RESULTS.md (also
+         printed to stdout).
+
+Usage:
+  python analyse_projection_study.py --study-dir <study> [--resamples 10000]
 """
 import argparse
 from pathlib import Path
@@ -34,7 +47,7 @@ def comparison_plan():
                 cell(stage+"_keep", c), cell(stage+"_mean", c))
     for handling in ("keep", "mean"):
         for a, b in ((CONFIGS[0], CONFIGS[1]), (CONFIGS[2], CONFIGS[3])):
-            # A mean over the one-channel checkpoint is exactly the keep arm.
+            # A mean over the one-channel checkpoint is identical to the keep variant.
             add("same_grid_checkpoints", f"projected {handling}, {a} to {b}",
                 cell("projected_keep", a), cell("projected_"+handling, b))
     for c in MULTI:
@@ -109,7 +122,7 @@ def load_results(study, manifest):
         frames.append(frame)
         for row in pd.read_csv(path/"summary.csv").itertuples():
             seed_sd[v, c, row.task] = float(row.seed_sd)
-    require(frames and any(len(f) for f in frames), "No completed results: run the primary or core phase first")
+    require(frames and any(len(f) for f in frames), "No completed results: no primary or core runs have completed")
     all_rows = pd.concat(frames, ignore_index=True)
     require(not all_rows.duplicated(["variant", "config", "task", "image_uuid"]).any(), "Duplicate result cells")
     values = {(v,c,t): sub.set_index("image_uuid").loc[ids, "error"].to_numpy()
@@ -226,7 +239,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--study-dir", type=Path, required=True)
     p.add_argument("--resamples", type=int, default=10000)
-    args = p.parse_args(); require(args.resamples >= 10000, "Use at least 10,000 bootstrap draws")
+    args = p.parse_args(); require(args.resamples >= 10000, "--resamples must be at least 10,000")
     analyse(args)
 
 

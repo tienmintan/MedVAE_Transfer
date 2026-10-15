@@ -1,31 +1,35 @@
 """
-connector_synth_to_medvae.py
+connector_synth_to_medvae.py: convert synthetic SD-VAE latents into MedVAE 4x/1ch latents for the Cobb regressor.
 
-Convert synthetic SD-VAE latents from the diffusion pipeline (output of
+Converts synthetic SD-VAE latents from the diffusion pipeline (output of
 sample_diffusion.py at SD-VAE format, shape (N, 4, 64, 64)) into MedVAE 4x/1ch
 latents (shape (N, 1, 96, 96)) compatible with train_cobb_regressor.py.
 
 Pipeline per synthetic latent:
-  1. SD-VAE decode: (1, 4, 64, 64) → (1, 3, 512, 512) in [-1, 1]
-  2. Convert RGB → grayscale by channel-mean
-  3. Resize 512x512 → 384x384 (matches BoostNet preprocessing target)
-  4. MedVAE 4x/1ch encode: (1, 1, 384, 384) → (1, 1, 96, 96)
+  1. SD-VAE decode: (1, 4, 64, 64) -> (1, 3, 512, 512) in [-1, 1]
+  2. Convert RGB -> greyscale by channel-mean
+  3. Resize 512x512 -> 384x384 (matches BoostNet preprocessing target)
+  4. MedVAE 4x/1ch encode: (1, 1, 384, 384) -> (1, 1, 96, 96)
 
-Concatenate with real BoostNet latents from latents_pretrained_4x.npz and
-write a combined .npz in the schema train_cobb_regressor.py expects:
+The result is concatenated with real BoostNet latents from latents_pretrained_4x.npz and
+written as a combined .npz in the schema train_cobb_regressor.py expects:
   - latents  (N+M, 1, 96, 96)
   - angles   (N+M, 3)
   - splits   (N+M,) ["train"/"val"/"test"], synthetic all tagged "train"
   - uuids    (N+M,), synthetic prefixed with "synth_diff_"
 
-Includes a sanity-check visualization decoding 4 synthetic MedVAE latents
-back through MedVAE's pixel decoder, so we can verify the connector is
-producing in-distribution MedVAE latents (recognizable spine X-rays).
+An optional sanity-check visualisation decodes 4 synthetic MedVAE latents
+back through MedVAE's pixel decoder, to check that the connector produces
+in-distribution MedVAE latents (recognisable spine X-rays).
 
 Caveat: synthetic images may have different aspect-padding proportions
 than real BoostNet (synthetic content fills more of the 384x384 frame).
-This is a real distribution shift that the downstream regressor will
-need to handle. Documented here; assessed by the regression result.
+This distribution shift is not corrected here; the downstream regressor
+has to handle it, and its effect is reflected in the regression result.
+
+Inputs:  --synth-latents (from sample_diffusion.py, SD-VAE format, with
+         angles); --real-latents (MedVAE 4x/1ch, from extract_latents.py).
+Outputs: --out combined .npz; optionally the sanity figure at --sanity-out.
 
 Usage:
     python connector_synth_to_medvae.py \\
@@ -50,9 +54,7 @@ from huggingface_hub import hf_hub_download
 from medvae.models.autoencoder_kl import AutoencoderKL as MedVAEAutoencoderKL
 
 
-# ---------------------------------------------------------------------------
 # Model loading
-# ---------------------------------------------------------------------------
 
 def load_sdvae(device, dtype):
     print("Loading Stable Diffusion VAE...")
@@ -70,55 +72,51 @@ def load_medvae(device, dtype):
                                  filename="model_weights/vae_4x_1c_2D.ckpt")
     cfg = OmegaConf.to_container(OmegaConf.load(cfg_path), resolve=True)
     model = MedVAEAutoencoderKL(**cfg, ckpt_path=ckpt_path).to(device).eval()
-    # MedVAE's loader doesn't honour torch_dtype; keep it in fp32 to avoid
+    # MedVAE's loader does not honour torch_dtype; it is kept in fp32 to avoid
     # mixed-precision surprises during encode.
     return model
 
 
-# ---------------------------------------------------------------------------
 # Single-sample round-trip
-# ---------------------------------------------------------------------------
 
 @torch.no_grad()
 def synth_sdvae_latent_to_medvae_latent(
         sd_latent: torch.Tensor,
         sdvae, medvae, device,
         sdvae_dtype=torch.float16):
-    """Convert (1, 4, 64, 64) SD-VAE latent → (1, 1, 96, 96) MedVAE latent.
+    """Convert (1, 4, 64, 64) SD-VAE latent -> (1, 1, 96, 96) MedVAE latent.
 
     Done per-sample to avoid OOM on the A10 (attention layers in both VAEs
-    are at their bottleneck spatial extent and don't batch cheaply).
+    are at their bottleneck spatial extent and do not batch cheaply).
     """
-    # ---- SD-VAE decode ----
+    # SD-VAE decode
     z_sd = sd_latent.to(device=device, dtype=sdvae_dtype)
     img_3ch = sdvae.decode(z_sd).sample              # (1, 3, 512, 512), [-1, 1]
     img_1ch = img_3ch.mean(dim=1, keepdim=True)      # (1, 1, 512, 512)
     img_1ch = img_1ch.clamp(-1.0, 1.0).float()
 
-    # ---- Resize 512 → 384 ----
+    # Resize 512 -> 384
     img_384 = F.interpolate(img_1ch, size=(384, 384),
                              mode="bilinear", align_corners=False)
 
-    # ---- MedVAE encode ----
+    # MedVAE encode
     posterior = medvae.encode(img_384)
     z_med = posterior.sample()                       # (1, 1, 96, 96)
     return z_med.float(), img_384.squeeze().cpu().numpy()
 
 
-# ---------------------------------------------------------------------------
-# Sanity-check visualization
-# ---------------------------------------------------------------------------
+# Sanity-check visualisation
 
 @torch.no_grad()
 def make_sanity_visualization(
         sd_latents: np.ndarray, intermediate_imgs: list,
         medvae_latents: np.ndarray, medvae, device,
         out_path: Path, n_show: int = 4):
-    """Side-by-side visualization for a few samples:
+    """Side-by-side visualisation for a few samples:
         col 1: 384x384 intermediate (after SD-VAE decode + resize)
         col 2: MedVAE-decoded image from the produced MedVAE latent
 
-    Lets us verify the connector preserves anatomical structure end-to-end.
+    Used to check that the connector preserves anatomical structure end-to-end.
     """
     n = min(n_show, len(medvae_latents))
 
@@ -145,36 +143,34 @@ def make_sanity_visualization(
         axes[i, 1].imshow(decoded[i], cmap="gray", vmin=0, vmax=1)
         axes[i, 1].axis("off")
 
-    axes[0, 0].set_title("SD-VAE decode → 384x384", fontsize=10)
+    axes[0, 0].set_title("SD-VAE decode -> 384x384", fontsize=10)
     axes[0, 1].set_title("MedVAE re-decode (from connector output)",
                           fontsize=10)
     fig.text(0.5, 0.02,
-              "Connector pipeline sanity check. The right column shows what "
-              "the regressor will 'see' after our connector — if both columns "
-              "show recognizable spines, the connector preserves structure.",
+              "Connector pipeline sanity check. The right column shows the input "
+              "the regressor receives after the connector; if both columns "
+              "show recognisable spines, the connector preserves structure.",
               ha="center", fontsize=9, style="italic")
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(out_path, dpi=120, bbox_inches="tight")
     plt.close()
-    print(f"Saved sanity visualization to {out_path}")
+    print(f"Saved sanity visualisation to {out_path}")
 
 
-# ---------------------------------------------------------------------------
 # Main
-# ---------------------------------------------------------------------------
 
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--synth-latents", required=True, type=Path,
-                    help="NPZ from sample_diffusion.py — SD-VAE format "
+                    help="NPZ from sample_diffusion.py, in SD-VAE format "
                          "(latents shape (N, 4, 64, 64), with angles).")
     p.add_argument("--real-latents",  required=True, type=Path,
                     help="Real BoostNet MedVAE latents from extract_latents.py "
                          "(e.g. latents_pretrained_4x.npz).")
     p.add_argument("--out",           required=True, type=Path)
     p.add_argument("--sanity-out",    type=Path, default=None,
-                    help="Optional path to save a sanity-check visualization "
+                    help="Optional path to save a sanity-check visualisation "
                          "of 4 round-tripped samples.")
     p.add_argument("--n-synth",       type=int, default=None,
                     help="Limit number of synthetic samples to process "
@@ -187,7 +183,7 @@ def main():
     device = torch.device(args.device)
     torch.manual_seed(args.seed)
 
-    # ---- Load data ----
+    # Load data
     synth = np.load(args.synth_latents, allow_pickle=True)
     synth_lat = synth["latents"]
     synth_ang = synth["angles"]
@@ -210,12 +206,12 @@ def main():
     print(f"  Split counts: " + ", ".join(
         f"{s}={(real_splits == s).sum()}" for s in sorted(set(real_splits))))
 
-    # ---- Load both VAEs ----
+    # Load both VAEs
     sdvae = load_sdvae(device, dtype=torch.float16)
     medvae = load_medvae(device, dtype=torch.float32)
 
-    # ---- Round-trip each synthetic latent ----
-    print(f"\nRound-trip pipeline (SD-VAE decode → resize → MedVAE encode)...")
+    # Round-trip each synthetic latent
+    print(f"\nRound-trip pipeline (SD-VAE decode -> resize -> MedVAE encode)...")
     medvae_synth_latents = np.empty((n_synth, 1, 96, 96), dtype=np.float32)
     saved_intermediates = []
 
@@ -241,14 +237,14 @@ def main():
     print(f"  Compared to real (train split): "
           f"mean={real_train.mean():.3f} std={real_train.std():.3f}")
 
-    # ---- Sanity visualization ----
+    # Sanity visualisation
     if args.sanity_out is not None:
         sanity_lat = medvae_synth_latents[np.array(sorted(sanity_indices))]
         make_sanity_visualization(synth_lat, saved_intermediates,
                                     sanity_lat, medvae, device,
                                     args.sanity_out)
 
-    # ---- Combine with real, write final ----
+    # Combine with real, write final
     synth_uuids = np.array([f"synth_diff_{i:06d}" for i in range(n_synth)])
     synth_splits = np.array(["train"] * n_synth)
 

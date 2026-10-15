@@ -1,37 +1,34 @@
 """
-investigate_joint_dataset_shift.py
+investigate_joint_dataset_shift.py: per-position (joint) distribution-shift diagnostic between VinDr and BoostNet latents.
 
-Phase A.5: joint-distribution shift diagnostic.
+Follow-up to investigate_dataset_shift_content_only.py, which tests whether
+the marginal per-channel offsets between VinDr and BoostNet latents are
+explained by differential padding fractions. That diagnostic motivated the
+content-aware cropping pipeline.
 
-Follow-up to investigate_dataset_shift_content_only.py, which showed
-that the MARGINAL per-channel offsets between VinDr and BoostNet
-latents are largely explained by differential padding fractions
-(83% reduction when padding positions are excluded). That diagnostic
-motivated the iteration-5 content-aware cropping intervention.
-
-The iteration-5 downstream result (32% recovery of conditional
-augmentation; 0.04° → 0.89° widening of the conditional-vs-unconditional
-gap) was only partial. This script tests whether the residual shift can
-be explained by a JOINT spatial structure that the marginal analysis
-cannot detect: padding positioned at different spatial locations in the
-latent grid between corpora, even when marginal padding fractions are
-similar. Specifically:
-  - BoostNet (1:2.8 native aspect) → after cropping + repad-to-1:1.5
-    → always has padding in vertical bars at the latent grid's left
+This script tests whether a shift remaining after cropping can be explained
+by a joint spatial structure that the marginal analysis cannot detect:
+padding positioned at different spatial locations in the latent grid
+between corpora, even when marginal padding fractions are similar.
+Specifically:
+  - BoostNet (1:2.8 native aspect) -> after cropping + repad-to-1:1.5
+    -> always has padding in vertical bars at the latent grid's left
     and right edges.
-  - VinDr (varied aspect, mean ~1:1.8) → padding pattern varies per
+  - VinDr (varied aspect, mean ~1:1.8) -> padding pattern varies per
     image, sometimes vertical bars, sometimes top/bottom, sometimes
     both.
 
-The score we compute is the per-(channel, spatial position) effective
-Z-score between corpora:
+The score is the per-(channel, spatial position) effective Z-score between
+corpora:
     z(c, i, j) = |μ_BN(c, i, j) - μ_V(c, i, j)|
                / sqrt(σ_BN(c, i, j)² + σ_V(c, i, j)²)
 
 This captures asymmetric spatial structure that the channel-pooled
-marginal analysis averages away. We compute it for both pipelines and
-compare.
+marginal analysis averages away. It is computed for both pipelines
+(original aspect-padded and cropped) and compared.
 
+Inputs:  VinDr and BoostNet SD-VAE latent .npz files from the original and
+         the cropped pipelines (four files).
 Outputs (in --out-dir, default outputs/figures/joint_shift/):
   joint_shift_padding_structure.png  - per-(i, j) padding probability
   joint_shift_zscore.png             - per-(c, i, j) Z-score heatmaps
@@ -66,19 +63,15 @@ from investigate_dataset_shift_content_only import (
 )
 
 
-# ---------------------------------------------------------------------------
-# Configuration
-# ---------------------------------------------------------------------------
+# --- Configuration ---
 
-DEFAULT_N_VINDR_SUBSAMPLE = 2000     # matches the existing content-only script
-DEFAULT_TOLERANCE = 0.3              # matches the existing content-only script
+DEFAULT_N_VINDR_SUBSAMPLE = 2000     # matches investigate_dataset_shift_content_only.py
+DEFAULT_TOLERANCE = 0.3              # matches investigate_dataset_shift_content_only.py
 EPS_FOR_ZSCORE = 1e-3                # numerical floor when pooled std is tiny
 RNG_SEED = 20260606
 
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
+# --- Helpers ---
 
 def per_position_mean_std(latents: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     """For each (channel, i, j), compute mean and std across the N samples.
@@ -112,12 +105,12 @@ def per_position_padding_prob(padding_mask: np.ndarray) -> np.ndarray:
 def load_corpus(path: Path, name: str, subsample: int | None = None,
                 rng: np.random.Generator | None = None,
                 filter_boostnet_test: bool = True) -> np.ndarray:
-    """Load a corpus's latents. Mirrors the existing diagnostic's logic.
+    """Load a corpus's latents, as in investigate_dataset_shift_content_only.py.
 
     If `subsample` is provided and the corpus is larger, randomly subsamples.
     If the corpus has a `splits` array containing 'boostnet_test', removes
-    those rows (we never want to peek at the held-out test set when
-    diagnosing training-distribution shift).
+    those rows (the held-out test set is excluded when diagnosing
+    training-distribution shift).
     """
     print(f"  Loading {name} from {path}")
     if not path.is_file():
@@ -142,9 +135,7 @@ def load_corpus(path: Path, name: str, subsample: int | None = None,
     return lats
 
 
-# ---------------------------------------------------------------------------
-# Per-pipeline analysis
-# ---------------------------------------------------------------------------
+# --- Per-pipeline analysis ---
 
 def analyse_pipeline(
     vindr_lats: np.ndarray, boost_lats: np.ndarray,
@@ -203,9 +194,7 @@ def analyse_pipeline(
     }
 
 
-# ---------------------------------------------------------------------------
-# Plotting
-# ---------------------------------------------------------------------------
+# --- Plotting ---
 
 def plot_padding_structure(orig: Dict, cropped: Dict, out_path: Path) -> None:
     """2x3 grid: padding probability per (i, j) per corpus, per pipeline."""
@@ -222,7 +211,7 @@ def plot_padding_structure(orig: Dict, cropped: Dict, out_path: Path) -> None:
         # VinDr padding probability
         ax = axes[row_idx, 0]
         im = ax.imshow(v_pp, vmin=0, vmax=1, cmap="Blues", interpolation="nearest")
-        ax.set_title(f"VinDr padding probability — {label}\n"
+        ax.set_title(f"VinDr padding probability: {label}\n"
                       f"mean = {data['v_pad_frac']*100:.1f}%", fontsize=10)
         ax.set_xlabel("latent col"); ax.set_ylabel("latent row")
         plt.colorbar(im, ax=ax, fraction=0.046)
@@ -230,7 +219,7 @@ def plot_padding_structure(orig: Dict, cropped: Dict, out_path: Path) -> None:
         # BoostNet padding probability
         ax = axes[row_idx, 1]
         im = ax.imshow(b_pp, vmin=0, vmax=1, cmap="Oranges", interpolation="nearest")
-        ax.set_title(f"BoostNet padding probability — {label}\n"
+        ax.set_title(f"BoostNet padding probability: {label}\n"
                       f"mean = {data['b_pad_frac']*100:.1f}%", fontsize=10)
         ax.set_xlabel("latent col"); ax.set_ylabel("latent row")
         plt.colorbar(im, ax=ax, fraction=0.046)
@@ -240,7 +229,7 @@ def plot_padding_structure(orig: Dict, cropped: Dict, out_path: Path) -> None:
         vmax = max(0.5, np.abs(diff).max())
         im = ax.imshow(diff, vmin=-vmax, vmax=vmax, cmap="RdBu_r",
                         interpolation="nearest")
-        ax.set_title(f"BoostNet - VinDr padding prob — {label}\n"
+        ax.set_title(f"BoostNet - VinDr padding prob: {label}\n"
                       f"max |Δ| = {np.abs(diff).max():.2f}", fontsize=10)
         ax.set_xlabel("latent col"); ax.set_ylabel("latent row")
         plt.colorbar(im, ax=ax, fraction=0.046)
@@ -249,7 +238,7 @@ def plot_padding_structure(orig: Dict, cropped: Dict, out_path: Path) -> None:
         "Spatial padding structure: per-(i, j) probability that a latent "
         "position encodes padding.\n"
         "Asymmetric structure (e.g., BoostNet bars at left/right edges, "
-        "VinDr distributed differently) is NOT captured by marginal "
+        "VinDr distributed differently) is not captured by marginal "
         "(channel-pooled) analyses.",
         fontsize=11, y=0.995,
     )
@@ -280,7 +269,7 @@ def plot_zscore_heatmaps(orig: Dict, cropped: Dict, out_path: Path) -> None:
             stats = (f"mean {z[c].mean():.2f}  "
                      f"med {np.median(z[c]):.2f}  "
                      f"p95 {np.quantile(z[c], 0.95):.2f}")
-            ax.set_title(f"ch{c} Z-score — {label}\n{stats}", fontsize=9)
+            ax.set_title(f"ch{c} Z-score: {label}\n{stats}", fontsize=9)
             ax.set_xlabel("latent col"); ax.set_ylabel("latent row")
             plt.colorbar(im, ax=ax, fraction=0.046)
 
@@ -296,9 +285,7 @@ def plot_zscore_heatmaps(orig: Dict, cropped: Dict, out_path: Path) -> None:
     print(f"  Saved {out_path}")
 
 
-# ---------------------------------------------------------------------------
-# Summary table
-# ---------------------------------------------------------------------------
+# --- Summary table ---
 
 def summary_rows(orig: Dict, cropped: Dict) -> pd.DataFrame:
     """Aggregate Z-score statistics per pipeline."""
@@ -328,7 +315,7 @@ def print_verdict(df: pd.DataFrame) -> None:
     crop = df.iloc[1]
 
     print("\n" + "=" * 78)
-    print("VERDICT: did the cropping intervention reduce JOINT distribution shift?")
+    print("Result: did the cropping intervention reduce joint distribution shift?")
     print("=" * 78)
 
     z_reduction = (1 - crop["z_mean"] / orig["z_mean"]) * 100 \
@@ -356,27 +343,25 @@ def print_verdict(df: pd.DataFrame) -> None:
 
     print()
     if z_reduction >= 50 and crop["z_mean"] < 0.30:
-        print("[+] The cropping intervention substantially reduced joint shift.")
-        print("    Residual is small; the iteration-5 partial recovery is")
+        print(f"Result: the cropping intervention reduced joint shift substantially (mean Z reduced by {z_reduction:.0f}%).")
+        print("    Residual is small; any remaining gap in downstream recovery is")
         print("    likely limited by other factors (data scale, fine textural")
         print("    differences) rather than padding structure.")
     elif z_reduction >= 30:
-        print("[~] The cropping intervention partially reduced joint shift.")
+        print(f"Result: the cropping intervention partially reduced joint shift (mean Z reduced by {z_reduction:.0f}%).")
         print("    Marginal padding gap was largely closed, but joint spatial")
         print("    structure remains substantially different between corpora.")
-        print("    This residual joint shift may explain why the iteration-5")
-        print("    downstream recovery was partial rather than complete.")
+        print("    This residual joint shift may explain a partial rather than")
+        print("    complete downstream recovery after cropping.")
     else:
-        print("[!] The cropping intervention reduced marginal padding gap but")
-        print("    NOT joint spatial structure. The dominant remaining")
+        print(f"Result: the cropping intervention reduced the marginal padding gap but")
+        print(f"    not the joint spatial structure (mean Z reduced by {z_reduction:.0f}%). The dominant remaining")
         print("    distribution shift is joint, not marginal. This would")
-        print("    explain why the iteration-5 downstream improvement was")
-        print("    limited even though marginal statistics looked aligned.")
+        print("    explain a limited downstream improvement after cropping")
+        print("    even when marginal statistics are aligned.")
 
 
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
+# --- Main ---
 
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__,
@@ -400,10 +385,10 @@ def main() -> int:
     rng = np.random.default_rng(args.seed)
 
     print("=" * 78)
-    print("Phase A.5: Joint-distribution shift diagnostic")
+    print("Joint-distribution shift diagnostic")
     print("=" * 78)
 
-    # ---- ORIGINAL PIPELINE ----
+    # --- Original pipeline ---
     print("\n[1/3] Original (aspect-padded) pipeline:")
     vindr_orig    = load_corpus(args.vindr_orig,    "VinDr orig",
                                   subsample=args.n_vindr_subsample, rng=rng)
@@ -414,7 +399,7 @@ def main() -> int:
     # Free memory before loading the second pipeline
     del vindr_orig, boostnet_orig
 
-    # ---- CROPPED PIPELINE ----
+    # --- Cropped pipeline ---
     print("\n[2/3] Cropped (content-aware) pipeline:")
     vindr_crop    = load_corpus(args.vindr_cropped,    "VinDr cropped",
                                   subsample=args.n_vindr_subsample, rng=rng)
@@ -424,7 +409,7 @@ def main() -> int:
 
     del vindr_crop, boostnet_crop
 
-    # ---- AGGREGATE + REPORT ----
+    # --- Aggregate and report ---
     print("\n[3/3] Aggregating + generating figures...")
 
     summary_df = summary_rows(orig_results, crop_results)

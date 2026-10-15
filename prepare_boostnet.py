@@ -1,11 +1,9 @@
 """
-prepare_boostnet.py
+prepare_boostnet.py: prepare the BoostNet (AASCE 2019) spinal AP X-ray dataset for MedVAE finetuning.
 
-Prepare the BoostNet (AASCE 2019) spinal AP X-ray dataset for MedVAE finetuning.
-
-What this script does:
+Steps:
   1. Reads images from <SRC>/data/training and <SRC>/data/test.
-  2. Cleans filenames (replaces spaces and uppercases extensions, e.g.
+  2. Cleans filenames (replaces spaces, e.g.
      'sunhl-1th-25-Jan-2017-279 A AP.jpg' -> 'sunhl-1th-25-Jan-2017-279_A_AP.jpg').
   3. Copies cleaned images into <DST>/<DATASET_NAME>/<image_uuid>.jpg
      (a flat directory, as required by MedVAE's GenericDataset).
@@ -17,7 +15,10 @@ Why this layout?
   MedVAE's mmgs-style dataloader expects:
     - A CSV at  ${data_dir}/${dataset_name}.csv
     - Images in ${data_dir}/${dataset_name}/<image_uuid><img_suffix>
-  We point dataset_name=boostnet and img_suffix=.jpg in our custom configs.
+  The custom configs set dataset_name=boostnet and img_suffix=.jpg.
+
+Inputs:  <SRC>/data/training and <SRC>/data/test image folders (--src).
+Outputs: <DST>/<DATASET_NAME>/<image_uuid>.jpg and <DST>/<DATASET_NAME>.csv.
 
 Usage:
   python prepare_boostnet.py \\

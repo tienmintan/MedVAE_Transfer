@@ -1,24 +1,26 @@
 """
-detect_content_bbox.py
+detect_content_bbox.py: detect the bounding box of non-padding content and re-pad to a fixed aspect ratio.
 
 Utility for detecting the bounding box of "content" (non-padding) regions
-in a preprocessed grayscale image. Used by extract_latents_*_cropped.py to
+in a preprocessed greyscale image. Used by extract_latents_*_cropped.py to
 crop out aspect-padding before SD-VAE encoding.
 
 The detection logic:
   1. Normalise the input image to [0, 1].
-  2. Threshold at the lower of (5% of the dynamic range) or (a small
-     absolute floor at 0.02), to catch faint tissue against black
-     background.
+  2. Threshold at the higher of (5% of the dynamic range) or (an absolute
+     floor at 0.02), so the threshold never falls below 0.02.
   3. Apply a small morphological opening to suppress isolated bright
-     noise (DICOM artifacts, edge markers, etc).
+     noise (DICOM artefacts, edge markers, etc).
   4. Take the bounding box of the remaining "True" pixels.
   5. If the bbox is degenerate (too small, e.g., the image is mostly
      black), fall back to using the full image.
 
-Returns: (y_min, x_min, y_max, x_max) tuple, all in pixel coordinates,
-inclusive of the bounds. y_max and x_max are exclusive (i.e., suitable
-for array slicing as img[y_min:y_max, x_min:x_max]).
+Returns: (y_min, x_min, y_max, x_max) tuple in pixel coordinates; y_min and
+x_min are inclusive, y_max and x_max are exclusive (i.e., suitable for array
+slicing as img[y_min:y_max, x_min:x_max]).
+
+Usage:
+    python detect_content_bbox.py      # synthetic-data self-test
 """
 
 import numpy as np
@@ -32,12 +34,12 @@ def detect_content_bbox(
         morph_kernel_size: int = 5,
         min_content_fraction: float = 0.05,
 ) -> tuple:
-    """Detect the bounding box of non-padding content in a 2D grayscale image.
+    """Detect the bounding box of non-padding content in a 2D greyscale image.
 
     Parameters
     ----------
     img : np.ndarray
-        2D grayscale image. Any value range; will be min-max normalised
+        2D greyscale image. Any value range; will be min-max normalised
         internally for thresholding.
     threshold_pct : float
         Fraction of the image's dynamic range above which a pixel is
@@ -47,11 +49,11 @@ def detect_content_bbox(
         threshold from being too low when the image has very high contrast.
     morph_kernel_size : int
         Size of the morphological opening kernel (in pixels). Suppresses
-        isolated noise/artifacts.
+        isolated noise/artefacts.
     min_content_fraction : float
         If the detected content region is smaller than this fraction of
-        the total image, the image is considered "mostly empty" and we
-        return the full bbox (fallback).
+        the total image, the image is considered "mostly empty" and the
+        full bbox is returned (fallback).
 
     Returns
     -------
@@ -90,7 +92,7 @@ def detect_content_bbox(
     content_area = (y_max - y_min) * (x_max - x_min)
     total_area = H * W
     if content_area / total_area < min_content_fraction:
-        # Too small — image is mostly noise, fall back to full
+        # Too small: image is mostly noise, fall back to full
         return (0, 0, H, W)
 
     return (y_min, x_min, y_max, x_max)
@@ -108,11 +110,11 @@ def crop_and_repad_to_aspect(
     Parameters
     ----------
     img : np.ndarray
-        2D grayscale image in any range.
+        2D greyscale image in any range.
     target_aspect : float
         Desired height-to-width aspect ratio of the content after cropping.
         E.g. 1.5 means content is 50% taller than wide. Wider than BoostNet's
-        native 2.8, taller than VinDr's typical ~1.0 — chosen as a
+        native 2.8, taller than VinDr's typical ~1.0, chosen as a
         symmetric compromise.
     target_size : int
         Side length of the output square image (after padding).
@@ -123,7 +125,7 @@ def crop_and_repad_to_aspect(
     Returns
     -------
     out : np.ndarray
-        2D grayscale image of shape (target_size, target_size). Content
+        2D greyscale image of shape (target_size, target_size). Content
         occupies the centre, with minimal symmetric padding.
     """
     from PIL import Image as PILImage
@@ -142,16 +144,16 @@ def crop_and_repad_to_aspect(
     content_aspect = ch / cw
 
     # Bring content to target_aspect by extending the shorter side
-    # (we extend by padding with black, not by stretching)
+    # (extension is by padding with black, not by stretching)
     if content_aspect > target_aspect:
-        # Content is taller than target — extend width
+        # Content is taller than target: extend width
         new_w = int(round(ch / target_aspect))
         pad_w = (new_w - cw) // 2
         new_content = np.zeros((ch, new_w), dtype=content.dtype)
         new_content[:, pad_w:pad_w + cw] = content
         content = new_content
     elif content_aspect < target_aspect:
-        # Content is wider than target — extend height
+        # Content is wider than target: extend height
         new_h = int(round(cw * target_aspect))
         pad_h = (new_h - ch) // 2
         new_content = np.zeros((new_h, cw), dtype=content.dtype)
@@ -178,9 +180,7 @@ def crop_and_repad_to_aspect(
     return out
 
 
-# ---------------------------------------------------------------------------
-# Quick sanity check (run as: python detect_content_bbox.py)
-# ---------------------------------------------------------------------------
+# Quick sanity check (synthetic-data self-test; run as: python detect_content_bbox.py)
 
 if __name__ == "__main__":
     # Synthesise a test image: 200×500 black with content in the middle

@@ -1,25 +1,34 @@
 """
-landmark_heatmap.py — a stronger (heatmap-regression) landmark detector.
+landmark_heatmap.py: heatmap-regression landmark detector on frozen MedVAE latents at 4x and 8x.
 
-The frontier used DIRECT coordinate regression (136 outputs). The standard,
-usually-stronger approach is HEATMAP regression: predict one 2-D heatmap per
-landmark and take its soft-argmax as the coordinate. This trains that detector
-on the frozen MedVAE latents at 4x and 8x, so we can answer two review-relevant
+train_frontier.py uses direct coordinate regression (136 outputs). A common
+alternative, often more accurate, is heatmap regression: predict one 2-D
+heatmap per landmark and take its soft-argmax as the coordinate. This script
+trains that detector on the frozen MedVAE latents at 4x and 8x to address two
 questions:
 
-  1. quality — is a proper detector meaningfully better than the direct head?
-  2. mechanism — does a *good* detector still resist compression (4x vs 8x),
-     or does it, being finer, start to degrade? (Either way is informative:
-     robust => strengthens "landmark pathway is compression-tolerant";
-     degrades => the coarse head was robust *because* it was coarse.)
+  1. Quality: is the heatmap detector more accurate than the direct head?
+  2. Compression sensitivity: is the heatmap detector's error unchanged
+     between 4x and 8x, or does it degrade?
+
+Interpretation (question 2):
+  error unchanged -> landmark localisation is compression-tolerant also with
+      a finer detector.
+  error degrades  -> the direct head's insensitivity to compression reflects
+      its coarseness.
 
 Predictions are saved in the shared format (uuids, pred_landmarks, gt_landmarks;
 (N,136) ordering A normalised [0,1]) so landmark_pixel_audit.py can convert them
 to pixels/mm and audit them the same way.
 
-Run:
+Inputs:  <latents-dir>/latents_<config>_{train,val,test}.npz (latents,
+         landmarks, uuids) from extract_latents_aspect.py.
+Outputs: <out-dir>/preds_heatmap_<config>.npz; per-configuration errors and
+         the 4x->8x comparison printed to stdout.
+
+Usage:
   python landmark_heatmap.py --latents-dir ./latents_aspect --out-dir ./outputs/heatmap --seeds 0 1 2
-  python landmark_heatmap.py --smoke
+  python landmark_heatmap.py --smoke      # synthetic-data self-test
 """
 import argparse
 from pathlib import Path
@@ -38,9 +47,7 @@ BETA = 30.0     # soft-argmax sharpness (higher = sharper; set from CLI)
 DIRECT_REF = {"medvae_4_1_2d": 0.0418, "medvae_8_1_2d": 0.0418}  # direct-regressor norm error
 
 
-# ==========================================================================
-# model
-# ==========================================================================
+# Model
 class HeatmapNet(nn.Module):
     """latent (B,C,h,w) -> (B,68,R,R) heatmaps. Adaptive to 96 or 48 input."""
     def __init__(self, in_ch=1, k=N_LM, res=R):
@@ -92,9 +99,7 @@ def gaussian_targets(lm136, res=R, sigma=2.0, device="cpu"):
     return hm
 
 
-# ==========================================================================
-# data / train
-# ==========================================================================
+# Data / train
 class LatentLM(Dataset):
     def __init__(self, latents, lm):
         self.x = torch.as_tensor(latents, dtype=torch.float32)
@@ -161,7 +166,7 @@ def boot_ci(v, seed=0, nb=10000):
     return float(v.mean()), float(np.percentile(b, 2.5)), float(np.percentile(b, 97.5))
 
 
-# ==========================================================================
+# Run
 def run(latents_dir, out_dir, seeds, device, **kw):
     out_dir.mkdir(parents=True, exist_ok=True)
     results = {}
@@ -180,7 +185,7 @@ def run(latents_dir, out_dir, seeds, device, **kw):
         train_err = norm_err(np.mean(seed_train, axis=0), tr[1]).mean()
         results[config] = errs
         mean, lo, hi = boot_ci(errs)
-        gap = "OVERFIT" if mean > 1.5 * train_err else ("UNDERFIT" if train_err > 0.06 else "ok")
+        gap = "overfit" if mean > 1.5 * train_err else ("underfit" if train_err > 0.06 else "ok")
         print(f"[{LABEL[config]}] heatmap norm error: test={mean:.4f} "
               f"CI[{lo:.4f},{hi:.4f}]  train={train_err:.4f}  [{gap}]   "
               f"(direct={DIRECT_REF[config]:.4f})")
@@ -195,8 +200,8 @@ def run(latents_dir, out_dir, seeds, device, **kw):
     m, lo, hi = boot_ci(d)
     print(f"\nheatmap detector 4x->8x: Δ={m:+.4f} CI[{lo:+.4f},{hi:+.4f}] "
           f"rel={100*m/a.mean():+.1f}% paired p={pt:.3g}")
-    print("compare to direct regressor (flat, p~0.99): does the stronger detector "
-          "also resist compression, or does it degrade?")
+    print("Interpretation: compare with the direct regressor (direct reference above): is the heatmap "
+          "detector also unaffected by compression, or does it degrade?")
 
 
 def smoke():
@@ -217,7 +222,7 @@ def smoke():
     ca = soft_argmax(hm)
     ok = hm.shape == (2, N_LM, R, R) and ca.shape == (2, N_LM, 2) and np.isfinite(e)
     print(f"heatmap shape {tuple(hm.shape)}, coords {tuple(ca.shape)}, test err {e:.4f}")
-    print("SMOKE:", "PASS" if ok else "FAIL")
+    print("Self-test:", "PASS" if ok else "FAIL")
 
 
 def main():
@@ -245,7 +250,7 @@ def main():
             epochs=args.epochs, bs=args.batch_size, lr=args.lr,
             wd=args.weight_decay, patience=args.patience, sigma=args.sigma, aug=args.aug)
     else:
-        raise SystemExit("--latents-dir required (or --smoke)")
+        raise SystemExit("--latents-dir is required (or --smoke for the synthetic-data self-test)")
 
 
 if __name__ == "__main__":

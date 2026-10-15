@@ -1,20 +1,26 @@
 """
-cobb_distributions.py — characterise the Cobb angle values and errors, per angle.
+cobb_distributions.py: characterise the ground-truth and inferred Cobb angle values and their errors, per angle.
 
-Addresses the review requests:
-  * spread and level of inferred values (main-thoracic is typically largest);
-  * distribution of angle VALUES and of ERROR, for each of the three angles;
-  * ground-truth vs inferred distribution (does the model compress the range /
-    regress to the mean?);
+Reports:
+  * level and spread of the ground-truth and inferred values for each angle;
+  * the distribution of angle values and of absolute error for each of the
+    three angles;
+  * a regression of inferred on ground truth, to test whether the model
+    compresses the range (regresses to the mean);
   * the range each Cobb measurement takes.
 
-All errors are in DEGREES (not %). Reads a saved prediction file
-(preds_{config}.npz with pred_cobb, gt_cobb, each (N,3) = [PT, MT, TL]).
+All errors are in degrees, not percentages. Columns follow the dataset order
+[PT, MT, TL]; column 0 holds the major curve.
 
-Run:
+Inputs:  --preds, a saved prediction file preds_{config}.npz with pred_cobb and
+         gt_cobb, each of shape (N, 3).
+Outputs: in --out-dir, {tag}_cobb_distributions.csv, {tag}_scatter.png and
+         {tag}_boxplots.png, where tag is the prediction file stem.
+
+Usage:
   python cobb_distributions.py --preds ./outputs/frontier/preds_medvae_4_1_2d.npz \
       --out-dir ./outputs/cobb_dist
-  python cobb_distributions.py --smoke
+  python cobb_distributions.py --smoke      # synthetic-data self-test
 """
 import argparse
 from pathlib import Path
@@ -27,7 +33,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-ANGLES = ["PT (proximal thoracic)", "MT (main thoracic)", "TL (thoracolumbar)"]
+ANGLES = ["Major curve (col 0)", "Col 1", "Col 2"]
 SHORT = ["PT", "MT", "TL"]
 GT_COLOR = "#1C7293"
 INF_COLOR = "#B85042"
@@ -67,17 +73,17 @@ def characterise(preds_path, out_dir):
 
     # console: level + spread + range (GT vs inferred), error, regression
     pd.set_option("display.float_format", lambda x: f"{x:6.2f}")
-    print("VALUE distribution — level, spread, range (degrees):")
+    print("Value distribution: level, spread, range (degrees):")
     print(tab[["angle", "gt_mean", "gt_sd", "gt_min", "gt_median", "gt_max",
                "inf_mean", "inf_sd", "inf_min", "inf_median", "inf_max"]].to_string(index=False))
-    print("\nERROR distribution (degrees) and GT-vs-inferred regression:")
+    print("\nError distribution (degrees) and GT-vs-inferred regression:")
     print(tab[["angle", "MAE_deg", "err_median", "err_90pct", "err_max", "r", "slope"]].to_string(index=False))
-    print("\nnote: slope < 1 means the model COMPRESSES the range (under-predicts "
-          "large angles / regresses to the mean) — worth watching for the large MT curves.")
+    print("\nNote: slope < 1 indicates that the model compresses the range (under-predicts "
+          "large angles, regressing to the mean); this is worth watching for the large curves in col 1 (MT).")
     tab.to_csv(out_dir / f"{tag}_cobb_distributions.csv", index=False)
 
     make_figures(gt, pred, tag, out_dir)
-    print(f"\nwrote table + figures to {out_dir}")
+    print(f"\nWrote table and figures to {out_dir}")
     return tab
 
 
@@ -97,7 +103,7 @@ def make_figures(gt, pred, tag, out_dir):
         ax.set_xlabel("ground truth (°)"); ax.set_ylabel("inferred (°)")
         ax.set_title(f"{name}\nr={lr.rvalue:.3f}", fontsize=10)
         ax.legend(fontsize=8, frameon=False, loc="upper left")
-    fig.suptitle(f"Ground truth vs inferred Cobb angle — {tag}", fontsize=13)
+    fig.suptitle(f"Ground truth vs inferred Cobb angle: {tag}", fontsize=13)
     fig.tight_layout(rect=[0, 0, 1, 0.94])
     fig.savefig(out_dir / f"{tag}_scatter.png", dpi=140, bbox_inches="tight"); plt.close(fig)
 
@@ -114,7 +120,7 @@ def make_figures(gt, pred, tag, out_dir):
         patch.set_facecolor(c); patch.set_alpha(0.6)
     axL.set_xticks(ticks); axL.set_xticklabels(SHORT)
     axL.set_ylabel("Cobb angle (°)")
-    axL.set_title("Value range per angle — GT (blue) vs inferred (red)")
+    axL.set_title("Value range per angle: GT (blue) vs inferred (red)")
     from matplotlib.patches import Patch
     axL.legend(handles=[Patch(facecolor=GT_COLOR, alpha=0.6, label="ground truth"),
                         Patch(facecolor=INF_COLOR, alpha=0.6, label="inferred")],
@@ -127,21 +133,22 @@ def make_figures(gt, pred, tag, out_dir):
     axR.set_xticks([1, 2, 3]); axR.set_xticklabels(SHORT)
     axR.set_ylabel("absolute error (°)")
     axR.set_title("Error distribution per angle (degrees)")
-    fig.suptitle(f"Cobb angle value & error distributions — {tag}", fontsize=13)
+    fig.suptitle(f"Cobb angle value & error distributions: {tag}", fontsize=13)
     fig.tight_layout(rect=[0, 0, 1, 0.94])
     fig.savefig(out_dir / f"{tag}_boxplots.png", dpi=140, bbox_inches="tight"); plt.close(fig)
 
 
 def smoke():
     rng = np.random.default_rng(0); N = 128
-    # MT larger + wider than PT/TL; inferred = regress-to-mean version of GT + noise
+    # synthetic data: col 1 (MT) larger and wider than cols 0 and 2;
+    # inferred = regress-to-mean version of GT plus noise
     gt = np.stack([rng.normal(18, 8, N), rng.normal(30, 14, N), rng.normal(15, 9, N)], 1).clip(0)
     pred = (0.8 * gt + 0.2 * gt.mean(0) + rng.normal(0, 3, gt.shape)).clip(0)
     np.savez("/tmp/preds_cobb_smoke.npz", gt_cobb=gt.astype(np.float32),
              pred_cobb=pred.astype(np.float32),
              uuids=np.array([f"i{k}" for k in range(N)]))
     characterise(Path("/tmp/preds_cobb_smoke.npz"), Path("/tmp/cobb_dist"))
-    print("\nSMOKE: PASS")
+    print("\nSelf-test: PASS")
 
 
 def main():
@@ -155,7 +162,7 @@ def main():
     elif args.preds:
         characterise(args.preds, args.out_dir)
     else:
-        raise SystemExit("--preds required (or --smoke)")
+        raise SystemExit("--preds is required (or use --smoke for the synthetic-data self-test)")
 
 
 if __name__ == "__main__":

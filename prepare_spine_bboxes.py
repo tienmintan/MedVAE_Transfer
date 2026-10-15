@@ -1,17 +1,22 @@
 """
-prepare_spine_bboxes.py
+prepare_spine_bboxes.py: compute a spine bounding box per BoostNet image from the landmarks.
 
-For each BoostNet image, compute the bounding box of the spine in normalised
-[0,1] coordinates from the landmark file. Saves a CSV with columns:
+For each BoostNet image, the bounding box of all 68 landmarks is computed in
+normalised [0,1] coordinates, optionally expanded by --margin. The bbox
+columns are joined to the split CSV on image_uuid:
 
     image_uuid, bbox_x0, bbox_y0, bbox_x1, bbox_y1
 
 These coordinates are used by the patch loader to bias random crops toward
-the spine region rather than wasting training capacity on empty corners.
+the spine region rather than spending training capacity on empty corners.
 
-We deliberately keep the bounding box in normalised coordinates so it
-survives any intermediate resize. The patch loader will multiply by the
-actual image dimensions at load time.
+The bounding box is kept in normalised coordinates so that it remains valid
+after any intermediate resize. The patch loader multiplies by the actual
+image dimensions at load time.
+
+Inputs:  labels/{training,test}/{filenames,landmarks}.csv under
+         --boostnet-src; --csv-in (boostnet.csv).
+Outputs: --csv-out (the --csv-in rows with the bbox columns added).
 
 Usage:
   python prepare_spine_bboxes.py \\
@@ -30,7 +35,7 @@ import pandas as pd
 
 
 def clean_stem(filename: str) -> str:
-    """Match the cleaning we did in prepare_boostnet.py."""
+    """Apply the same filename cleaning as prepare_boostnet.py."""
     stem = Path(filename).stem
     stem = re.sub(r"\s+", "_", stem)
     stem = re.sub(r"[^A-Za-z0-9_\-]", "_", stem)
@@ -42,8 +47,8 @@ def load_split_landmarks(split_dir: Path) -> pd.DataFrame:
     """Read filenames.csv + landmarks.csv from a split directory.
 
     landmarks.csv has 136 columns: 68 landmarks * 2 coords (x, y), normalised
-    to [0, 1] of image dimensions. We compute the (x0, y0, x1, y1) bounding
-    box that contains all landmarks.
+    to [0, 1] of image dimensions. The (x0, y0, x1, y1) bounding box that
+    contains all landmarks is computed.
     """
     filenames = pd.read_csv(
         split_dir / "filenames.csv", header=None, names=["filename"]
@@ -95,7 +100,7 @@ def main() -> None:
         all_bb["bbox_x1"] = (all_bb["bbox_x1"] + args.margin).clip(0.0, 1.0)
         all_bb["bbox_y1"] = (all_bb["bbox_y1"] + args.margin).clip(0.0, 1.0)
 
-    # Sanity: report bbox shape statistics
+    # Sanity check: report bbox shape statistics
     bb_w = all_bb["bbox_x1"] - all_bb["bbox_x0"]
     bb_h = all_bb["bbox_y1"] - all_bb["bbox_y0"]
     print(f"\nBbox width  (normalised): mean={bb_w.mean():.3f}  "
@@ -103,12 +108,13 @@ def main() -> None:
     print(f"Bbox height (normalised): mean={bb_h.mean():.3f}  "
           f"range=[{bb_h.min():.3f}, {bb_h.max():.3f}]")
 
-    # Merge with the main split CSV so we have split + bbox in one file
+    # Merge with the main split CSV so that split + bbox are in one file
     base = pd.read_csv(args.csv_in)
     merged = base.merge(all_bb, on="image_uuid", how="left")
     missing = merged["bbox_x0"].isna().sum()
     if missing:
-        print(f"\nWARNING: {missing} rows have no matching bbox.")
+        print(f"\nWARNING: bbox join found no matching landmarks for {missing} rows. "
+              f"Their bbox columns are empty, and results that use them may be unreliable.")
     args.csv_out.parent.mkdir(parents=True, exist_ok=True)
     merged.to_csv(args.csv_out, index=False)
     print(f"\nWrote {args.csv_out}")

@@ -1,13 +1,18 @@
 """
-prepare_cobb_labels.py
+prepare_cobb_labels.py: join BoostNet's per-image Cobb angles to boostnet.csv.
 
-Join BoostNet's per-image Cobb angles (3 values: proximal-thoracic,
-main-thoracic, thoracolumbar) to your existing boostnet.csv (which already
-has image_uuid + split columns). Produces boostnet_with_angles.csv.
+The three angles per image are stored in the columns angle_proximal_thoracic,
+angle_main_thoracic and angle_thoracolumbar (dataset order). They are joined
+on image_uuid to boostnet.csv, which already has image_uuid + split columns.
 
 The MAT files in labels/{training,test}/*.mat contain landmark data per
-image — we don't use those here. We use angles.csv + filenames.csv which
-give us the angles in row-order matching the image list.
+image and are not used here. angles.csv + filenames.csv are used instead;
+they give the angles in row order matching the image list.
+
+Inputs:  labels/{training,test}/{filenames,angles}.csv under --boostnet-src;
+         --csv-in (boostnet.csv).
+Outputs: --csv-out (boostnet_with_angles.csv); per-split angle statistics
+         printed to stdout.
 
 Usage:
   python prepare_cobb_labels.py \\
@@ -24,7 +29,7 @@ import pandas as pd
 
 
 def clean_stem(filename: str) -> str:
-    """Match the cleaning we did in prepare_boostnet.py."""
+    """Apply the same filename cleaning as prepare_boostnet.py."""
     stem = Path(filename).stem
     stem = re.sub(r"\s+", "_", stem)
     stem = re.sub(r"[^A-Za-z0-9_\-]", "_", stem)
@@ -72,8 +77,8 @@ def main() -> None:
     merged = base.merge(all_labels, on="image_uuid", how="left")
     missing = merged["angle_proximal_thoracic"].isna().sum()
     if missing:
-        print(f"WARNING: {missing} rows have no matching label — "
-              f"they'll be dropped from the regressor's training set.")
+        print(f"WARNING: label join found no matching angles for {missing} rows. "
+              f"These rows will be dropped from the regressor's training set.")
         print("First few unmatched UUIDs:")
         print(merged.loc[merged["angle_proximal_thoracic"].isna(),
                          "image_uuid"].head().to_string())

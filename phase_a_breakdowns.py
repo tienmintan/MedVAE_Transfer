@@ -1,16 +1,16 @@
 """
-Phase A.2: Per-curve and per-cohort MAE breakdowns.
+phase_a_breakdowns.py: per-curve and per-cohort MAE breakdowns of the multi-seed matched-regressor results.
 
-Uses:
+Inputs:
   - phase_a_per_image_mae.csv (output of phase_a_bootstrap.py) for the
     per-image MAE and per-curve absolute errors averaged across seeds.
   - targets from any of the multi-seed .npz files (used to assign each
     test image to a severity cohort based on its maximum Cobb angle).
-    Targets are identical across all 25 files; we just need to load one.
+    Targets are identical across all the multi-seed files, so only one is loaded.
 
 Computes:
-  - Per-curve (PT, MT, TL) MAE per configuration, with bootstrap 95% CIs
-    and paired comparison against the baseline within each curve.
+  - Per-curve MAE per configuration (major curve (col 0), col 1, col 2), with bootstrap 95% CIs and paired comparison against the
+    baseline within each curve.
   - Per-cohort (mild <25°, moderate 25-50°, severe >50°) MAE per
     configuration, with bootstrap CIs and paired comparison against the
     baseline within each cohort.
@@ -18,12 +18,11 @@ Computes:
 Outputs:
   phase_a_per_curve_results.csv     - raw numbers per (config, curve)
   phase_a_per_cohort_results.csv    - raw numbers per (config, cohort)
-  phase_a_per_curve_table.tex       - LaTeX table for thesis
-  phase_a_per_cohort_table.tex      - LaTeX table for thesis
+  phase_a_per_curve_table.tex       - LaTeX table
+  phase_a_per_cohort_table.tex      - LaTeX table
 
 Usage:
-    cd ~/MedVAE/MedVAE
-    python phase_a_breakdowns.py
+    python phase_a_breakdowns.py      # run from the repository root
 """
 
 from __future__ import annotations
@@ -36,16 +35,14 @@ import numpy as np
 import pandas as pd
 
 
-# ---------------------------------------------------------------------------
-# Configuration
-# ---------------------------------------------------------------------------
+# --- Configuration ---
 
 PER_IMAGE_CSV = Path("phase_a_per_image_mae.csv")
-# Any of the 25 .npz files works for loading targets — they all match.
+# Any of the multi-seed .npz files can be used for loading targets; they all match.
 TARGETS_NPZ   = Path("outputs/multiseed/matched_4x_seed0.npz")
 OUT_DIR = Path(".")
 
-# Severity cohort boundaries (max Cobb angle across PT/MT/TL):
+# Severity cohort boundaries (max Cobb angle across the three columns):
 #   mild     < MILD_MAX
 #   moderate in [MILD_MAX, MODERATE_MAX]
 #   severe   > MODERATE_MAX
@@ -64,7 +61,7 @@ CONFIGS = [
 ]
 BASELINE_PREFIX = "matched_4x"
 
-CURVE_NAMES   = ["PT", "MT", "TL"]
+CURVE_NAMES   = ["Major curve (col 0)", "Col 1", "Col 2"]
 CURVE_COLUMNS = ["pt_abs_err", "mt_abs_err", "tl_abs_err"]
 COHORT_NAMES  = ["mild", "moderate", "severe"]
 
@@ -74,9 +71,7 @@ ALPHA = 0.05
 RNG_SEED = 20260606
 
 
-# ---------------------------------------------------------------------------
-# Helpers (reused from phase_a_bootstrap.py — duplicated for self-containment)
-# ---------------------------------------------------------------------------
+# --- Helpers (from phase_a_bootstrap.py, duplicated so this script is self-contained) ---
 
 PRED_KEY_CANDIDATES   = ["preds", "predictions", "y_pred", "pred", "test_preds"]
 TARGET_KEY_CANDIDATES = ["targets", "labels", "y_true", "true", "test_targets",
@@ -155,9 +150,7 @@ def bootstrap_paired_diff(
     )
 
 
-# ---------------------------------------------------------------------------
-# Analyses
-# ---------------------------------------------------------------------------
+# --- Analyses ---
 
 def compute_per_curve(per_image_df: pd.DataFrame) -> pd.DataFrame:
     """Per-curve MAE breakdown with bootstrap CIs and paired comparisons."""
@@ -277,9 +270,7 @@ def compute_per_cohort(
     return pd.DataFrame(rows)
 
 
-# ---------------------------------------------------------------------------
-# Pretty printing and LaTeX output
-# ---------------------------------------------------------------------------
+# --- Printing and LaTeX output ---
 
 def print_summary(df: pd.DataFrame, group_col: str, group_names: List[str],
                   n_per_group: Dict[str, int]) -> None:
@@ -354,22 +345,20 @@ def write_latex_table(
     print(f"    Saved LaTeX table to {out_path}")
 
 
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
+# --- Main ---
 
 def main() -> int:
     print("=" * 70)
-    print("Phase A.2: Per-curve and per-cohort MAE breakdowns")
+    print("Per-curve and per-cohort MAE breakdowns")
     print("=" * 70)
     print()
 
     if not PER_IMAGE_CSV.is_file():
-        print(f"ERROR: {PER_IMAGE_CSV} not found. Run phase_a_bootstrap.py first.",
+        print(f"Error: {PER_IMAGE_CSV} not found; it is produced by phase_a_bootstrap.py.",
               file=sys.stderr)
         return 1
     if not TARGETS_NPZ.is_file():
-        print(f"ERROR: {TARGETS_NPZ} not found.", file=sys.stderr)
+        print(f"Error: {TARGETS_NPZ} not found.", file=sys.stderr)
         return 1
 
     print(f"[1/4] Loading per-image MAE from {PER_IMAGE_CSV}")
@@ -390,7 +379,7 @@ def main() -> int:
     print(f"    Cohort counts: {n_per_cohort}")
     print()
 
-    # ---- Per-curve ----
+    # --- Per-curve ---
     print("[3/4] Per-curve breakdown")
     per_curve = compute_per_curve(per_image_df)
     per_curve.to_csv(OUT_DIR / "phase_a_per_curve_results.csv", index=False)
@@ -406,7 +395,7 @@ def main() -> int:
         out_path=OUT_DIR / "phase_a_per_curve_table.tex",
     )
 
-    # ---- Per-cohort ----
+    # --- Per-cohort ---
     print("[4/4] Per-cohort breakdown (by max Cobb angle)")
     per_cohort = compute_per_cohort(per_image_df, cohorts)
     per_cohort.to_csv(OUT_DIR / "phase_a_per_cohort_results.csv", index=False)
@@ -425,11 +414,11 @@ def main() -> int:
     )
 
     print()
-    print("Phase A.2 complete. Things worth scanning for in the output:")
-    print("  - PT vs MT vs TL: are some curves systematically harder under compression?")
-    print("  - Does the tile-and-stitch improvement concentrate in any one curve?")
-    print("  - Cohort balance: severe cohort may be small; treat its CIs with caution.")
-    print("  - Does the tile-and-stitch improvement concentrate in moderate or severe?")
+    print("Breakdowns complete. Questions the output addresses:")
+    print("  - Major curve (col 0) vs col 1 vs col 2: are some curves systematically harder under compression?")
+    print("  - Is the tile-and-stitch difference concentrated in any one curve?")
+    print("  - Cohort balance: the severe cohort may be small, so its CIs should be interpreted with caution.")
+    print("  - Is the tile-and-stitch difference concentrated in the moderate or severe cohort?")
     print("    (Native resolution should matter more for larger curves.)")
     return 0
 
