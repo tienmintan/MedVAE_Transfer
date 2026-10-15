@@ -1,0 +1,42 @@
+# @package _global_
+# The line above must remain the first line of this file.
+
+# Stage-1 (reconstruction) finetuning of medvae_4_1_2d on BoostNet at native
+# resolution, using random 384 x 384 patches. Place in
+# MedVAE/configs/experiment/ and run:
+#   medvae_finetune experiment=medvae_4x_1c_2d_boostnet_patch
+#
+# Changes from MedVAE's medvae_4x_1c_2d_finetuning.yaml:
+#   dataloader   boostnet_patch (BoostNetPatchDataset)
+#   batch size   4 with 2 gradient-accumulation steps (effective batch 8);
+#                larger batches exceeded memory in the bottleneck self-attention
+#   precision    bf16, to reduce activation memory
+#   disc_start   1500 instead of 3125, as in the other BoostNet runs
+#   seed         42
+
+defaults:
+  - override /dataloader: boostnet_patch.yaml
+  - override /metrics: reconstruction_minimal.yaml
+  - override /criterion: lpips_with_discriminator.yaml
+
+task_name: boostnet_finetuning_patch
+model_name: medvae_4_1_2d
+dataset_name: boostnet
+merge_channels: true
+stage2: false
+device: cuda
+
+mixed_precision: "bf16"
+gradient_accumulation_steps: 2
+max_epoch: 100
+batch_size: 4
+log_every_n_steps: 20
+base_learning_rate: 4.5e-6
+ema_decay: null
+fast_dev_run: false
+
+criterion:
+  num_channels: 1
+  disc_start: 1500
+
+seed: 42
