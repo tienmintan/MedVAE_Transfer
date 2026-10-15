@@ -1,104 +1,259 @@
-# MedVAE: Efficient Automated Interpretation of Medical Images with Large-Scale Generalizable Autoencoders
+# MedVAE Transfer for Spinal Geometry
 
-[![Hugging Face](https://huggingface.co/datasets/huggingface/badges/resolve/main/model-on-hf-md.svg)](https://huggingface.co/stanfordmimi/MedVAE)    [![pypi](https://img.shields.io/pypi/v/medvae?style=for-the-badge)](https://pypi.org/project/medvae/)    [![arXiv](https://img.shields.io/badge/arXiv-2502.14753-b31b1b.svg?style=for-the-badge)](https://arxiv.org/abs/2502.14753)    [![Watch the Talk on YouTube](https://img.shields.io/badge/YouTube-Talk-red?style=for-the-badge&logo=youtube)](https://www.youtube.com/watch?v=5zoxHz71ZgY)    [![License](https://img.shields.io/github/license/stanfordmimi/medvae?style=for-the-badge)](LICENSE)
+Code and saved results for the MSc individual project report *MedVAE Transfer for Spinal Geometry*. The report source is available as a read-only Overleaf project: [MedVAE Transfer for Spinal Geometry](https://www.overleaf.com/read/nhmhbtcygvvq#ceaef9).
 
-This repository contains the official PyTorch implementation for [MedVAE: Efficient Automated Interpretation of Medical Images with Large-Scale Generalizable Autoencoders](https://arxiv.org/abs/2502.14753) (MIDL 2025; Best Oral Paper Award).
+The project tests whether the pretrained 2D encoders of [MedVAE](https://github.com/StanfordMIMI/MedVAE) retain enough information to predict spinal geometry: three Cobb angles and 68 vertebral-corner landmarks on the 609 radiographs of the BoostNet/AASCE dataset. The encoders stay frozen except in the finetuning experiments of Chapter 4. The experiments cover:
 
-![Overview](documentation/assets/overview.png)
+- how to present tall radiographs to the encoder (Chapter 4);
+- where reconstruction error occurs, and how prediction error changes across MedVAE configurations (Chapters 5 and 6);
+- MedVAE's stage-2 projection and channel averaging (Section 6.6);
+- a comparison with DINOv2, contrast enhancement and augmentation (Chapter 7);
+- diffusion models that generate radiographs as extra training data (Chapter 8).
 
-## 🫁 What is MedVAE?
+The report presents and interprets the results. This repository holds the code and the saved outputs behind its tables and figures.
 
-MedVAE is a family of six large-scale, generalizable 2D and 3D variational autoencoders (VAEs) designed for medical imaging. It is trained on over one million medical images across multiple anatomical regions and modalities. MedVAE autoencoders encode medical images as downsized latent representations and decode latent representations back to high-resolution images. Across diverse tasks obtained from 20 medical image datasets, we demonstrate that utilizing MedVAE latent representations in place of high-resolution images when training downstream models can lead to efficiency benefits (up to 70x improvement in throughput) while simultaneously preserving clinically-relevant features.
+MedVAE has four 2D configurations, written `4_3`, `4_1`, `8_4` and `8_1` in the report. The first number is the downsampling factor along each image axis and the second is the number of latent channels. The code uses MedVAE's model names: `medvae_4_3_2d`, `medvae_4_1_2d`, `medvae_8_4_2d` and `medvae_8_1_2d`.
 
-## ⚡️ Installation
+## Repository contents
 
-To install MedVAE, you can simply run:
+| Path | Contents |
+|---|---|
+| `*.py` (top level) | Scripts for data preparation, latent extraction, training, analysis and generation. Most scripts describe their inputs, outputs and usage at the top of the file. |
+| `projection_experiments/` | Projection and channel-averaging study (Section 6.6, Appendix B.5) and its tests. |
+| `medvae_followup/` | Follow-up checks in Appendix C. |
+| `medvae_patches/` | Files this project adds to MedVAE: the extended image loader, the patch dataset and the finetuning configurations. |
+| `MedVAE_Report_Completion/` | Scripts and data used to draw the report figures. |
+| `report_figures/` | The report figures and the values plotted in them. |
+| `report/figures/` | Earlier figures and LaTeX tables written by `make_report_figures.py`. |
+| `results/` | Saved results of the main experiments, one folder per run. |
+| `outputs/` | Saved results and run records of the projection study and the Appendix C checks. |
+| `data/boostnet_labeldata/` | BoostNet/AASCE radiographs and labels, also provided as a zip file. |
 
-```python
-pip install medvae
-```
+Cached latents and trained models are not included because of their size; the scripts regenerate them.
 
-For an editable installation, use the following commands to clone and install this repository.
+## Where to find each result
 
-```python
+| Report section | Code | Saved results |
+|---|---|---|
+| 3.1.2, B.4 Dataset checks: angle columns, landmark order, image-label matching | `verify_angle_semantics.py`, `verify_angle_columns.py`, `verify_landmarks.py`, `verify_landmark_alignment.py`, `verify_corner_ordering.py` | `results/angle_semantics/` |
+| 3.5 Landmark error in pixels | `landmark_pixel_audit.py` | `results/landmark_audit/` |
+| 4.1 to 4.3 Input strategies: padding, resizing, tiling | `extract_latents.py`, `extract_latents_whole.py`, `extract_latents_tiled.py`, `extract_latents_tiled_pretrained.py`, `merge_split_latents.py`, `run_multiseed_matched.py`, `train_cobb_regressor_matched.py`, `phase_a_bootstrap.py`, `phase_a_breakdowns.py` | `results/multiseed/` |
+| 4.2, 4.3.1 Encoder finetuning | `medvae_patches/`, `prepare_spine_bboxes.py`, `evaluate_reconstruction.py`, `evaluate_reconstruction_tiled.py`, `evaluate_whole_image.py` | |
+| 4.4 Diffusion features | `extract_diffusion_features.py` | |
+| 5.1, 5.2 Reconstruction error by spatial frequency and anatomical region | `freq_loss_spectrum.py`, `freq_loss_endplate.py`, `freq_loss_edge_interior.py` | `results/freq_loss/` |
+| 5.3 Cobb and landmark error | `extract_latents_aspect.py`, `train_frontier.py` | `results/frontier/` |
+| 5.4, 5.5 Position, orientation and per-curve error | `cobb_from_landmarks.py` | `results/mechanism/` |
+| 5.6 Saliency | `xai_verify.py` | `results/xai/` |
+| 6.1 Reconstruction fidelity | `recon_fidelity.py` | `results/fidelity/` |
+| 6.3, 6.4 Computational cost | `cost_benchmark.py` | `results/cost/` |
+| 6.6, B.5 Projection and channel averaging | `projection_experiments/` | `outputs/projection_study_fresh_v1/` |
+| 6.6.4, C.1 Removing the two corrupt annotations | `medvae_followup/` | `outputs/followup_annotation_v1/` |
+| 7.1 DINOv2 comparison | `extract_latents_dino.py` | `results/dino/`, `results/dino_pca/` (equal storage), `results/dino_aug/` (augmented) |
+| 7.2 Contrast enhancement | `extract_latents_multichannel.py`, `compare_runs.py` | `results/clahe/`, `results/clahe_rep/` |
+| 7.3 Augmentation presets | `augment_and_extract.py` | `results/aug_cons/` (conservative), `results/aug_mod/` (moderate), `results/aug/` (aggressive) |
+| 7.3.4, C.3 Augmentation after projection | `medvae_followup/` | `outputs/followup_augmentation_v1/` |
+| 8.1, B.1 Cobb-conditioned generation | `extract_latents_vindr.py`, `extract_latents_vindr_cropped.py`, `extract_latents_boostnet_512.py`, `extract_latents_boostnet_cropped.py`, `train_diffusion.py`, `sample_diffusion.py`, `connector_synth_to_medvae.py`, `investigate_dataset_shift.py`, `investigate_dataset_shift_content_only.py`, `investigate_joint_dataset_shift.py`, `verify_padding_fractions.py` | `results/figures/` |
+| 8.2 to 8.6, B.2 Landmark-conditioned generation | `diffusion_latent.py`, `latent_quality.py` | `results/diffusion5/`, `results/scaling_v3/` |
+| B.3 Six-task comparison | `derive_task_labels.py`, `train_frontier.py`, `task_baselines.py` | `results/ladder/`, `results/baselines/` |
+| B.3.1 Alternative landmark heads | `landmark_heatmap.py`, `landmark_fullres.py` | `results/landmark_audit_hm/` |
+| C.2 Reconstruction at 384 and 768 pixels | `medvae_followup/reconstruction_audit.py` | `outputs/followup_reconstruction_v1/` |
+
+Notes on the saved results:
+
+- The report cites some files by their original location, `outputs/<name>/`. In this repository those folders are under `results/<name>/`; for example, `outputs/ladder/` in the report is `results/ladder/` here.
+- `results/frontier/` holds the first run of Chapter 5, with ten seeds per configuration and task. The saliency results use three trained heads instead, and the pixel landmark errors come from an earlier run.
+- Folders in `results/` and top-level scripts that are not listed above belong to earlier runs or supporting analyses.
+
+## Running the code
+
+### Setup
+
+Each experiment ran on one NVIDIA GPU, either an A10 (24 GB) or an A100 (40 GB). The recorded software versions are Python 3.10.21, PyTorch 2.14.0 with CUDA 13.0, torchvision 0.29.0, MONAI 1.4.0 and NumPy 1.26.4 (`runtime` in `outputs/projection_study_fresh_v1/manifest.json`).
+
+The scripts run from the root of this repository and expect MedVAE's package folder at `./medvae`, as on the experiment machine. Install MedVAE from its GitHub repository and link its package folder into this one:
+
+```bash
 git clone https://github.com/StanfordMIMI/MedVAE.git
-cd MedVAE
-pip install -e .[dev]
-pre-commit install
-pre-commit
+git clone https://github.com/tienmintan/MedVAE_Transfer.git
+pip install -e ./MedVAE
+cd MedVAE_Transfer
+ln -s ../MedVAE/medvae medvae
 ```
 
-## 🚀 Inference Instructions
-
-```python
-import torch
-from medvae import MVAE
-
-fpath = "documentation/data/mmg_data/isJV8hQ2hhJsvEP5rdQNiy.png"
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-model = MVAE(model_name="medvae_4_3_2d", modality="xray").to(device)
-img = model.apply_transform(fpath).to(device)
-
-model.requires_grad_(False)
-model.eval()
-
-with torch.no_grad():
-    latent = model(img)
-```
-
-We also developed an easy-to-use CLI inference tool for compressing your high-dimensional medical images into usable latents:
-
-```python
-medvae_inference -i INPUT_FOLDER -o OUTPUT_FOLDER -model_name MED_VAE_MODEL -modality MODALITY
-```
-
-For more information, please check our [inference documentation](/documentation/inference.md) and [demo](documentation/demo.ipynb).
-
-## 🔧 Finetuning Instructions
-
-Easily finetune MedVAE on **your own dataset**! Follow the instructions below (requires Python 3.9 and cloning the repository).
-
-Run the following commands depending on your finetuning scenario:
-
-**Stage 1 (2D) Finetuning**
+`medvae_patches/` holds the files this project adds to MedVAE. Copy them into the MedVAE folder:
 
 ```bash
-medvae_finetune experiment=medvae_4x_1c_2d_finetuning
+cp -r medvae_patches/. ../MedVAE/
 ```
 
-**Stage 2 (2D) Finetuning:**
+This replaces MedVAE's `medvae/utils/loaders.py` with the version used in the experiments, which is MedVAE's original file with two loaders added. `load_2d_finetune_aspect`, used by most extraction and reconstruction scripts, pads each radiograph to a square without changing its proportions, then resizes it to 384 × 384 (report Section 3.3). `load_2d_finetune_patch` returns random 384 × 384 crops at native resolution for patch finetuning. The copy also adds the patch dataset and the finetuning configurations described under [Encoder finetuning](#encoder-finetuning-chapter-4).
+
+MedVAE's model code itself is unchanged: the projection-study records include a hash of MedVAE's model file, which matches the original repository.
+
+Three further packages are needed by particular scripts: `transformers` for DINOv2 (`extract_latents_dino.py`), `lpips` for perceptual distance (`recon_fidelity.py`) and `diffusers` for the Stable Diffusion autoencoder used in Cobb-conditioned generation.
 
 ```bash
-medvae_finetune_s2 experiment=medvae_4x_1c_2d_s2_finetuning
+pip install transformers lpips diffusers
 ```
 
-**Stage 2 (3D) Finetuning:**
+Pretrained weights are downloaded from Hugging Face on first use: MedVAE (`stanfordmimi/MedVAE`), DINOv2 (`facebook/dinov2-base`) and the Stable Diffusion autoencoder (`stabilityai/sd-vae-ft-mse`).
+
+These checks run on a CPU without the data or model weights:
 
 ```bash
-medvae_finetune experiment=medvae_4x_1c_3d_finetuning
+python -m unittest discover -s projection_experiments -p "test_*.py"
+python medvae_followup/selftest.py
 ```
 
-This setup supports multi-GPU training and includes integration with Weights & Biases for experiment tracking.
+Many top-level scripts also accept `--smoke`, which runs them on small synthetic inputs.
 
-For detailed finetuning guidelines, see the [Finetuning Documentation](documentation/finetune.md).
+### Data preparation
 
-To create classification models using downsized latent representations, refer to the [Classification Documentation](documentation/classification.md).
+BoostNet/AASCE is included in `data/boostnet_labeldata/`: 481 training and 128 test radiographs with their landmark and angle files. The commands below copy the images into MedVAE's data folder, create the training, validation and test split, attach the Cobb angles, and match each landmark row to its image, since the landmark files list rows without image names.
 
-## 📎 Citation
-
-If you find this repository useful for your work, please cite the following paper:
-
-```bibtex
-@misc{varma2025medvaeefficientautomatedinterpretation,
-      title={MedVAE: Efficient Automated Interpretation of Medical Images with Large-Scale Generalizable Autoencoders}, 
-      author={Maya Varma and Ashwin Kumar and Rogier van der Sluijs and Sophie Ostmeier and Louis Blankemeier and Pierre Chambon and Christian Bluethgen and Jip Prince and Curtis Langlotz and Akshay Chaudhari},
-      year={2025},
-      eprint={2502.14753},
-      archivePrefix={arXiv},
-      primaryClass={eess.IV},
-      url={https://arxiv.org/abs/2502.14753}, 
-}
+```bash
+python prepare_boostnet.py --src ./data/boostnet_labeldata --dst ./medvae/data
+python prepare_cobb_labels.py --boostnet-src ./data/boostnet_labeldata \
+    --csv-in ./medvae/data/boostnet.csv --csv-out ./medvae/data/boostnet_with_angles.csv
+python fix_train_lookup.py --csv ./medvae/data/boostnet_with_angles.csv \
+    --landmarks-dir ./data/boostnet_labeldata/labels --out ./landmark_row_lookup_train_fixed.csv
+python fix_landmark_lookup.py --split test
 ```
 
-This repository is powered by [Hydra](https://github.com/facebookresearch/hydra) and [HuggingFace Accelerate](https://github.com/huggingface/accelerate). Our implementation of MedVAE is inspired by prior work on diffusion models from [CompVis](https://github.com/CompVis/latent-diffusion) and [Stability AI](https://github.com/Stability-AI/stablediffusion).
+`prepare_boostnet.py` keeps the 128 test images and splits the 481 training images into 409 training and 72 validation images (seed 42). Before running `fix_landmark_lookup.py`, set the two paths at the top of the file, `LABELDATA` and `PIPELINE_CSV`, to `data/boostnet_labeldata` and `medvae/data/boostnet.csv`.
+
+BoostNet's angle file has no column names. The code calls its three columns `angle_proximal_thoracic`, `angle_main_thoracic` and `angle_thoracolumbar` (abbreviated PT, MT and TL), in file order. Report Section 3.1.2 shows that column 0 is the major curve and that columns 1 and 2 usually lie above and below it, so the report calls them the major, upper and lower curves.
+
+VinDr-SpineXR (version 1.0.0, [PhysioNet](https://physionet.org/content/vindr-spinexr/1.0.0/)) is used only for the Cobb-conditioned generator (Section 8.1, Appendix B.1): to pretrain it without labels and to compare image padding between the two datasets. It is not included, because access requires a PhysioNet account and a signed data use agreement. Scripts that read it take the dataset folder as an argument (`--vindr-dir`, `--dicom-dir` or `--vindr-dicom-dir`) and expect PhysioNet's folder structure, with `train_images/` and `test_images/`.
+
+### Encoder finetuning (Chapter 4)
+
+MedVAE's finetuning command reads the location of its data folder from `PROJECT_DIR` in `MedVAE/.env`. Create that file once, then finetune the 4_1 encoder on resized or padded images:
+
+```bash
+echo "PROJECT_DIR=$(cd ../MedVAE && pwd)" > ../MedVAE/.env
+medvae_finetune experiment=medvae_4x_1c_2d_boostnet          # images resized to 384 x 384
+medvae_finetune experiment=medvae_4x_1c_2d_boostnet_aspect   # images padded to a square first
+```
+
+Patch finetuning also needs spine bounding boxes in the split file and the patch dataset registered with MedVAE:
+
+```bash
+python prepare_spine_bboxes.py --boostnet-src ./data/boostnet_labeldata \
+    --csv-in ./medvae/data/boostnet.csv --csv-out ./medvae/data/boostnet.csv
+echo "from medvae.dataloaders.patch_dataset import BoostNetPatchDataset" >> ../MedVAE/medvae/dataloaders/__init__.py
+medvae_finetune experiment=medvae_4x_1c_2d_boostnet_patch
+```
+
+Each run saves its checkpoints under `../MedVAE/medvae/logs/<task name>/runs/`. Scripts that use a finetuned encoder take its checkpoint as an argument: `--ckpt` in `extract_latents_tiled.py` and `extract_latents_whole.py`, and `--finetuned-ckpt` in `extract_latents.py`.
+
+### Main comparison (Chapter 5)
+
+These commands extract padded latents for the four configurations, train the fixed head (the same task-head design for every configuration) with ten seeds per configuration and task, and calculate the position, orientation and per-curve errors of Sections 5.4 and 5.5:
+
+```bash
+python extract_latents_aspect.py \
+    --csv ./medvae/data/boostnet_with_angles.csv --img-dir ./medvae/data/boostnet \
+    --landmarks-dir ./data/boostnet_labeldata/labels \
+    --train-lookup ./landmark_row_lookup_train_fixed.csv \
+    --test-lookup ./landmark_row_lookup_test_fixed.csv \
+    --configs medvae_4_3_2d medvae_4_1_2d medvae_8_4_2d medvae_8_1_2d \
+    --out-dir ./latents_aspect
+python train_frontier.py --latents-dir ./latents_aspect --out-dir ./outputs/frontier \
+    --seeds 0 1 2 3 4 5 6 7 8 9 --save-preds
+python cobb_from_landmarks.py --preds-dir ./outputs/frontier --img-dir ./medvae/data/boostnet
+```
+
+Adding `--verify` to the first command overlays the landmarks on a few images without extracting anything, to check that labels match images. `train_frontier.py` writes per-image errors, summary tables and the paired comparisons for the equal-storage pair (4_1 and 8_4) and the spatial comparison (4_1 and 8_1). `compare_runs.py` compares two runs image by image, for example augmented against unaugmented training.
+
+The saliency analysis (Section 5.6) uses three trained Cobb heads, and the saved pixel landmark errors (Section 3.5) also come from an earlier run. To repeat both, train with three seeds and save the models:
+
+```bash
+python train_frontier.py --latents-dir ./latents_aspect --out-dir ./outputs/frontier_3seed \
+    --seeds 0 1 2 --save-preds --save-models
+python xai_verify.py --models-dir ./outputs/frontier_3seed --latents-dir ./latents_aspect --out-dir ./outputs/xai
+python landmark_pixel_audit.py --preds ./outputs/frontier_3seed/preds_medvae_4_1_2d.npz \
+    --img-dir ./medvae/data/boostnet --out-dir ./outputs/landmark_audit
+```
+
+### Projection study (Section 6.6)
+
+The study extracts raw and projected latents together from the images, using the earlier latents only for image names and labels. It then trains 240 heads (12 latent sets, two tasks, seeds 0 to 9) and computes the 38 planned comparisons. Training uses the copy of `train_frontier.py` kept in `projection_experiments/references/`, and the analysis first checks that the latents and scripts match those recorded when the study was run.
+
+```bash
+python projection_experiments/prepare_fresh_projection_study.py \
+    --label-cache-dir ./latents_aspect --split-csv ./medvae/data/boostnet_with_angles.csv \
+    --img-dir ./medvae/data/boostnet --out-dir ./outputs/projection_study_fresh
+python projection_experiments/run_projection_study.py --study-dir ./outputs/projection_study_fresh --phase all
+python projection_experiments/analyse_projection_study.py --study-dir ./outputs/projection_study_fresh
+python projection_experiments/analyse_projection_geometry.py --study-dir ./outputs/projection_study_fresh \
+    --img-dir ./medvae/data/boostnet
+```
+
+The output folder must be new and empty. The reported study is in `outputs/projection_study_fresh_v1/`.
+
+### Follow-up checks (Appendix C)
+
+These checks build on the projection study. Each first runs a short pilot to estimate the run time, and the scripts refuse the full run until the pilot has finished.
+
+```bash
+# Removing the two corrupt annotations (Section 6.6.4, Appendix C.1)
+python medvae_followup/prepare_annotation_study.py --study-dir ./outputs/projection_study_fresh \
+    --out-dir ./outputs/followup_annotation --img-dir ./medvae/data/boostnet
+python medvae_followup/run_heads.py --out-dir ./outputs/followup_annotation --pilot
+python medvae_followup/run_heads.py --out-dir ./outputs/followup_annotation
+python medvae_followup/analyse_heads.py --out-dir ./outputs/followup_annotation
+
+# Augmentation of projected, channel-averaged 4_3 latents (Section 7.3.4, Appendix C.3)
+python medvae_followup/prepare_augmentation.py --annotation-dir ./outputs/followup_annotation \
+    --out-dir ./outputs/followup_augmentation --img-dir ./medvae/data/boostnet --phase pilot
+python medvae_followup/prepare_augmentation.py --annotation-dir ./outputs/followup_annotation \
+    --out-dir ./outputs/followup_augmentation --img-dir ./medvae/data/boostnet --phase run
+python medvae_followup/run_heads.py --out-dir ./outputs/followup_augmentation --pilot
+python medvae_followup/run_heads.py --out-dir ./outputs/followup_augmentation
+python medvae_followup/analyse_heads.py --out-dir ./outputs/followup_augmentation
+
+# Reconstruction at 384 and 768 pixels (Appendix C.2)
+python medvae_followup/reconstruction_audit.py --phase prepare --out-dir ./outputs/followup_reconstruction \
+    --study-dir ./outputs/projection_study_fresh --img-dir ./medvae/data/boostnet
+python medvae_followup/reconstruction_audit.py --phase pilot --out-dir ./outputs/followup_reconstruction
+python medvae_followup/reconstruction_audit.py --phase run --out-dir ./outputs/followup_reconstruction
+python medvae_followup/reconstruction_audit.py --phase analyse --out-dir ./outputs/followup_reconstruction
+```
+
+The reported runs are in `outputs/followup_annotation_v1/`, `outputs/followup_augmentation_v1/` and `outputs/followup_reconstruction_v1/`.
+
+### Rerunning analyses from the saved results
+
+The projection, annotation-removal and augmentation analyses need the cached latents and per-seed predictions, which are not included, so they cannot be rerun from this repository alone. Their results are in each study's `analysis/` folder, with the projection geometry in `geometry/`. The reconstruction check (Appendix C.2) needs only its saved per-image records, so its tables can be rebuilt on a CPU:
+
+```bash
+python medvae_followup/reconstruction_audit.py --phase analyse --out-dir ./outputs/followup_reconstruction_v1
+```
+
+`projection_experiments/references/` and `medvae_followup/references/` keep exact copies of the training, geometry and augmentation scripts used in those studies, and the study scripts check them before use. The top-level versions of these scripts run the same code but have revised comments and messages, so they are not exact copies.
+
+### Report figures
+
+```bash
+python MedVAE_Report_Completion/scripts/plot_report_csv.py \
+    --root MedVAE_Report_Completion/data/project_csv --out-dir ./figures_check
+```
+
+This redraws Figures 3.2, 5.2, 6.1, 7.1 and 7.2 from saved CSV files, without a GPU. Figures 2.1, 3.1, 5.1, 8.1 and 8.2 also need the radiographs, saved predictions or generated latents (`report_radiographs.py`, `report_endplate.py` and `report_generated.py` in the same folder).
+
+## Checkpoints
+
+Two trained generators from Chapter 8 are provided as a release of this repository. Other trained models are not included, but the commands above retrain them.
+
+TODO: publish the release, then list its two files here and the script that loads each. `diffusion_latent.py` loads `diffusion.pt` from its `--out-dir`; `sample_diffusion.py` loads a `final.pt` written by `train_diffusion.py` through `--checkpoint`.
+
+## Acknowledgements
+
+This project uses the following code, models and data:
+
+- MedVAE: Varma M, Kumar A, van der Sluijs R, et al. MedVAE: efficient automated interpretation of medical images with large-scale generalizable autoencoders. arXiv:2502.14753, 2025. Code: <https://github.com/StanfordMIMI/MedVAE> (MIT licence). Weights: <https://huggingface.co/stanfordmimi/MedVAE>.
+- BoostNet/AASCE: Wu H, Bailey C, Rasoulinejad P, Li S. Automatic landmark estimation for adolescent idiopathic scoliosis assessment using BoostNet. MICCAI 2017, LNCS 10433, pp. 127-135. Challenge page: <https://aasce19.grand-challenge.org/>.
+- VinDr-SpineXR: Pham HH, Nguyen Trung H, Nguyen HQ. VinDr-SpineXR: a large annotated medical image dataset for spinal lesions detection and classification from radiographs (version 1.0.0). PhysioNet, 2021. doi:10.13026/q45h-5h59.
+- DINOv2: Oquab M, et al. DINOv2: learning robust visual features without supervision. TMLR, 2024.
+- Stable Diffusion autoencoder: Rombach R, et al. High-resolution image synthesis with latent diffusion models. CVPR 2022. Weights: `stabilityai/sd-vae-ft-mse`.

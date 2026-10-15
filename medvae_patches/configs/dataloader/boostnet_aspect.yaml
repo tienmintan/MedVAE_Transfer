@@ -1,0 +1,65 @@
+# BoostNet dataloader that preserves aspect ratio. Place in MedVAE/configs/dataloader/.
+#
+# Same as boostnet.yaml except that it uses load_2d_finetune_aspect, which pads
+# each radiograph to a square before resizing it to 384 x 384, so that tall
+# radiographs are not compressed vertically.
+
+defaults:
+  - default.yaml
+
+train:
+  dataset:
+    _target_: medvae.dataloaders.ConcatDataset
+    datasets:
+      - _target_: medvae.dataloaders.GenericDataset
+        split_path: ${paths.data_dir}/${dataset_name}.csv
+        split_column: split
+        split_name: train
+        data_dir: ${paths.data_dir}/${dataset_name}/
+        dataset_id: 0
+        img_column: image_uuid
+        img_suffix: .jpg
+        img_transform:
+          _target_: torchvision.transforms.Compose
+          transforms:
+            - _partial_: true
+              _target_: medvae.utils.loaders.load_2d_finetune_aspect
+              merge_channels: ${merge_channels}
+
+valid:
+  dataset:
+    _target_: medvae.dataloaders.ConcatDataset
+    datasets:
+      - _target_: medvae.dataloaders.GenericDataset
+        split_path: ${paths.data_dir}/${dataset_name}.csv
+        split_column: split
+        split_name: val
+        data_dir: ${paths.data_dir}/${dataset_name}/
+        dataset_id: 0
+        img_column: image_uuid
+        img_suffix: .jpg
+        img_transform:
+          _target_: torchvision.transforms.Compose
+          transforms:
+            - _partial_: true
+              _target_: medvae.utils.loaders.load_2d_finetune_aspect
+              merge_channels: ${merge_channels}
+
+test:
+  dataset:
+    _target_: medvae.dataloaders.ConcatDataset
+    datasets:
+      - _target_: medvae.dataloaders.GenericDataset
+        split_path: ${paths.data_dir}/${dataset_name}.csv
+        split_column: split
+        split_name: test
+        data_dir: ${paths.data_dir}/${dataset_name}/
+        dataset_id: 0
+        img_column: image_uuid
+        img_suffix: .jpg
+        img_transform:
+          _target_: torchvision.transforms.Compose
+          transforms:
+            - _partial_: true
+              _target_: medvae.utils.loaders.load_2d_finetune_aspect
+              merge_channels: ${merge_channels}
