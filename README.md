@@ -126,7 +126,7 @@ python fix_landmark_lookup.py --split test
 
 `prepare_boostnet.py` keeps the 128 test images and splits the 481 training images into 409 training and 72 validation images (seed 42). Before running `fix_landmark_lookup.py`, set the two paths at the top of the file, `LABELDATA` and `PIPELINE_CSV`, to the dataset folder and `medvae/data/boostnet.csv`.
 
-BoostNet's angle file has no column names. The code calls its three columns `angle_proximal_thoracic`, `angle_main_thoracic` and `angle_thoracolumbar` (abbreviated PT, MT and TL), in file order. Report Section 3.1.2 shows that column 0 is the major curve and that columns 1 and 2 usually lie above and below it, so the report calls them the major, upper and lower curves.
+BoostNet's angle file came with no column names. The code calls its three columns `angle_proximal_thoracic`, `angle_main_thoracic` and `angle_thoracolumbar` (abbreviated PT, MT and TL), in file order. Report Section 3.1.2 shows that column 0 is the major curve and that columns 1 and 2 usually lie above and below it, so the report calls them the major, upper and lower curves.
 
 VinDr-SpineXR (version 1.0.0, [PhysioNet](https://physionet.org/content/vindr-spinexr/1.0.0/)) is used only for the Cobb-conditioned generator (Section 7.3.1, Appendix B.1): to pretrain it without labels and to compare image padding between the two datasets. It is not included, because access requires a PhysioNet account and a signed data use agreement. Scripts that read it take the dataset folder as an argument (`--vindr-dir`, `--dicom-dir` or `--vindr-dicom-dir`) and expect PhysioNet's folder structure, with `train_images/` and `test_images/`.
 
