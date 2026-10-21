@@ -27,7 +27,6 @@ MedVAE has four 2D configurations, written `4_3`, `4_1`, `8_4` and `8_1` in the 
 | `report/figures/` | Earlier figures and LaTeX tables written by `make_report_figures.py`. |
 | `results/` | Saved results of the main experiments, one folder per run. |
 | `outputs/` | Saved results and run records of the projection study and the Appendix C checks. |
-| `data/boostnet_labeldata/` | Not included. To run the experiments, place a copy of the BoostNet/AASCE radiographs and labels here (see [Data preparation](#data-preparation)). |
 
 Cached latents and trained models are not included because of their size; the scripts regenerate them.
 
@@ -109,23 +108,23 @@ Many top-level scripts also accept `--smoke`, which runs them on small synthetic
 
 ### Data preparation
 
-The BoostNet/AASCE radiographs and annotations are not included in this repository. The dataset has 481 training and 128 test radiographs with their landmark and angle files. To run the experiments, place a copy of it in `data/boostnet_labeldata/` with this layout:
+The BoostNet/AASCE radiographs and annotations are not included in this repository. The dataset has 481 training and 128 test radiographs with their landmark and angle files. The preparation scripts take the dataset folder as an argument and expect this layout:
 
 - `data/training/` and `data/test/`: the 481 training and 128 test radiographs, as JPEG files named `sunhl-<...>.jpg`.
 - `labels/training/` and `labels/test/`: one landmark file per radiograph, named after the image with `.mat` appended (`<image name>.jpg.mat`), and the three files `angles.csv`, `filenames.csv` and `landmarks.csv`.
 
-The commands below copy the images into MedVAE's data folder, create the training, validation and test split, attach the Cobb angles, and match each landmark row to its image, since the landmark files list rows without image names.
+In the commands below, `$BOOSTNET` is the path to the dataset folder. The commands copy the images into MedVAE's data folder, create the training, validation and test split, attach the Cobb angles, and match each landmark row to its image, since the landmark files list rows without image names.
 
 ```bash
-python prepare_boostnet.py --src ./data/boostnet_labeldata --dst ./medvae/data
-python prepare_cobb_labels.py --boostnet-src ./data/boostnet_labeldata \
+python prepare_boostnet.py --src "$BOOSTNET" --dst ./medvae/data
+python prepare_cobb_labels.py --boostnet-src "$BOOSTNET" \
     --csv-in ./medvae/data/boostnet.csv --csv-out ./medvae/data/boostnet_with_angles.csv
 python fix_train_lookup.py --csv ./medvae/data/boostnet_with_angles.csv \
-    --landmarks-dir ./data/boostnet_labeldata/labels --out ./landmark_row_lookup_train_fixed.csv
+    --landmarks-dir "$BOOSTNET/labels" --out ./landmark_row_lookup_train_fixed.csv
 python fix_landmark_lookup.py --split test
 ```
 
-`prepare_boostnet.py` keeps the 128 test images and splits the 481 training images into 409 training and 72 validation images (seed 42). Before running `fix_landmark_lookup.py`, set the two paths at the top of the file, `LABELDATA` and `PIPELINE_CSV`, to `data/boostnet_labeldata` and `medvae/data/boostnet.csv`.
+`prepare_boostnet.py` keeps the 128 test images and splits the 481 training images into 409 training and 72 validation images (seed 42). Before running `fix_landmark_lookup.py`, set the two paths at the top of the file, `LABELDATA` and `PIPELINE_CSV`, to the dataset folder and `medvae/data/boostnet.csv`.
 
 BoostNet's angle file has no column names. The code calls its three columns `angle_proximal_thoracic`, `angle_main_thoracic` and `angle_thoracolumbar` (abbreviated PT, MT and TL), in file order. Report Section 3.1.2 shows that column 0 is the major curve and that columns 1 and 2 usually lie above and below it, so the report calls them the major, upper and lower curves.
 
@@ -144,7 +143,7 @@ medvae_finetune experiment=medvae_4x_1c_2d_boostnet_aspect   # images padded to 
 Patch finetuning also needs spine bounding boxes in the split file and the patch dataset registered with MedVAE:
 
 ```bash
-python prepare_spine_bboxes.py --boostnet-src ./data/boostnet_labeldata \
+python prepare_spine_bboxes.py --boostnet-src "$BOOSTNET" \
     --csv-in ./medvae/data/boostnet.csv --csv-out ./medvae/data/boostnet.csv
 echo "from medvae.dataloaders.patch_dataset import BoostNetPatchDataset" >> ../MedVAE/medvae/dataloaders/__init__.py
 medvae_finetune experiment=medvae_4x_1c_2d_boostnet_patch
@@ -159,7 +158,7 @@ These commands extract padded latents for the four configurations, train the fix
 ```bash
 python extract_latents_aspect.py \
     --csv ./medvae/data/boostnet_with_angles.csv --img-dir ./medvae/data/boostnet \
-    --landmarks-dir ./data/boostnet_labeldata/labels \
+    --landmarks-dir "$BOOSTNET/labels" \
     --train-lookup ./landmark_row_lookup_train_fixed.csv \
     --test-lookup ./landmark_row_lookup_test_fixed.csv \
     --configs medvae_4_3_2d medvae_4_1_2d medvae_8_4_2d medvae_8_1_2d \
