@@ -108,7 +108,7 @@ Many top-level scripts also accept `--smoke`, which runs them on small synthetic
 
 ### Data preparation
 
-The BoostNet/AASCE radiographs and annotations are not included in this repository. The dataset has 481 training and 128 test radiographs with their landmark and angle files. The preparation scripts take the dataset folder as an argument and expect this layout:
+The BoostNet/AASCE radiographs and landmark annotations are not included in this repository. The dataset has 481 training and 128 test radiographs with their landmark and angle files. The preparation scripts take the dataset folder as an argument and expect this layout:
 
 - `data/training/` and `data/test/`: the 481 training and 128 test radiographs, as JPEG files named `sunhl-<...>.jpg`.
 - `labels/training/` and `labels/test/`: one landmark file per radiograph, named after the image with `.mat` appended (`<image name>.jpg.mat`), and the three files `angles.csv`, `filenames.csv` and `landmarks.csv`.
