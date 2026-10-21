@@ -27,7 +27,7 @@ MedVAE has four 2D configurations, written `4_3`, `4_1`, `8_4` and `8_1` in the 
 | `report/figures/` | Earlier figures and LaTeX tables written by `make_report_figures.py`. |
 | `results/` | Saved results of the main experiments, one folder per run. |
 | `outputs/` | Saved results and run records of the projection study and the Appendix C checks. |
-| `data/boostnet_labeldata/` | Not included. Place the BoostNet/AASCE radiographs and labels here after downloading them (see [Data preparation](#data-preparation)). |
+| `data/boostnet_labeldata/` | Not included. To run the experiments, place a copy of the BoostNet/AASCE radiographs and labels here (see [Data preparation](#data-preparation)). |
 
 Cached latents and trained models are not included because of their size; the scripts regenerate them.
 
@@ -109,7 +109,7 @@ Many top-level scripts also accept `--smoke`, which runs them on small synthetic
 
 ### Data preparation
 
-The BoostNet/AASCE radiographs and annotations are not included in this repository. The dataset has 481 training and 128 test radiographs with their landmark and angle files. After downloading, place it in `data/boostnet_labeldata/` with this layout:
+The BoostNet/AASCE radiographs and annotations are not included in this repository. The dataset has 481 training and 128 test radiographs with their landmark and angle files. To run the experiments, place a copy of it in `data/boostnet_labeldata/` with this layout:
 
 - `data/training/` and `data/test/`: the 481 training and 128 test radiographs, as JPEG files named `sunhl-<...>.jpg`.
 - `labels/training/` and `labels/test/`: one landmark file per radiograph, named after the image with `.mat` appended (`<image name>.jpg.mat`), and the three files `angles.csv`, `filenames.csv` and `landmarks.csv`.
