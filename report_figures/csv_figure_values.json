@@ -1,0 +1,35 @@
+{
+  "augmented_landmark_p": 0.9282036740106463,
+  "augmentation_reductions": [
+    {
+      "task": "cobb",
+      "setting": "Conservative",
+      "reduction_pct": 4.389715519424797
+    },
+    {
+      "task": "cobb",
+      "setting": "Moderate",
+      "reduction_pct": 14.251298961568438
+    },
+    {
+      "task": "cobb",
+      "setting": "Aggressive",
+      "reduction_pct": 15.164512591259271
+    },
+    {
+      "task": "landmark",
+      "setting": "Conservative",
+      "reduction_pct": 3.1495557698412058
+    },
+    {
+      "task": "landmark",
+      "setting": "Moderate",
+      "reduction_pct": 7.16288584068886
+    },
+    {
+      "task": "landmark",
+      "setting": "Aggressive",
+      "reduction_pct": 12.636291714240599
+    }
+  ]
+}

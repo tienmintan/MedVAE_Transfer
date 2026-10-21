@@ -1,0 +1,31 @@
+{
+  "excluded_ids": [
+    "sunhl-1th-20-Jul-2016-coronal6",
+    "sunhl-1th-30-Dec-2016-161_A_AP"
+  ],
+  "train_before": 409,
+  "train_after": 407,
+  "val": 72,
+  "test": 128,
+  "cobb_mean_before": [
+    39.088626861572266,
+    19.812042236328125,
+    18.835559844970703
+  ],
+  "cobb_sd_before": [
+    19.577089309692383,
+    14.110898971557617,
+    14.270709037780762
+  ],
+  "cobb_mean_after": [
+    38.844566345214844,
+    19.81882095336914,
+    18.83502197265625
+  ],
+  "cobb_sd_after": [
+    18.72126007080078,
+    14.136551856994629,
+    14.305176734924316
+  ],
+  "note": "Training targets will be standardised separately by the unchanged trainer. Landmark targets remain unstandardised."
+}

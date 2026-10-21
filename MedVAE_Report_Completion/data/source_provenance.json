@@ -1,0 +1,157 @@
+[
+  {
+    "path": "data/project_csv/medvae/data/boostnet_with_angles.csv",
+    "source": "all_csv_contents.txt: FILE: ./medvae/data/boostnet_with_angles.csv",
+    "sha256": "a2a977637841e54465ceac3fbaf6603c9ea8dad46828832edafc273b18858018"
+  },
+  {
+    "path": "data/project_csv/outputs/angle_semantics/angle_semantics_per_match.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/angle_semantics/angle_semantics_per_match.csv",
+    "sha256": "ffce37a292d9730dcc28bf710d6150582944fada1770b108632dadf0fdfebe76"
+  },
+  {
+    "path": "data/project_csv/outputs/aug/clean_spatial_4_1_vs_8_1.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/aug/clean_spatial_4_1_vs_8_1.csv",
+    "sha256": "666eb4dc74cb90258639628fb496b73e62f7f6f971a7c79b2b64e102cfb34166"
+  },
+  {
+    "path": "data/project_csv/outputs/aug/frontier_per_image.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/aug/frontier_per_image.csv",
+    "sha256": "e855cb2369f7469ef89ed666532615a40981d65b0d6c3c2dc5bddf3fe626c2db"
+  },
+  {
+    "path": "data/project_csv/outputs/aug/frontier_summary.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/aug/frontier_summary.csv",
+    "sha256": "bda27632e2b69356970ef7131327464b606314b94e5193bd3a30d37832d877c4"
+  },
+  {
+    "path": "data/project_csv/outputs/aug_cons/clean_spatial_4_1_vs_8_1.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/aug_cons/clean_spatial_4_1_vs_8_1.csv",
+    "sha256": "5a0c2942b557dd57d09df6e2767a838b68cb3448148b45a82827ece64138e5be"
+  },
+  {
+    "path": "data/project_csv/outputs/aug_cons/frontier_per_image.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/aug_cons/frontier_per_image.csv",
+    "sha256": "60816b6f988f1b454798a7b8c00c47ddc5ffe27ab014dd39f21c0431221cede4"
+  },
+  {
+    "path": "data/project_csv/outputs/aug_cons/frontier_summary.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/aug_cons/frontier_summary.csv",
+    "sha256": "c0c5ae09830efd686c4012b6a2ef9bf5fafb0dc3e39315e39b59ba5072c5451f"
+  },
+  {
+    "path": "data/project_csv/outputs/aug_mod/clean_spatial_4_1_vs_8_1.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/aug_mod/clean_spatial_4_1_vs_8_1.csv",
+    "sha256": "5cdbf4ca689e9874edf7baaa59133b4dc8b3a3ea9a222834503e28cd8dc0910c"
+  },
+  {
+    "path": "data/project_csv/outputs/aug_mod/frontier_per_image.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/aug_mod/frontier_per_image.csv",
+    "sha256": "24dc25c2aff22cc5fc424fd0a57e9c4b35a7b7729228bca08cf4f18d84b0bc78"
+  },
+  {
+    "path": "data/project_csv/outputs/aug_mod/frontier_summary.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/aug_mod/frontier_summary.csv",
+    "sha256": "38955cc0ae3ef4a7b429fba624b349d1d8c65735dbcc53cdd3a1b963a01044f3"
+  },
+  {
+    "path": "data/project_csv/outputs/clahe/frontier_per_image.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/clahe/frontier_per_image.csv",
+    "sha256": "057e960d179023bcb3761aeaa62fe6d1b2c150b56103c83688bb5f67f32504a4"
+  },
+  {
+    "path": "data/project_csv/outputs/clahe/frontier_summary.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/clahe/frontier_summary.csv",
+    "sha256": "d6f9891ecad7a60ac35768d8f4cb85a7cfc66809da1479157f3247367acf69fa"
+  },
+  {
+    "path": "data/project_csv/outputs/clahe_rep/frontier_per_image.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/clahe_rep/frontier_per_image.csv",
+    "sha256": "a060eb0e34e14752b46d483ac99900e7461cc5ae576841aac325b872d17b747e"
+  },
+  {
+    "path": "data/project_csv/outputs/clahe_rep/frontier_summary.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/clahe_rep/frontier_summary.csv",
+    "sha256": "183c4697ac28a6f8628341dd1ee5a83bf46515e8a67d01f2d8893326c763f8ba"
+  },
+  {
+    "path": "data/project_csv/outputs/cost/cost_benchmark.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/cost/cost_benchmark.csv",
+    "sha256": "cc0f20d5d1ec7fef443a1f0df39cb065f6e71f8f0ae19bd009cb96733aeeef6d"
+  },
+  {
+    "path": "data/project_csv/outputs/diffusion5/synthetic_utility.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/diffusion5/synthetic_utility.csv",
+    "sha256": "dbc396905403d7a4cff9b1feadce0004da2bfd4b1fc895986a2c849dbcadd5d0"
+  },
+  {
+    "path": "data/project_csv/outputs/dino/frontier_per_image.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/dino/frontier_per_image.csv",
+    "sha256": "f4221c4f44b5ff2a6f5828962ae1c5149eefac51f20ee0f1af8a0d002f67acbd"
+  },
+  {
+    "path": "data/project_csv/outputs/dino/frontier_summary.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/dino/frontier_summary.csv",
+    "sha256": "b874de50938f62d59304051fd09141821e45636505e680de2c0ca60ef3f14d3f"
+  },
+  {
+    "path": "data/project_csv/outputs/dino_aug/frontier_per_image.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/dino_aug/frontier_per_image.csv",
+    "sha256": "b3d7ebb92e371d96b907af0c7ad16a6d532233677352567289f839349dc03e5c"
+  },
+  {
+    "path": "data/project_csv/outputs/dino_aug/frontier_summary.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/dino_aug/frontier_summary.csv",
+    "sha256": "70979fa6dc7107d7a9f1e5bcb3361f901c84c8a1bbfd2ad195e293f6414d2d4b"
+  },
+  {
+    "path": "data/project_csv/outputs/dino_pca/frontier_per_image.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/dino_pca/frontier_per_image.csv",
+    "sha256": "48c1efe761f4e8f5c8cf08620c25e2b07e4e82acd835743b05b038e27e61e570"
+  },
+  {
+    "path": "data/project_csv/outputs/dino_pca/frontier_summary.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/dino_pca/frontier_summary.csv",
+    "sha256": "4ed898d56f6b2a6294f4d7c76bc8d4f4d234a4c9ecc71d55447b2531ece638fc"
+  },
+  {
+    "path": "data/project_csv/outputs/fidelity/recon_fidelity_summary.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/fidelity/recon_fidelity_summary.csv",
+    "sha256": "bb28a76b25390e93e30357f2f3a098813cd7e0a940ba81972a845a33f3b97c00"
+  },
+  {
+    "path": "data/project_csv/outputs/freq_loss/endplate_per_image.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/freq_loss/endplate_per_image.csv",
+    "sha256": "ea778a56f7d4da1e25f3ed3d1bd173674230020078a88a8bd269ec1738e8b35c"
+  },
+  {
+    "path": "data/project_csv/outputs/freq_loss/endplate_summary.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/freq_loss/endplate_summary.csv",
+    "sha256": "52d940dfd56687e2983dc3053fc41e64fb093649f7633475efc13f707029fe6b"
+  },
+  {
+    "path": "data/project_csv/outputs/frontier/clean_spatial_4_1_vs_8_1.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/frontier/clean_spatial_4_1_vs_8_1.csv",
+    "sha256": "ca2d8db31d25f12c8170a73745f6569bd7352d5948cce67a40fa805941ed7bde"
+  },
+  {
+    "path": "data/project_csv/outputs/frontier/frontier_per_image.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/frontier/frontier_per_image.csv",
+    "sha256": "4e0b22f502f952b39e23cbb8caea5d5469b7d5c2f7a7bfc3feb064eaa32843e3"
+  },
+  {
+    "path": "data/project_csv/outputs/frontier/frontier_summary.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/frontier/frontier_summary.csv",
+    "sha256": "2b06bae739765c681d701a19e710f3f094c390de6f42e8bcdbb5cf8488d60a05"
+  },
+  {
+    "path": "data/project_csv/outputs/frontier/matched_pair_4_1_vs_8_4.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/frontier/matched_pair_4_1_vs_8_4.csv",
+    "sha256": "7216ad01163018765e2134758a0e346398e0b7e995ce53fc990b6250a05064dc"
+  },
+  {
+    "path": "data/project_csv/outputs/xai/xai_per_image.csv",
+    "source": "all_csv_contents.txt: FILE: ./outputs/xai/xai_per_image.csv",
+    "sha256": "94298170395c4854909ba879bee349ed7050b9d61142e101f62e0336c3844051"
+  }
+]

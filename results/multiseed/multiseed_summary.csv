@@ -1,0 +1,36 @@
+condition_key,condition_label,seed,test_mae
+matched_4x,MedVAE 4× aspect-padded (baseline),0,7.5306
+matched_4x,MedVAE 4× aspect-padded (baseline),1,7.7792
+matched_4x,MedVAE 4× aspect-padded (baseline),7,7.2611
+matched_4x,MedVAE 4× aspect-padded (baseline),42,7.5348
+matched_4x,MedVAE 4× aspect-padded (baseline),100,6.9204
+matched_8x,MedVAE 8× aspect-padded,0,8.3297
+matched_8x,MedVAE 8× aspect-padded,1,7.8746
+matched_8x,MedVAE 8× aspect-padded,7,7.8575
+matched_8x,MedVAE 8× aspect-padded,42,8.2850
+matched_8x,MedVAE 8× aspect-padded,100,7.9911
+matched_whole_768,MedVAE 4× whole-image 384×768,0,6.9991
+matched_whole_768,MedVAE 4× whole-image 384×768,1,7.3741
+matched_whole_768,MedVAE 4× whole-image 384×768,7,7.5226
+matched_whole_768,MedVAE 4× whole-image 384×768,42,7.4006
+matched_whole_768,MedVAE 4× whole-image 384×768,100,7.1815
+matched_whole_1024,MedVAE 4× whole-image 384×1024,0,7.1449
+matched_whole_1024,MedVAE 4× whole-image 384×1024,1,6.9996
+matched_whole_1024,MedVAE 4× whole-image 384×1024,7,7.3260
+matched_whole_1024,MedVAE 4× whole-image 384×1024,42,7.0843
+matched_whole_1024,MedVAE 4× whole-image 384×1024,100,7.4599
+matched_tiled_pretrained,MedVAE 4× tile-and-stitch (pretrained encoder),0,7.1231
+matched_tiled_pretrained,MedVAE 4× tile-and-stitch (pretrained encoder),1,6.9756
+matched_tiled_pretrained,MedVAE 4× tile-and-stitch (pretrained encoder),7,6.8866
+matched_tiled_pretrained,MedVAE 4× tile-and-stitch (pretrained encoder),42,6.9077
+matched_tiled_pretrained,MedVAE 4× tile-and-stitch (pretrained encoder),100,6.8262
+matched_tiled,MedVAE 4× tile-and-stitch (patch encoder),0,6.8315
+matched_tiled,MedVAE 4× tile-and-stitch (patch encoder),1,6.5005
+matched_tiled,MedVAE 4× tile-and-stitch (patch encoder),7,7.0030
+matched_tiled,MedVAE 4× tile-and-stitch (patch encoder),42,6.9556
+matched_tiled,MedVAE 4× tile-and-stitch (patch encoder),100,6.5902
+matched_diffusion_features,"Diffusion U-Net features (level 1, t=250)",0,9.0642
+matched_diffusion_features,"Diffusion U-Net features (level 1, t=250)",1,9.2076
+matched_diffusion_features,"Diffusion U-Net features (level 1, t=250)",7,9.4016
+matched_diffusion_features,"Diffusion U-Net features (level 1, t=250)",42,8.8239
+matched_diffusion_features,"Diffusion U-Net features (level 1, t=250)",100,9.0754

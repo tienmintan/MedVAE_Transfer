@@ -1,0 +1,4 @@
+image_uuid,row,major_deg,lumbar_p90_minus_p10,path
+sunhl-1th-28-Feb-2017-307_B_AP,123,8.030799865722656,30.0,medvae/data/boostnet/sunhl-1th-28-Feb-2017-307_B_AP.jpg
+sunhl-1th-01-Mar-2017-311_Q_AP,12,80.77100372314453,31.0,medvae/data/boostnet/sunhl-1th-01-Mar-2017-311_Q_AP.jpg
+sunhl-1th-28-Feb-2017-295_G_AP,102,22.152000427246094,11.0,medvae/data/boostnet/sunhl-1th-28-Feb-2017-295_G_AP.jpg

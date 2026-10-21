@@ -1,0 +1,4 @@
+n,mean_difference,ci_low,ci_high,p_raw,comparison,metric,family,family_size,p_bonferroni,p_all_tests_sensitivity,unit,coefficients
+128,-0.7630672915838658,-1.1506945897242984,-0.37502754169593894,0.00024210627947187881,augmentation_cobb,cobb,primary,2,0.00048421255894375763,0.0007263188384156365,degrees,"{""augmented/projected_mean"": 1, ""clean/projected_mean"": -1}"
+128,-0.00290111281279123,-0.004300735028737176,-0.0015492801742852124,6.420618507216586e-05,augmentation_landmark,landmark,primary,2,0.00012841237014433172,0.0001926185552164976,image_normalised_distance,"{""augmented/projected_mean"": 1, ""clean/projected_mean"": -1}"
+128,-0.07696660767584763,-0.20387878841077578,0.04855960431186828,0.23162103361067418,augmentation_landmark,landmark_isotropic,secondary,1,0.23162103361067418,0.6948631008320225,percent_vertical_spine_extent,"{""augmented/projected_mean"": 1, ""clean/projected_mean"": -1}"

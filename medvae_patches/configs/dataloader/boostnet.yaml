@@ -1,0 +1,68 @@
+# BoostNet dataloader for MedVAE finetuning, with images resized to 384 x 384.
+# Place in MedVAE/configs/dataloader/.
+#
+# Same as MedVAE's mmgs.yaml except that it reads JPEG files, as BoostNet is
+# distributed in that format. Images are read from
+# ${paths.data_dir}/${dataset_name}/<image_uuid>.jpg and the split from
+# ${paths.data_dir}/${dataset_name}.csv. MedVAE's load_2d_finetune resizes each
+# image to 384 x 384 and scales intensities to [-1, 1].
+
+defaults:
+  - default.yaml
+
+train:
+  dataset:
+    _target_: medvae.dataloaders.ConcatDataset
+    datasets:
+      - _target_: medvae.dataloaders.GenericDataset
+        split_path: ${paths.data_dir}/${dataset_name}.csv
+        split_column: split
+        split_name: train
+        data_dir: ${paths.data_dir}/${dataset_name}/
+        dataset_id: 0
+        img_column: image_uuid
+        img_suffix: .jpg
+        img_transform:
+          _target_: torchvision.transforms.Compose
+          transforms:
+            - _partial_: true
+              _target_: medvae.utils.loaders.load_2d_finetune
+              merge_channels: ${merge_channels}
+
+valid:
+  dataset:
+    _target_: medvae.dataloaders.ConcatDataset
+    datasets:
+      - _target_: medvae.dataloaders.GenericDataset
+        split_path: ${paths.data_dir}/${dataset_name}.csv
+        split_column: split
+        split_name: val
+        data_dir: ${paths.data_dir}/${dataset_name}/
+        dataset_id: 0
+        img_column: image_uuid
+        img_suffix: .jpg
+        img_transform:
+          _target_: torchvision.transforms.Compose
+          transforms:
+            - _partial_: true
+              _target_: medvae.utils.loaders.load_2d_finetune
+              merge_channels: ${merge_channels}
+
+test:
+  dataset:
+    _target_: medvae.dataloaders.ConcatDataset
+    datasets:
+      - _target_: medvae.dataloaders.GenericDataset
+        split_path: ${paths.data_dir}/${dataset_name}.csv
+        split_column: split
+        split_name: test
+        data_dir: ${paths.data_dir}/${dataset_name}/
+        dataset_id: 0
+        img_column: image_uuid
+        img_suffix: .jpg
+        img_transform:
+          _target_: torchvision.transforms.Compose
+          transforms:
+            - _partial_: true
+              _target_: medvae.utils.loaders.load_2d_finetune
+              merge_channels: ${merge_channels}

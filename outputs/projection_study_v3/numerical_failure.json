@@ -1,0 +1,481 @@
+{
+  "error_type": "NumericalMismatch",
+  "message": "Numerical check failed (medvae_4_3_2d/train/sunhl-1th-02-Jan-2017-162_A_AP historical cache consistency (fixed)): max_abs=2.6653634309768677, rms=0.026338542982075094, failing_elements=2444/27648. The detailed record is saved in the study's numerical_failure.json. Inspect that record and CACHE_MISMATCH_RECOVERY.md before retrying.",
+  "active_check": {
+    "config": "medvae_4_3_2d",
+    "split": "train",
+    "image_uuid": "sunhl-1th-02-Jan-2017-162_A_AP",
+    "image": {
+      "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-02-Jan-2017-162_A_AP.jpg",
+      "file_sha256": "0b2c461b36715baa8f963bbc099c9e3acfb2e2ff1228a924ab3d5766b64ff783",
+      "input_sha256": "3352b9e805a9c311f30e11ef36f2a43ddd3208f82885e3123a5f4796c6cf6fab",
+      "input_shape": [
+        1,
+        3,
+        384,
+        384
+      ],
+      "input_min": -1.0,
+      "input_max": 1.0,
+      "input_mean": -0.7080100178718567,
+      "input_sd": 0.4504721760749817,
+      "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+    },
+    "fresh_raw_vs_cached_raw": {
+      "shape_actual": [
+        1,
+        3,
+        96,
+        96
+      ],
+      "shape_expected": [
+        1,
+        3,
+        96,
+        96
+      ],
+      "dtype_actual": "float32",
+      "dtype_expected": "float32",
+      "atol": 0.001,
+      "rtol": 0.001,
+      "passed": false,
+      "elements": 27648,
+      "failing_elements": 2444,
+      "failing_fraction": 0.08839699074074074,
+      "max_abs": 2.6653634309768677,
+      "rms": 0.026338542982075094,
+      "mean_signed_difference": 0.0002078296352515786,
+      "expected_mean": 0.19933562904407154,
+      "expected_sd": 9.490980114085092,
+      "expected_rms": 9.493073170420898,
+      "rms_relative_to_expected_rms": 0.002774501208327599,
+      "absolute_difference_percentiles": {
+        "p50": 0.0010762214660644531,
+        "p95": 0.008383750915527344,
+        "p99": 0.022651615142822157,
+        "p99_9": 0.18545087170601135
+      },
+      "worst_positions": [
+        {
+          "index": [
+            0,
+            2,
+            83,
+            60
+          ],
+          "actual": -1.7666367292404175,
+          "expected": 0.8987267017364502,
+          "absolute_difference": 2.6653634309768677,
+          "allowed_difference": 0.00189872670173645
+        },
+        {
+          "index": [
+            0,
+            2,
+            28,
+            56
+          ],
+          "actual": -4.183216571807861,
+          "expected": -2.4636731147766113,
+          "absolute_difference": 1.71954345703125,
+          "allowed_difference": 0.0034636731147766114
+        },
+        {
+          "index": [
+            0,
+            2,
+            80,
+            30
+          ],
+          "actual": -0.4324270486831665,
+          "expected": 1.2237176895141602,
+          "absolute_difference": 1.6561447381973267,
+          "allowed_difference": 0.0022237176895141602
+        },
+        {
+          "index": [
+            0,
+            2,
+            90,
+            58
+          ],
+          "actual": -0.609545111656189,
+          "expected": 0.5633495450019836,
+          "absolute_difference": 1.1728946566581726,
+          "allowed_difference": 0.0015633495450019835
+        },
+        {
+          "index": [
+            0,
+            2,
+            39,
+            48
+          ],
+          "actual": -0.46939605474472046,
+          "expected": -1.4294863939285278,
+          "absolute_difference": 0.9600903391838074,
+          "allowed_difference": 0.0024294863939285276
+        }
+      ]
+    },
+    "formula_vs_api_same_fresh_z": {
+      "shape_actual": [
+        1,
+        3,
+        96,
+        96
+      ],
+      "shape_expected": [
+        1,
+        3,
+        96,
+        96
+      ],
+      "dtype_actual": "float32",
+      "dtype_expected": "float32",
+      "atol": 0.001,
+      "rtol": 0.001,
+      "passed": true,
+      "elements": 27648,
+      "failing_elements": 0,
+      "failing_fraction": 0.0,
+      "max_abs": 0.0,
+      "rms": 0.0,
+      "mean_signed_difference": 0.0,
+      "expected_mean": 0.7426944990848251,
+      "expected_sd": 4.151381273089092,
+      "expected_rms": 4.217293159542702,
+      "rms_relative_to_expected_rms": 0.0,
+      "absolute_difference_percentiles": {
+        "p50": 0.0,
+        "p95": 0.0,
+        "p99": 0.0,
+        "p99_9": 0.0
+      },
+      "worst_positions": [
+        {
+          "index": [
+            0,
+            2,
+            95,
+            95
+          ],
+          "actual": 0.06444942951202393,
+          "expected": 0.06444942951202393,
+          "absolute_difference": 0.0,
+          "allowed_difference": 0.001064449429512024
+        },
+        {
+          "index": [
+            0,
+            0,
+            95,
+            95
+          ],
+          "actual": -0.9286026358604431,
+          "expected": -0.9286026358604431,
+          "absolute_difference": 0.0,
+          "allowed_difference": 0.001928602635860443
+        },
+        {
+          "index": [
+            0,
+            1,
+            0,
+            2
+          ],
+          "actual": 3.081773042678833,
+          "expected": 3.081773042678833,
+          "absolute_difference": 0.0,
+          "allowed_difference": 0.004081773042678833
+        },
+        {
+          "index": [
+            0,
+            1,
+            0,
+            0
+          ],
+          "actual": -1.721243143081665,
+          "expected": -1.721243143081665,
+          "absolute_difference": 0.0,
+          "allowed_difference": 0.0027212431430816654
+        },
+        {
+          "index": [
+            0,
+            1,
+            0,
+            1
+          ],
+          "actual": 3.183906316757202,
+          "expected": 3.183906316757202,
+          "absolute_difference": 0.0,
+          "allowed_difference": 0.004183906316757202
+        }
+      ]
+    },
+    "projected_drift_from_different_raw_inputs": {
+      "shape_actual": [
+        1,
+        3,
+        96,
+        96
+      ],
+      "shape_expected": [
+        1,
+        3,
+        96,
+        96
+      ],
+      "dtype_actual": "float32",
+      "dtype_expected": "float32",
+      "atol": 0.001,
+      "rtol": 0.001,
+      "passed": false,
+      "elements": 27648,
+      "failing_elements": 1076,
+      "failing_fraction": 0.03891782407407408,
+      "max_abs": 0.9824002683162689,
+      "rms": 0.011689106824732195,
+      "mean_signed_difference": 0.0001263386463203157,
+      "expected_mean": 0.7426944990848251,
+      "expected_sd": 4.151381273089092,
+      "expected_rms": 4.217293159542702,
+      "rms_relative_to_expected_rms": 0.0027717083879460944,
+      "absolute_difference_percentiles": {
+        "p50": 0.00040030479431152344,
+        "p95": 0.0028464794158935547,
+        "p99": 0.009191128015518173,
+        "p99_9": 0.10375210440159859
+      },
+      "worst_positions": [
+        {
+          "index": [
+            0,
+            0,
+            83,
+            60
+          ],
+          "actual": 0.5098814964294434,
+          "expected": -0.47251877188682556,
+          "absolute_difference": 0.9824002683162689,
+          "allowed_difference": 0.0014725187718868256
+        },
+        {
+          "index": [
+            0,
+            0,
+            28,
+            56
+          ],
+          "actual": -3.7795963287353516,
+          "expected": -4.4211297035217285,
+          "absolute_difference": 0.641533374786377,
+          "allowed_difference": 0.005421129703521729
+        },
+        {
+          "index": [
+            0,
+            0,
+            80,
+            30
+          ],
+          "actual": -1.6554218530654907,
+          "expected": -2.271880865097046,
+          "absolute_difference": 0.6164590120315552,
+          "allowed_difference": 0.003271880865097046
+        },
+        {
+          "index": [
+            0,
+            2,
+            83,
+            60
+          ],
+          "actual": -4.014208793640137,
+          "expected": -3.489319086074829,
+          "absolute_difference": 0.5248897075653076,
+          "allowed_difference": 0.004489319086074829
+        },
+        {
+          "index": [
+            0,
+            0,
+            90,
+            58
+          ],
+          "actual": 1.0288110971450806,
+          "expected": 0.5508245229721069,
+          "absolute_difference": 0.47798657417297363,
+          "allowed_difference": 0.001550824522972107
+        }
+      ]
+    },
+    "encode_mode_vs_api_raw_same_input": {
+      "shape_actual": [
+        1,
+        3,
+        96,
+        96
+      ],
+      "shape_expected": [
+        1,
+        3,
+        96,
+        96
+      ],
+      "dtype_actual": "float32",
+      "dtype_expected": "float32",
+      "atol": 0.001,
+      "rtol": 0.001,
+      "passed": true,
+      "elements": 27648,
+      "failing_elements": 0,
+      "failing_fraction": 0.0,
+      "max_abs": 0.0,
+      "rms": 0.0,
+      "mean_signed_difference": 0.0,
+      "expected_mean": 0.1995434586793231,
+      "expected_sd": 9.491983939485873,
+      "expected_rms": 9.49408114033999,
+      "rms_relative_to_expected_rms": 0.0,
+      "absolute_difference_percentiles": {
+        "p50": 0.0,
+        "p95": 0.0,
+        "p99": 0.0,
+        "p99_9": 0.0
+      },
+      "worst_positions": [
+        {
+          "index": [
+            0,
+            2,
+            95,
+            95
+          ],
+          "actual": 9.852814674377441,
+          "expected": 9.852814674377441,
+          "absolute_difference": 0.0,
+          "allowed_difference": 0.010852814674377442
+        },
+        {
+          "index": [
+            0,
+            0,
+            95,
+            95
+          ],
+          "actual": 21.825496673583984,
+          "expected": 21.825496673583984,
+          "absolute_difference": 0.0,
+          "allowed_difference": 0.022825496673583984
+        },
+        {
+          "index": [
+            0,
+            1,
+            0,
+            2
+          ],
+          "actual": -12.437395095825195,
+          "expected": -12.437395095825195,
+          "absolute_difference": 0.0,
+          "allowed_difference": 0.013437395095825196
+        },
+        {
+          "index": [
+            0,
+            1,
+            0,
+            0
+          ],
+          "actual": -12.532628059387207,
+          "expected": -12.532628059387207,
+          "absolute_difference": 0.0,
+          "allowed_difference": 0.013532628059387208
+        },
+        {
+          "index": [
+            0,
+            1,
+            0,
+            1
+          ],
+          "actual": -13.088240623474121,
+          "expected": -13.088240623474121,
+          "absolute_difference": 0.0,
+          "allowed_difference": 0.014088240623474121
+        }
+      ]
+    },
+    "historical_cache_consistency": {
+      "policy": "fixed",
+      "elementwise_passed": false,
+      "max_abs": 2.6653634309768677,
+      "rms": 0.026338542982075094,
+      "elements": 27648,
+      "failing_elements": 2444,
+      "scope": "cache consistency only; not historical identity or downstream equivalence",
+      "rms_over_cached_sd_limit": 0.001,
+      "max_over_cached_sd_limit": 0.01,
+      "rms_over_cached_sd": 0.002775113072145981,
+      "max_over_cached_sd": 0.2808312101530309,
+      "passed": false
+    }
+  },
+  "precision_mode": "current",
+  "runtime": {
+    "python": "3.10.21",
+    "packages": {
+      "torch": "2.14.0",
+      "torchvision": "0.29.0",
+      "monai": "1.4.0",
+      "numpy": "1.26.4",
+      "Pillow": "10.4.0",
+      "huggingface-hub": "0.36.2"
+    },
+    "cuda": "13.0",
+    "cudnn": 92400,
+    "gpu": {
+      "name": "NVIDIA A10",
+      "compute_capability": [
+        8,
+        6
+      ],
+      "memory_bytes": 23684841472
+    },
+    "precision": {
+      "api": "fp32_precision",
+      "values": {
+        "global": "none",
+        "cuda_matmul": "none",
+        "cudnn": "none",
+        "cudnn_conv": "tf32",
+        "cudnn_rnn": "tf32"
+      },
+      "cudnn_benchmark": false,
+      "cudnn_deterministic": false
+    },
+    "environment": {
+      "NVIDIA_TF32_OVERRIDE": null,
+      "TORCH_ALLOW_TF32_CUBLAS_OVERRIDE": null,
+      "CUBLAS_WORKSPACE_CONFIG": null
+    }
+  },
+  "context": "medvae_4_3_2d/train/sunhl-1th-02-Jan-2017-162_A_AP historical cache consistency (fixed)",
+  "comparison": {
+    "policy": "fixed",
+    "elementwise_passed": false,
+    "max_abs": 2.6653634309768677,
+    "rms": 0.026338542982075094,
+    "elements": 27648,
+    "failing_elements": 2444,
+    "scope": "cache consistency only; not historical identity or downstream equivalence",
+    "rms_over_cached_sd_limit": 0.001,
+    "max_over_cached_sd_limit": 0.01,
+    "rms_over_cached_sd": 0.002775113072145981,
+    "max_over_cached_sd": 0.2808312101530309,
+    "passed": false
+  }
+}

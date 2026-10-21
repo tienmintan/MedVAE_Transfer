@@ -1,0 +1,3 @@
+task,config,compression,error,rel_to_lightest
+cobb,dinov2_base,1.0,5.883452415466309,1.0
+landmark,dinov2_base,1.0,0.03434934467077255,1.0

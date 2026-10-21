@@ -1,0 +1,3037 @@
+{
+  "schema": 1,
+  "status": "diagnostic_only",
+  "expected_checks_per_mode": 2,
+  "config": "medvae_4_1_2d",
+  "split": "train",
+  "requested_modes": [
+    "current",
+    "ieee",
+    "tf32"
+  ],
+  "checks": [
+    {
+      "image_uuid": "sunhl-1th-02-Jan-2017-162_A_AP",
+      "mode": "current",
+      "image": {
+        "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-02-Jan-2017-162_A_AP.jpg",
+        "file_sha256": "0b2c461b36715baa8f963bbc099c9e3acfb2e2ff1228a924ab3d5766b64ff783",
+        "input_sha256": "f8f57fecf8c3769121f6cd02dd7301d68e651b1d4d572fcf68e66cf1d3042707",
+        "input_shape": [
+          1,
+          1,
+          384,
+          384
+        ],
+        "input_min": -1.0,
+        "input_max": 1.0,
+        "input_mean": -0.7080100178718567,
+        "input_sd": 0.4504721462726593,
+        "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+      },
+      "precision": {
+        "api": "fp32_precision",
+        "values": {
+          "global": "none",
+          "cuda_matmul": "none",
+          "cudnn": "none",
+          "cudnn_conv": "tf32",
+          "cudnn_rnn": "tf32"
+        },
+        "cudnn_benchmark": false,
+        "cudnn_deterministic": false
+      },
+      "comparisons": {
+        "fresh_raw_vs_cached_raw": {
+          "shape_actual": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "shape_expected": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "dtype_actual": "float32",
+          "dtype_expected": "float32",
+          "atol": 0.001,
+          "rtol": 0.001,
+          "passed": false,
+          "elements": 9216,
+          "failing_elements": 2,
+          "failing_fraction": 0.00021701388888888888,
+          "max_abs": 0.017161846160888672,
+          "rms": 0.0003213561708085434,
+          "mean_signed_difference": -7.597603447114428e-07,
+          "expected_mean": 9.032652868557811,
+          "expected_sd": 6.980359812730266,
+          "expected_rms": 11.41552631108375,
+          "rms_relative_to_expected_rms": 2.8150797611190907e-05,
+          "absolute_difference_percentiles": {
+            "p50": 3.62396240234375e-05,
+            "p95": 0.00026422739028930664,
+            "p99": 0.000564491748809817,
+            "p99_9": 0.0023064041137699845
+          },
+          "worst_positions": [
+            {
+              "index": [
+                0,
+                0,
+                73,
+                65
+              ],
+              "actual": 3.4435670375823975,
+              "expected": 3.426405191421509,
+              "absolute_difference": 0.017161846160888672,
+              "allowed_difference": 0.004426405191421508
+            },
+            {
+              "index": [
+                0,
+                0,
+                74,
+                65
+              ],
+              "actual": 2.561319351196289,
+              "expected": 2.5757076740264893,
+              "absolute_difference": 0.014388322830200195,
+              "allowed_difference": 0.003575707674026489
+            },
+            {
+              "index": [
+                0,
+                0,
+                73,
+                64
+              ],
+              "actual": -13.922345161437988,
+              "expected": -13.912672996520996,
+              "absolute_difference": 0.009672164916992188,
+              "allowed_difference": 0.014912672996520996
+            },
+            {
+              "index": [
+                0,
+                0,
+                74,
+                64
+              ],
+              "actual": -13.046817779541016,
+              "expected": -13.056001663208008,
+              "absolute_difference": 0.009183883666992188,
+              "allowed_difference": 0.014056001663208008
+            },
+            {
+              "index": [
+                0,
+                0,
+                73,
+                66
+              ],
+              "actual": 21.74220848083496,
+              "expected": 21.7493839263916,
+              "absolute_difference": 0.007175445556640625,
+              "allowed_difference": 0.022749383926391604
+            }
+          ]
+        },
+        "formula_vs_api_same_fresh_z": {
+          "shape_actual": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "shape_expected": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "dtype_actual": "float32",
+          "dtype_expected": "float32",
+          "atol": 0.001,
+          "rtol": 0.001,
+          "passed": true,
+          "elements": 9216,
+          "failing_elements": 0,
+          "failing_fraction": 0.0,
+          "max_abs": 0.0,
+          "rms": 0.0,
+          "mean_signed_difference": 0.0,
+          "expected_mean": 7.255208792882816,
+          "expected_sd": 6.404655941857933,
+          "expected_rms": 9.67768941234943,
+          "rms_relative_to_expected_rms": 0.0,
+          "absolute_difference_percentiles": {
+            "p50": 0.0,
+            "p95": 0.0,
+            "p99": 0.0,
+            "p99_9": 0.0
+          },
+          "worst_positions": [
+            {
+              "index": [
+                0,
+                0,
+                95,
+                95
+              ],
+              "actual": 22.503585815429688,
+              "expected": 22.503585815429688,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.02350358581542969
+            },
+            {
+              "index": [
+                0,
+                0,
+                31,
+                95
+              ],
+              "actual": 14.961559295654297,
+              "expected": 14.961559295654297,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.015961559295654296
+            },
+            {
+              "index": [
+                0,
+                0,
+                31,
+                94
+              ],
+              "actual": 10.813404083251953,
+              "expected": 10.813404083251953,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.011813404083251954
+            },
+            {
+              "index": [
+                0,
+                0,
+                32,
+                1
+              ],
+              "actual": 11.159088134765625,
+              "expected": 11.159088134765625,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.012159088134765624
+            },
+            {
+              "index": [
+                0,
+                0,
+                32,
+                4
+              ],
+              "actual": 10.18858528137207,
+              "expected": 10.18858528137207,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.011188585281372069
+            }
+          ]
+        },
+        "projected_drift_from_different_raw_inputs": {
+          "shape_actual": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "shape_expected": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "dtype_actual": "float32",
+          "dtype_expected": "float32",
+          "atol": 0.001,
+          "rtol": 0.001,
+          "passed": false,
+          "elements": 9216,
+          "failing_elements": 3,
+          "failing_fraction": 0.0003255208333333333,
+          "max_abs": 0.01632976531982422,
+          "rms": 0.00030077129115209,
+          "mean_signed_difference": 4.7525423320217266e-07,
+          "expected_mean": 7.255208792882816,
+          "expected_sd": 6.404655941857933,
+          "expected_rms": 9.67768941234943,
+          "rms_relative_to_expected_rms": 3.107883280158631e-05,
+          "absolute_difference_percentiles": {
+            "p50": 3.224611282348633e-05,
+            "p95": 0.000247955322265625,
+            "p99": 0.0005279064178466807,
+            "p99_9": 0.0020626497268678625
+          },
+          "worst_positions": [
+            {
+              "index": [
+                0,
+                0,
+                73,
+                65
+              ],
+              "actual": 0.7332932949066162,
+              "expected": 0.7496230602264404,
+              "absolute_difference": 0.01632976531982422,
+              "allowed_difference": 0.0017496230602264404
+            },
+            {
+              "index": [
+                0,
+                0,
+                74,
+                65
+              ],
+              "actual": -0.13474005460739136,
+              "expected": -0.14789801836013794,
+              "absolute_difference": 0.013157963752746582,
+              "allowed_difference": 0.001147898018360138
+            },
+            {
+              "index": [
+                0,
+                0,
+                73,
+                64
+              ],
+              "actual": -14.156352996826172,
+              "expected": -14.164501190185547,
+              "absolute_difference": 0.008148193359375,
+              "allowed_difference": 0.015164501190185548
+            },
+            {
+              "index": [
+                0,
+                0,
+                74,
+                64
+              ],
+              "actual": -13.636432647705078,
+              "expected": -13.628335952758789,
+              "absolute_difference": 0.008096694946289062,
+              "allowed_difference": 0.014628335952758788
+            },
+            {
+              "index": [
+                0,
+                0,
+                73,
+                66
+              ],
+              "actual": 19.53127098083496,
+              "expected": 19.523591995239258,
+              "absolute_difference": 0.007678985595703125,
+              "allowed_difference": 0.02052359199523926
+            }
+          ]
+        },
+        "encode_mode_vs_api_raw_same_input": {
+          "shape_actual": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "shape_expected": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "dtype_actual": "float32",
+          "dtype_expected": "float32",
+          "atol": 0.001,
+          "rtol": 0.001,
+          "passed": true,
+          "elements": 9216,
+          "failing_elements": 0,
+          "failing_fraction": 0.0,
+          "max_abs": 0.0,
+          "rms": 0.0,
+          "mean_signed_difference": 0.0,
+          "expected_mean": 9.032652108797468,
+          "expected_sd": 6.980350707831194,
+          "expected_rms": 11.41552014245881,
+          "rms_relative_to_expected_rms": 0.0,
+          "absolute_difference_percentiles": {
+            "p50": 0.0,
+            "p95": 0.0,
+            "p99": 0.0,
+            "p99_9": 0.0
+          },
+          "worst_positions": [
+            {
+              "index": [
+                0,
+                0,
+                95,
+                95
+              ],
+              "actual": 24.584848403930664,
+              "expected": 24.584848403930664,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.025584848403930667
+            },
+            {
+              "index": [
+                0,
+                0,
+                31,
+                95
+              ],
+              "actual": 16.09403419494629,
+              "expected": 16.09403419494629,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.01709403419494629
+            },
+            {
+              "index": [
+                0,
+                0,
+                31,
+                94
+              ],
+              "actual": 13.274016380310059,
+              "expected": 13.274016380310059,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.014274016380310058
+            },
+            {
+              "index": [
+                0,
+                0,
+                32,
+                1
+              ],
+              "actual": 13.302509307861328,
+              "expected": 13.302509307861328,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.014302509307861328
+            },
+            {
+              "index": [
+                0,
+                0,
+                32,
+                4
+              ],
+              "actual": 12.3055419921875,
+              "expected": 12.3055419921875,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.0133055419921875
+            }
+          ]
+        }
+      }
+    },
+    {
+      "image_uuid": "sunhl-1th-02-Jan-2017-162_A_AP",
+      "mode": "ieee",
+      "image": {
+        "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-02-Jan-2017-162_A_AP.jpg",
+        "file_sha256": "0b2c461b36715baa8f963bbc099c9e3acfb2e2ff1228a924ab3d5766b64ff783",
+        "input_sha256": "f8f57fecf8c3769121f6cd02dd7301d68e651b1d4d572fcf68e66cf1d3042707",
+        "input_shape": [
+          1,
+          1,
+          384,
+          384
+        ],
+        "input_min": -1.0,
+        "input_max": 1.0,
+        "input_mean": -0.7080100178718567,
+        "input_sd": 0.4504721462726593,
+        "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+      },
+      "precision": {
+        "api": "fp32_precision",
+        "values": {
+          "global": "ieee",
+          "cuda_matmul": "ieee",
+          "cudnn": "ieee",
+          "cudnn_conv": "ieee",
+          "cudnn_rnn": "ieee"
+        },
+        "cudnn_benchmark": false,
+        "cudnn_deterministic": false
+      },
+      "comparisons": {
+        "fresh_raw_vs_cached_raw": {
+          "shape_actual": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "shape_expected": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "dtype_actual": "float32",
+          "dtype_expected": "float32",
+          "atol": 0.001,
+          "rtol": 0.001,
+          "passed": false,
+          "elements": 9216,
+          "failing_elements": 54,
+          "failing_fraction": 0.005859375,
+          "max_abs": 0.08187007904052734,
+          "rms": 0.002324941525082963,
+          "mean_signed_difference": -0.0004003531082869611,
+          "expected_mean": 9.032652868557811,
+          "expected_sd": 6.980359812730266,
+          "expected_rms": 11.41552631108375,
+          "rms_relative_to_expected_rms": 0.00020366485624281663,
+          "absolute_difference_percentiles": {
+            "p50": 0.000972747802734375,
+            "p95": 0.0024356842041015625,
+            "p99": 0.004208230972290056,
+            "p99_9": 0.028878242969516937
+          },
+          "worst_positions": [
+            {
+              "index": [
+                0,
+                0,
+                91,
+                49
+              ],
+              "actual": -12.8115873336792,
+              "expected": -12.729717254638672,
+              "absolute_difference": 0.08187007904052734,
+              "allowed_difference": 0.013729717254638674
+            },
+            {
+              "index": [
+                0,
+                0,
+                91,
+                50
+              ],
+              "actual": -12.064504623413086,
+              "expected": -12.135546684265137,
+              "absolute_difference": 0.07104206085205078,
+              "allowed_difference": 0.013135546684265136
+            },
+            {
+              "index": [
+                0,
+                0,
+                9,
+                63
+              ],
+              "actual": 13.220449447631836,
+              "expected": 13.154403686523438,
+              "absolute_difference": 0.06604576110839844,
+              "allowed_difference": 0.014154403686523438
+            },
+            {
+              "index": [
+                0,
+                0,
+                10,
+                63
+              ],
+              "actual": 8.333992958068848,
+              "expected": 8.396442413330078,
+              "absolute_difference": 0.06244945526123047,
+              "allowed_difference": 0.00939644241333008
+            },
+            {
+              "index": [
+                0,
+                0,
+                10,
+                64
+              ],
+              "actual": 7.200501441955566,
+              "expected": 7.151122570037842,
+              "absolute_difference": 0.04937887191772461,
+              "allowed_difference": 0.008151122570037842
+            }
+          ]
+        },
+        "formula_vs_api_same_fresh_z": {
+          "shape_actual": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "shape_expected": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "dtype_actual": "float32",
+          "dtype_expected": "float32",
+          "atol": 0.001,
+          "rtol": 0.001,
+          "passed": true,
+          "elements": 9216,
+          "failing_elements": 0,
+          "failing_fraction": 0.0,
+          "max_abs": 0.0,
+          "rms": 0.0,
+          "mean_signed_difference": 0.0,
+          "expected_mean": 7.254858434402397,
+          "expected_sd": 6.404529286195988,
+          "expected_rms": 9.677342934967308,
+          "rms_relative_to_expected_rms": 0.0,
+          "absolute_difference_percentiles": {
+            "p50": 0.0,
+            "p95": 0.0,
+            "p99": 0.0,
+            "p99_9": 0.0
+          },
+          "worst_positions": [
+            {
+              "index": [
+                0,
+                0,
+                95,
+                95
+              ],
+              "actual": 22.502212524414062,
+              "expected": 22.502212524414062,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.023502212524414062
+            },
+            {
+              "index": [
+                0,
+                0,
+                31,
+                95
+              ],
+              "actual": 14.959991455078125,
+              "expected": 14.959991455078125,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.015959991455078124
+            },
+            {
+              "index": [
+                0,
+                0,
+                31,
+                94
+              ],
+              "actual": 10.816116333007812,
+              "expected": 10.816116333007812,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.011816116333007814
+            },
+            {
+              "index": [
+                0,
+                0,
+                32,
+                1
+              ],
+              "actual": 11.159894943237305,
+              "expected": 11.159894943237305,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.012159894943237305
+            },
+            {
+              "index": [
+                0,
+                0,
+                32,
+                4
+              ],
+              "actual": 10.18752670288086,
+              "expected": 10.18752670288086,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.011187526702880861
+            }
+          ]
+        },
+        "projected_drift_from_different_raw_inputs": {
+          "shape_actual": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "shape_expected": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "dtype_actual": "float32",
+          "dtype_expected": "float32",
+          "atol": 0.001,
+          "rtol": 0.001,
+          "passed": false,
+          "elements": 9216,
+          "failing_elements": 57,
+          "failing_fraction": 0.006184895833333333,
+          "max_abs": 0.07647132873535156,
+          "rms": 0.0021728340768237928,
+          "mean_signed_difference": 0.0003508529528820266,
+          "expected_mean": 7.254858434402397,
+          "expected_sd": 6.404529286195988,
+          "expected_rms": 9.677342934967308,
+          "rms_relative_to_expected_rms": 0.00022452796097290862,
+          "absolute_difference_percentiles": {
+            "p50": 0.000850677490234375,
+            "p95": 0.0021076202392578125,
+            "p99": 0.004042816162109386,
+            "p99_9": 0.02762198448181304
+          },
+          "worst_positions": [
+            {
+              "index": [
+                0,
+                0,
+                91,
+                49
+              ],
+              "actual": -12.786766052246094,
+              "expected": -12.863237380981445,
+              "absolute_difference": 0.07647132873535156,
+              "allowed_difference": 0.013863237380981445
+            },
+            {
+              "index": [
+                0,
+                0,
+                91,
+                50
+              ],
+              "actual": -12.166873931884766,
+              "expected": -12.096735000610352,
+              "absolute_difference": 0.07013893127441406,
+              "allowed_difference": 0.01309673500061035
+            },
+            {
+              "index": [
+                0,
+                0,
+                9,
+                63
+              ],
+              "actual": 10.999429702758789,
+              "expected": 11.062135696411133,
+              "absolute_difference": 0.06270599365234375,
+              "allowed_difference": 0.012062135696411132
+            },
+            {
+              "index": [
+                0,
+                0,
+                10,
+                63
+              ],
+              "actual": 6.880537986755371,
+              "expected": 6.824448108673096,
+              "absolute_difference": 0.05608987808227539,
+              "allowed_difference": 0.007824448108673096
+            },
+            {
+              "index": [
+                0,
+                0,
+                9,
+                64
+              ],
+              "actual": 11.500089645385742,
+              "expected": 11.456897735595703,
+              "absolute_difference": 0.04319190979003906,
+              "allowed_difference": 0.012456897735595704
+            }
+          ]
+        },
+        "encode_mode_vs_api_raw_same_input": {
+          "shape_actual": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "shape_expected": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "dtype_actual": "float32",
+          "dtype_expected": "float32",
+          "atol": 0.001,
+          "rtol": 0.001,
+          "passed": true,
+          "elements": 9216,
+          "failing_elements": 0,
+          "failing_fraction": 0.0,
+          "max_abs": 0.0,
+          "rms": 0.0,
+          "mean_signed_difference": 0.0,
+          "expected_mean": 9.032252515449525,
+          "expected_sd": 6.980208482319929,
+          "expected_rms": 11.415116992808063,
+          "rms_relative_to_expected_rms": 0.0,
+          "absolute_difference_percentiles": {
+            "p50": 0.0,
+            "p95": 0.0,
+            "p99": 0.0,
+            "p99_9": 0.0
+          },
+          "worst_positions": [
+            {
+              "index": [
+                0,
+                0,
+                95,
+                95
+              ],
+              "actual": 24.58342170715332,
+              "expected": 24.58342170715332,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.02558342170715332
+            },
+            {
+              "index": [
+                0,
+                0,
+                31,
+                95
+              ],
+              "actual": 16.092449188232422,
+              "expected": 16.092449188232422,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.017092449188232422
+            },
+            {
+              "index": [
+                0,
+                0,
+                31,
+                94
+              ],
+              "actual": 13.276755332946777,
+              "expected": 13.276755332946777,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.014276755332946776
+            },
+            {
+              "index": [
+                0,
+                0,
+                32,
+                1
+              ],
+              "actual": 13.303237915039062,
+              "expected": 13.303237915039062,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.014303237915039062
+            },
+            {
+              "index": [
+                0,
+                0,
+                32,
+                4
+              ],
+              "actual": 12.304351806640625,
+              "expected": 12.304351806640625,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.013304351806640625
+            }
+          ]
+        }
+      }
+    },
+    {
+      "image_uuid": "sunhl-1th-02-Jan-2017-162_A_AP",
+      "mode": "tf32",
+      "image": {
+        "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-02-Jan-2017-162_A_AP.jpg",
+        "file_sha256": "0b2c461b36715baa8f963bbc099c9e3acfb2e2ff1228a924ab3d5766b64ff783",
+        "input_sha256": "f8f57fecf8c3769121f6cd02dd7301d68e651b1d4d572fcf68e66cf1d3042707",
+        "input_shape": [
+          1,
+          1,
+          384,
+          384
+        ],
+        "input_min": -1.0,
+        "input_max": 1.0,
+        "input_mean": -0.7080100178718567,
+        "input_sd": 0.4504721462726593,
+        "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+      },
+      "precision": {
+        "api": "fp32_precision",
+        "values": {
+          "global": "tf32",
+          "cuda_matmul": "tf32",
+          "cudnn": "tf32",
+          "cudnn_conv": "tf32",
+          "cudnn_rnn": "tf32"
+        },
+        "cudnn_benchmark": false,
+        "cudnn_deterministic": false
+      },
+      "comparisons": {
+        "fresh_raw_vs_cached_raw": {
+          "shape_actual": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "shape_expected": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "dtype_actual": "float32",
+          "dtype_expected": "float32",
+          "atol": 0.001,
+          "rtol": 0.001,
+          "passed": false,
+          "elements": 9216,
+          "failing_elements": 2,
+          "failing_fraction": 0.00021701388888888888,
+          "max_abs": 0.01696944236755371,
+          "rms": 0.00031705850695894905,
+          "mean_signed_difference": 2.9063456976372336e-06,
+          "expected_mean": 9.032652868557811,
+          "expected_sd": 6.980359812730266,
+          "expected_rms": 11.41552631108375,
+          "rms_relative_to_expected_rms": 2.777432229744023e-05,
+          "absolute_difference_percentiles": {
+            "p50": 3.814697265625e-05,
+            "p95": 0.00026237964630126953,
+            "p99": 0.0005487680435180666,
+            "p99_9": 0.0022253859043125236
+          },
+          "worst_positions": [
+            {
+              "index": [
+                0,
+                0,
+                73,
+                65
+              ],
+              "actual": 3.4433746337890625,
+              "expected": 3.426405191421509,
+              "absolute_difference": 0.01696944236755371,
+              "allowed_difference": 0.004426405191421508
+            },
+            {
+              "index": [
+                0,
+                0,
+                74,
+                65
+              ],
+              "actual": 2.5614209175109863,
+              "expected": 2.5757076740264893,
+              "absolute_difference": 0.01428675651550293,
+              "allowed_difference": 0.003575707674026489
+            },
+            {
+              "index": [
+                0,
+                0,
+                73,
+                64
+              ],
+              "actual": -13.92223834991455,
+              "expected": -13.912672996520996,
+              "absolute_difference": 0.009565353393554688,
+              "allowed_difference": 0.014912672996520996
+            },
+            {
+              "index": [
+                0,
+                0,
+                74,
+                64
+              ],
+              "actual": -13.047125816345215,
+              "expected": -13.056001663208008,
+              "absolute_difference": 0.008875846862792969,
+              "allowed_difference": 0.014056001663208008
+            },
+            {
+              "index": [
+                0,
+                0,
+                73,
+                66
+              ],
+              "actual": 21.742382049560547,
+              "expected": 21.7493839263916,
+              "absolute_difference": 0.0070018768310546875,
+              "allowed_difference": 0.022749383926391604
+            }
+          ]
+        },
+        "formula_vs_api_same_fresh_z": {
+          "shape_actual": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "shape_expected": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "dtype_actual": "float32",
+          "dtype_expected": "float32",
+          "atol": 0.001,
+          "rtol": 0.001,
+          "passed": true,
+          "elements": 9216,
+          "failing_elements": 0,
+          "failing_fraction": 0.0,
+          "max_abs": 0.0,
+          "rms": 0.0,
+          "mean_signed_difference": 0.0,
+          "expected_mean": 7.255212120357707,
+          "expected_sd": 6.404661219859818,
+          "expected_rms": 9.67769539986466,
+          "rms_relative_to_expected_rms": 0.0,
+          "absolute_difference_percentiles": {
+            "p50": 0.0,
+            "p95": 0.0,
+            "p99": 0.0,
+            "p99_9": 0.0
+          },
+          "worst_positions": [
+            {
+              "index": [
+                0,
+                0,
+                95,
+                95
+              ],
+              "actual": 22.5037841796875,
+              "expected": 22.5037841796875,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.0235037841796875
+            },
+            {
+              "index": [
+                0,
+                0,
+                31,
+                95
+              ],
+              "actual": 14.961572647094727,
+              "expected": 14.961572647094727,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.015961572647094725
+            },
+            {
+              "index": [
+                0,
+                0,
+                31,
+                94
+              ],
+              "actual": 10.813404083251953,
+              "expected": 10.813404083251953,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.011813404083251954
+            },
+            {
+              "index": [
+                0,
+                0,
+                32,
+                1
+              ],
+              "actual": 11.159099578857422,
+              "expected": 11.159099578857422,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.012159099578857423
+            },
+            {
+              "index": [
+                0,
+                0,
+                32,
+                4
+              ],
+              "actual": 10.188583374023438,
+              "expected": 10.188583374023438,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.01118858337402344
+            }
+          ]
+        },
+        "projected_drift_from_different_raw_inputs": {
+          "shape_actual": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "shape_expected": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "dtype_actual": "float32",
+          "dtype_expected": "float32",
+          "atol": 0.001,
+          "rtol": 0.001,
+          "passed": false,
+          "elements": 9216,
+          "failing_elements": 3,
+          "failing_fraction": 0.0003255208333333333,
+          "max_abs": 0.016142964363098145,
+          "rms": 0.0002967722914289064,
+          "mean_signed_difference": -2.852220657385058e-06,
+          "expected_mean": 7.255212120357707,
+          "expected_sd": 6.404661219859818,
+          "expected_rms": 9.67769539986466,
+          "rms_relative_to_expected_rms": 3.066559538886259e-05,
+          "absolute_difference_percentiles": {
+            "p50": 3.5762786865234375e-05,
+            "p95": 0.000247955322265625,
+            "p99": 0.0005204200744628913,
+            "p99_9": 0.001960746347904354
+          },
+          "worst_positions": [
+            {
+              "index": [
+                0,
+                0,
+                73,
+                65
+              ],
+              "actual": 0.7332932949066162,
+              "expected": 0.7494362592697144,
+              "absolute_difference": 0.016142964363098145,
+              "allowed_difference": 0.0017494362592697143
+            },
+            {
+              "index": [
+                0,
+                0,
+                74,
+                65
+              ],
+              "actual": -0.13474005460739136,
+              "expected": -0.14781659841537476,
+              "absolute_difference": 0.013076543807983398,
+              "allowed_difference": 0.0011478165984153748
+            },
+            {
+              "index": [
+                0,
+                0,
+                73,
+                64
+              ],
+              "actual": -14.156352996826172,
+              "expected": -14.164409637451172,
+              "absolute_difference": 0.008056640625,
+              "allowed_difference": 0.015164409637451172
+            },
+            {
+              "index": [
+                0,
+                0,
+                74,
+                64
+              ],
+              "actual": -13.636432647705078,
+              "expected": -13.628622055053711,
+              "absolute_difference": 0.0078105926513671875,
+              "allowed_difference": 0.014628622055053712
+            },
+            {
+              "index": [
+                0,
+                0,
+                73,
+                66
+              ],
+              "actual": 19.53127098083496,
+              "expected": 19.523771286010742,
+              "absolute_difference": 0.00749969482421875,
+              "allowed_difference": 0.020523771286010743
+            }
+          ]
+        },
+        "encode_mode_vs_api_raw_same_input": {
+          "shape_actual": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "shape_expected": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "dtype_actual": "float32",
+          "dtype_expected": "float32",
+          "atol": 0.001,
+          "rtol": 0.001,
+          "passed": true,
+          "elements": 9216,
+          "failing_elements": 0,
+          "failing_fraction": 0.0,
+          "max_abs": 0.0,
+          "rms": 0.0,
+          "mean_signed_difference": 0.0,
+          "expected_mean": 9.03265577490351,
+          "expected_sd": 6.980356266902591,
+          "expected_rms": 11.415526442559887,
+          "rms_relative_to_expected_rms": 0.0,
+          "absolute_difference_percentiles": {
+            "p50": 0.0,
+            "p95": 0.0,
+            "p99": 0.0,
+            "p99_9": 0.0
+          },
+          "worst_positions": [
+            {
+              "index": [
+                0,
+                0,
+                95,
+                95
+              ],
+              "actual": 24.585063934326172,
+              "expected": 24.585063934326172,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.025585063934326174
+            },
+            {
+              "index": [
+                0,
+                0,
+                31,
+                95
+              ],
+              "actual": 16.09404945373535,
+              "expected": 16.09404945373535,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.01709404945373535
+            },
+            {
+              "index": [
+                0,
+                0,
+                31,
+                94
+              ],
+              "actual": 13.274018287658691,
+              "expected": 13.274018287658691,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.014274018287658691
+            },
+            {
+              "index": [
+                0,
+                0,
+                32,
+                1
+              ],
+              "actual": 13.302520751953125,
+              "expected": 13.302520751953125,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.014302520751953124
+            },
+            {
+              "index": [
+                0,
+                0,
+                32,
+                4
+              ],
+              "actual": 12.305540084838867,
+              "expected": 12.305540084838867,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.013305540084838866
+            }
+          ]
+        }
+      }
+    },
+    {
+      "image_uuid": "sunhl-1th-30-Dec-2016-161_A_AP",
+      "mode": "current",
+      "image": {
+        "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-30-Dec-2016-161_A_AP.jpg",
+        "file_sha256": "48b2cceae458b6c8fe6a71b54ec41faef5bc7b8adc823801f452abd882faaf9f",
+        "input_sha256": "d8d10ad20374eff0ec207c91df0afd0e7f3e5ce22a4806ab9c27f86d3b70a469",
+        "input_shape": [
+          1,
+          1,
+          384,
+          384
+        ],
+        "input_min": -1.0,
+        "input_max": 1.0,
+        "input_mean": -0.3671794533729553,
+        "input_sd": 0.7253847122192383,
+        "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+      },
+      "precision": {
+        "api": "fp32_precision",
+        "values": {
+          "global": "none",
+          "cuda_matmul": "none",
+          "cudnn": "none",
+          "cudnn_conv": "tf32",
+          "cudnn_rnn": "tf32"
+        },
+        "cudnn_benchmark": false,
+        "cudnn_deterministic": false
+      },
+      "comparisons": {
+        "fresh_raw_vs_cached_raw": {
+          "shape_actual": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "shape_expected": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "dtype_actual": "float32",
+          "dtype_expected": "float32",
+          "atol": 0.001,
+          "rtol": 0.001,
+          "passed": false,
+          "elements": 9216,
+          "failing_elements": 9,
+          "failing_fraction": 0.0009765625,
+          "max_abs": 0.011945247650146484,
+          "rms": 0.00029491225276095397,
+          "mean_signed_difference": 1.421716943797138e-05,
+          "expected_mean": 4.732336868449541,
+          "expected_sd": 9.75750309404694,
+          "expected_rms": 10.84453221060376,
+          "rms_relative_to_expected_rms": 2.7194557315491158e-05,
+          "absolute_difference_percentiles": {
+            "p50": 5.817413330078125e-05,
+            "p95": 0.0003324747085571289,
+            "p99": 0.0007435798645019538,
+            "p99_9": 0.0031860041618348373
+          },
+          "worst_positions": [
+            {
+              "index": [
+                0,
+                0,
+                34,
+                65
+              ],
+              "actual": -3.9494028091430664,
+              "expected": -3.93745756149292,
+              "absolute_difference": 0.011945247650146484,
+              "allowed_difference": 0.00493745756149292
+            },
+            {
+              "index": [
+                0,
+                0,
+                8,
+                39
+              ],
+              "actual": 4.79328727722168,
+              "expected": 4.801514625549316,
+              "absolute_difference": 0.008227348327636719,
+              "allowed_difference": 0.005801514625549316
+            },
+            {
+              "index": [
+                0,
+                0,
+                8,
+                40
+              ],
+              "actual": 4.185174942016602,
+              "expected": 4.177889823913574,
+              "absolute_difference": 0.007285118103027344,
+              "allowed_difference": 0.005177889823913574
+            },
+            {
+              "index": [
+                0,
+                0,
+                35,
+                65
+              ],
+              "actual": -5.660582065582275,
+              "expected": -5.666713237762451,
+              "absolute_difference": 0.006131172180175781,
+              "allowed_difference": 0.0066667132377624515
+            },
+            {
+              "index": [
+                0,
+                0,
+                34,
+                64
+              ],
+              "actual": -4.843753337860107,
+              "expected": -4.849603652954102,
+              "absolute_difference": 0.005850315093994141,
+              "allowed_difference": 0.0058496036529541015
+            }
+          ]
+        },
+        "formula_vs_api_same_fresh_z": {
+          "shape_actual": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "shape_expected": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "dtype_actual": "float32",
+          "dtype_expected": "float32",
+          "atol": 0.001,
+          "rtol": 0.001,
+          "passed": true,
+          "elements": 9216,
+          "failing_elements": 0,
+          "failing_fraction": 0.0,
+          "max_abs": 0.0,
+          "rms": 0.0,
+          "mean_signed_difference": 0.0,
+          "expected_mean": 3.2303416204312168,
+          "expected_sd": 9.075199229089668,
+          "expected_rms": 9.632982302089,
+          "rms_relative_to_expected_rms": 0.0,
+          "absolute_difference_percentiles": {
+            "p50": 0.0,
+            "p95": 0.0,
+            "p99": 0.0,
+            "p99_9": 0.0
+          },
+          "worst_positions": [
+            {
+              "index": [
+                0,
+                0,
+                95,
+                95
+              ],
+              "actual": 21.11110496520996,
+              "expected": 21.11110496520996,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.022111104965209964
+            },
+            {
+              "index": [
+                0,
+                0,
+                31,
+                95
+              ],
+              "actual": 14.404932022094727,
+              "expected": 14.404932022094727,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.015404932022094728
+            },
+            {
+              "index": [
+                0,
+                0,
+                31,
+                94
+              ],
+              "actual": 10.60352897644043,
+              "expected": 10.60352897644043,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.01160352897644043
+            },
+            {
+              "index": [
+                0,
+                0,
+                32,
+                1
+              ],
+              "actual": 10.832029342651367,
+              "expected": 10.832029342651367,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.011832029342651366
+            },
+            {
+              "index": [
+                0,
+                0,
+                32,
+                4
+              ],
+              "actual": 9.790569305419922,
+              "expected": 9.790569305419922,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.010790569305419922
+            }
+          ]
+        },
+        "projected_drift_from_different_raw_inputs": {
+          "shape_actual": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "shape_expected": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "dtype_actual": "float32",
+          "dtype_expected": "float32",
+          "atol": 0.001,
+          "rtol": 0.001,
+          "passed": false,
+          "elements": 9216,
+          "failing_elements": 10,
+          "failing_fraction": 0.0010850694444444445,
+          "max_abs": 0.011864185333251953,
+          "rms": 0.0002833385529504716,
+          "mean_signed_difference": -1.3400698662735522e-05,
+          "expected_mean": 3.2303416204312168,
+          "expected_sd": 9.075199229089668,
+          "expected_rms": 9.632982302089,
+          "rms_relative_to_expected_rms": 2.9413378335495027e-05,
+          "absolute_difference_percentiles": {
+            "p50": 5.340576171875e-05,
+            "p95": 0.000308990478515625,
+            "p99": 0.0006923675537109375,
+            "p99_9": 0.003117973804473948
+          },
+          "worst_positions": [
+            {
+              "index": [
+                0,
+                0,
+                34,
+                65
+              ],
+              "actual": -4.494821548461914,
+              "expected": -4.506685733795166,
+              "absolute_difference": 0.011864185333251953,
+              "allowed_difference": 0.005506685733795166
+            },
+            {
+              "index": [
+                0,
+                0,
+                8,
+                39
+              ],
+              "actual": 3.708804130554199,
+              "expected": 3.7010951042175293,
+              "absolute_difference": 0.007709026336669922,
+              "allowed_difference": 0.004701095104217529
+            },
+            {
+              "index": [
+                0,
+                0,
+                8,
+                40
+              ],
+              "actual": 3.2872514724731445,
+              "expected": 3.294046640396118,
+              "absolute_difference": 0.006795167922973633,
+              "allowed_difference": 0.004294046640396118
+            },
+            {
+              "index": [
+                0,
+                0,
+                35,
+                65
+              ],
+              "actual": -6.810441970825195,
+              "expected": -6.804259300231934,
+              "absolute_difference": 0.006182670593261719,
+              "allowed_difference": 0.007804259300231934
+            },
+            {
+              "index": [
+                0,
+                0,
+                33,
+                65
+              ],
+              "actual": -0.973278284072876,
+              "expected": -0.9681365489959717,
+              "absolute_difference": 0.005141735076904297,
+              "allowed_difference": 0.0019681365489959716
+            }
+          ]
+        },
+        "encode_mode_vs_api_raw_same_input": {
+          "shape_actual": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "shape_expected": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "dtype_actual": "float32",
+          "dtype_expected": "float32",
+          "atol": 0.001,
+          "rtol": 0.001,
+          "passed": true,
+          "elements": 9216,
+          "failing_elements": 0,
+          "failing_fraction": 0.0,
+          "max_abs": 0.0,
+          "rms": 0.0,
+          "mean_signed_difference": 0.0,
+          "expected_mean": 4.732351085618979,
+          "expected_sd": 9.757495477256747,
+          "expected_rms": 10.844531561402041,
+          "rms_relative_to_expected_rms": 0.0,
+          "absolute_difference_percentiles": {
+            "p50": 0.0,
+            "p95": 0.0,
+            "p99": 0.0,
+            "p99_9": 0.0
+          },
+          "worst_positions": [
+            {
+              "index": [
+                0,
+                0,
+                95,
+                95
+              ],
+              "actual": 23.067502975463867,
+              "expected": 23.067502975463867,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.024067502975463867
+            },
+            {
+              "index": [
+                0,
+                0,
+                31,
+                95
+              ],
+              "actual": 15.517528533935547,
+              "expected": 15.517528533935547,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.01651752853393555
+            },
+            {
+              "index": [
+                0,
+                0,
+                31,
+                94
+              ],
+              "actual": 13.005131721496582,
+              "expected": 13.005131721496582,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.014005131721496582
+            },
+            {
+              "index": [
+                0,
+                0,
+                32,
+                1
+              ],
+              "actual": 12.918525695800781,
+              "expected": 12.918525695800781,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.013918525695800783
+            },
+            {
+              "index": [
+                0,
+                0,
+                32,
+                4
+              ],
+              "actual": 11.855091094970703,
+              "expected": 11.855091094970703,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.012855091094970704
+            }
+          ]
+        }
+      }
+    },
+    {
+      "image_uuid": "sunhl-1th-30-Dec-2016-161_A_AP",
+      "mode": "ieee",
+      "image": {
+        "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-30-Dec-2016-161_A_AP.jpg",
+        "file_sha256": "48b2cceae458b6c8fe6a71b54ec41faef5bc7b8adc823801f452abd882faaf9f",
+        "input_sha256": "d8d10ad20374eff0ec207c91df0afd0e7f3e5ce22a4806ab9c27f86d3b70a469",
+        "input_shape": [
+          1,
+          1,
+          384,
+          384
+        ],
+        "input_min": -1.0,
+        "input_max": 1.0,
+        "input_mean": -0.3671794533729553,
+        "input_sd": 0.7253847122192383,
+        "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+      },
+      "precision": {
+        "api": "fp32_precision",
+        "values": {
+          "global": "ieee",
+          "cuda_matmul": "ieee",
+          "cudnn": "ieee",
+          "cudnn_conv": "ieee",
+          "cudnn_rnn": "ieee"
+        },
+        "cudnn_benchmark": false,
+        "cudnn_deterministic": false
+      },
+      "comparisons": {
+        "fresh_raw_vs_cached_raw": {
+          "shape_actual": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "shape_expected": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "dtype_actual": "float32",
+          "dtype_expected": "float32",
+          "atol": 0.001,
+          "rtol": 0.001,
+          "passed": false,
+          "elements": 9216,
+          "failing_elements": 70,
+          "failing_fraction": 0.007595486111111111,
+          "max_abs": 0.03900718688964844,
+          "rms": 0.0018905402900670522,
+          "mean_signed_difference": 3.235648748361402e-05,
+          "expected_mean": 4.732336868449541,
+          "expected_sd": 9.75750309404694,
+          "expected_rms": 10.84453221060376,
+          "rms_relative_to_expected_rms": 0.00017433119781953214,
+          "absolute_difference_percentiles": {
+            "p50": 0.0009441375732421875,
+            "p95": 0.002566218376159668,
+            "p99": 0.009223413467407232,
+            "p99_9": 0.019746822118759496
+          },
+          "worst_positions": [
+            {
+              "index": [
+                0,
+                0,
+                29,
+                24
+              ],
+              "actual": -3.992206573486328,
+              "expected": -4.031213760375977,
+              "absolute_difference": 0.03900718688964844,
+              "allowed_difference": 0.005031213760375976
+            },
+            {
+              "index": [
+                0,
+                0,
+                30,
+                24
+              ],
+              "actual": -1.7150049209594727,
+              "expected": -1.6764576435089111,
+              "absolute_difference": 0.03854727745056152,
+              "allowed_difference": 0.0026764576435089112
+            },
+            {
+              "index": [
+                0,
+                0,
+                31,
+                24
+              ],
+              "actual": -1.370589017868042,
+              "expected": -1.3954585790634155,
+              "absolute_difference": 0.024869561195373535,
+              "allowed_difference": 0.0023954585790634158
+            },
+            {
+              "index": [
+                0,
+                0,
+                84,
+                71
+              ],
+              "actual": -8.111465454101562,
+              "expected": -8.08771800994873,
+              "absolute_difference": 0.02374744415283203,
+              "allowed_difference": 0.009087718009948731
+            },
+            {
+              "index": [
+                0,
+                0,
+                28,
+                24
+              ],
+              "actual": -2.0646486282348633,
+              "expected": -2.0415220260620117,
+              "absolute_difference": 0.023126602172851562,
+              "allowed_difference": 0.003041522026062012
+            }
+          ]
+        },
+        "formula_vs_api_same_fresh_z": {
+          "shape_actual": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "shape_expected": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "dtype_actual": "float32",
+          "dtype_expected": "float32",
+          "atol": 0.001,
+          "rtol": 0.001,
+          "passed": true,
+          "elements": 9216,
+          "failing_elements": 0,
+          "failing_fraction": 0.0,
+          "max_abs": 0.0,
+          "rms": 0.0,
+          "mean_signed_difference": 0.0,
+          "expected_mean": 3.2303662648321025,
+          "expected_sd": 9.075043357648978,
+          "expected_rms": 9.632843720738656,
+          "rms_relative_to_expected_rms": 0.0,
+          "absolute_difference_percentiles": {
+            "p50": 0.0,
+            "p95": 0.0,
+            "p99": 0.0,
+            "p99_9": 0.0
+          },
+          "worst_positions": [
+            {
+              "index": [
+                0,
+                0,
+                95,
+                95
+              ],
+              "actual": 21.10923957824707,
+              "expected": 21.10923957824707,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.02210923957824707
+            },
+            {
+              "index": [
+                0,
+                0,
+                31,
+                95
+              ],
+              "actual": 14.403274536132812,
+              "expected": 14.403274536132812,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.015403274536132813
+            },
+            {
+              "index": [
+                0,
+                0,
+                31,
+                94
+              ],
+              "actual": 10.602304458618164,
+              "expected": 10.602304458618164,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.011602304458618165
+            },
+            {
+              "index": [
+                0,
+                0,
+                32,
+                1
+              ],
+              "actual": 10.832965850830078,
+              "expected": 10.832965850830078,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.011832965850830077
+            },
+            {
+              "index": [
+                0,
+                0,
+                32,
+                4
+              ],
+              "actual": 9.791204452514648,
+              "expected": 9.791204452514648,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.01079120445251465
+            }
+          ]
+        },
+        "projected_drift_from_different_raw_inputs": {
+          "shape_actual": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "shape_expected": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "dtype_actual": "float32",
+          "dtype_expected": "float32",
+          "atol": 0.001,
+          "rtol": 0.001,
+          "passed": false,
+          "elements": 9216,
+          "failing_elements": 52,
+          "failing_fraction": 0.005642361111111111,
+          "max_abs": 0.039816856384277344,
+          "rms": 0.0017408856612410408,
+          "mean_signed_difference": -3.80388163547549e-05,
+          "expected_mean": 3.2303662648321025,
+          "expected_sd": 9.075043357648978,
+          "expected_rms": 9.632843720738656,
+          "rms_relative_to_expected_rms": 0.00018072395978905678,
+          "absolute_difference_percentiles": {
+            "p50": 0.0008296966552734375,
+            "p95": 0.002369403839111328,
+            "p99": 0.007771396636962902,
+            "p99_9": 0.01904930591583475
+          },
+          "worst_positions": [
+            {
+              "index": [
+                0,
+                0,
+                29,
+                24
+              ],
+              "actual": -4.438999176025391,
+              "expected": -4.399182319641113,
+              "absolute_difference": 0.039816856384277344,
+              "allowed_difference": 0.005399182319641114
+            },
+            {
+              "index": [
+                0,
+                0,
+                30,
+                24
+              ],
+              "actual": -2.0273241996765137,
+              "expected": -2.0663912296295166,
+              "absolute_difference": 0.03906702995300293,
+              "allowed_difference": 0.0030663912296295167
+            },
+            {
+              "index": [
+                0,
+                0,
+                31,
+                24
+              ],
+              "actual": -1.8613791465759277,
+              "expected": -1.8344471454620361,
+              "absolute_difference": 0.0269320011138916,
+              "allowed_difference": 0.002834447145462036
+            },
+            {
+              "index": [
+                0,
+                0,
+                84,
+                71
+              ],
+              "actual": -10.081623077392578,
+              "expected": -10.105947494506836,
+              "absolute_difference": 0.024324417114257812,
+              "allowed_difference": 0.011105947494506836
+            },
+            {
+              "index": [
+                0,
+                0,
+                28,
+                24
+              ],
+              "actual": -2.5129075050354004,
+              "expected": -2.536356210708618,
+              "absolute_difference": 0.023448705673217773,
+              "allowed_difference": 0.003536356210708618
+            }
+          ]
+        },
+        "encode_mode_vs_api_raw_same_input": {
+          "shape_actual": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "shape_expected": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "dtype_actual": "float32",
+          "dtype_expected": "float32",
+          "atol": 0.001,
+          "rtol": 0.001,
+          "passed": true,
+          "elements": 9216,
+          "failing_elements": 0,
+          "failing_fraction": 0.0,
+          "max_abs": 0.0,
+          "rms": 0.0,
+          "mean_signed_difference": 0.0,
+          "expected_mean": 4.732369224937025,
+          "expected_sd": 9.757325624555437,
+          "expected_rms": 10.844386650462864,
+          "rms_relative_to_expected_rms": 0.0,
+          "absolute_difference_percentiles": {
+            "p50": 0.0,
+            "p95": 0.0,
+            "p99": 0.0,
+            "p99_9": 0.0
+          },
+          "worst_positions": [
+            {
+              "index": [
+                0,
+                0,
+                95,
+                95
+              ],
+              "actual": 23.065404891967773,
+              "expected": 23.065404891967773,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.024065404891967776
+            },
+            {
+              "index": [
+                0,
+                0,
+                31,
+                95
+              ],
+              "actual": 15.515804290771484,
+              "expected": 15.515804290771484,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.016515804290771485
+            },
+            {
+              "index": [
+                0,
+                0,
+                31,
+                94
+              ],
+              "actual": 13.003694534301758,
+              "expected": 13.003694534301758,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.01400369453430176
+            },
+            {
+              "index": [
+                0,
+                0,
+                32,
+                1
+              ],
+              "actual": 12.919252395629883,
+              "expected": 12.919252395629883,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.013919252395629883
+            },
+            {
+              "index": [
+                0,
+                0,
+                32,
+                4
+              ],
+              "actual": 11.855819702148438,
+              "expected": 11.855819702148438,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.012855819702148438
+            }
+          ]
+        }
+      }
+    },
+    {
+      "image_uuid": "sunhl-1th-30-Dec-2016-161_A_AP",
+      "mode": "tf32",
+      "image": {
+        "path": "/lambda/nfs/MedVAE/MedVAE/medvae/data/boostnet/sunhl-1th-30-Dec-2016-161_A_AP.jpg",
+        "file_sha256": "48b2cceae458b6c8fe6a71b54ec41faef5bc7b8adc823801f452abd882faaf9f",
+        "input_sha256": "d8d10ad20374eff0ec207c91df0afd0e7f3e5ce22a4806ab9c27f86d3b70a469",
+        "input_shape": [
+          1,
+          1,
+          384,
+          384
+        ],
+        "input_min": -1.0,
+        "input_max": 1.0,
+        "input_mean": -0.3671794533729553,
+        "input_sd": 0.7253847122192383,
+        "loader_source_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+      },
+      "precision": {
+        "api": "fp32_precision",
+        "values": {
+          "global": "tf32",
+          "cuda_matmul": "tf32",
+          "cudnn": "tf32",
+          "cudnn_conv": "tf32",
+          "cudnn_rnn": "tf32"
+        },
+        "cudnn_benchmark": false,
+        "cudnn_deterministic": false
+      },
+      "comparisons": {
+        "fresh_raw_vs_cached_raw": {
+          "shape_actual": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "shape_expected": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "dtype_actual": "float32",
+          "dtype_expected": "float32",
+          "atol": 0.001,
+          "rtol": 0.001,
+          "passed": false,
+          "elements": 9216,
+          "failing_elements": 12,
+          "failing_fraction": 0.0013020833333333333,
+          "max_abs": 0.014353275299072266,
+          "rms": 0.0003193069524495082,
+          "mean_signed_difference": 1.4006137563329605e-05,
+          "expected_mean": 4.732336868449541,
+          "expected_sd": 9.75750309404694,
+          "expected_rms": 10.84453221060376,
+          "rms_relative_to_expected_rms": 2.944405035168696e-05,
+          "absolute_difference_percentiles": {
+            "p50": 5.626678466796875e-05,
+            "p95": 0.0003407001495361328,
+            "p99": 0.000729656219482424,
+            "p99_9": 0.003875847458841202
+          },
+          "worst_positions": [
+            {
+              "index": [
+                0,
+                0,
+                34,
+                65
+              ],
+              "actual": -3.951810836791992,
+              "expected": -3.93745756149292,
+              "absolute_difference": 0.014353275299072266,
+              "allowed_difference": 0.00493745756149292
+            },
+            {
+              "index": [
+                0,
+                0,
+                8,
+                39
+              ],
+              "actual": 4.793285846710205,
+              "expected": 4.801514625549316,
+              "absolute_difference": 0.008228778839111328,
+              "allowed_difference": 0.005801514625549316
+            },
+            {
+              "index": [
+                0,
+                0,
+                35,
+                65
+              ],
+              "actual": -5.659440994262695,
+              "expected": -5.666713237762451,
+              "absolute_difference": 0.007272243499755859,
+              "allowed_difference": 0.0066667132377624515
+            },
+            {
+              "index": [
+                0,
+                0,
+                8,
+                40
+              ],
+              "actual": 4.185060024261475,
+              "expected": 4.177889823913574,
+              "absolute_difference": 0.007170200347900391,
+              "allowed_difference": 0.005177889823913574
+            },
+            {
+              "index": [
+                0,
+                0,
+                34,
+                64
+              ],
+              "actual": -4.842507362365723,
+              "expected": -4.849603652954102,
+              "absolute_difference": 0.007096290588378906,
+              "allowed_difference": 0.0058496036529541015
+            }
+          ]
+        },
+        "formula_vs_api_same_fresh_z": {
+          "shape_actual": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "shape_expected": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "dtype_actual": "float32",
+          "dtype_expected": "float32",
+          "atol": 0.001,
+          "rtol": 0.001,
+          "passed": true,
+          "elements": 9216,
+          "failing_elements": 0,
+          "failing_fraction": 0.0,
+          "max_abs": 0.0,
+          "rms": 0.0,
+          "mean_signed_difference": 0.0,
+          "expected_mean": 3.230341294895172,
+          "expected_sd": 9.075201859947086,
+          "expected_rms": 9.632984671444882,
+          "rms_relative_to_expected_rms": 0.0,
+          "absolute_difference_percentiles": {
+            "p50": 0.0,
+            "p95": 0.0,
+            "p99": 0.0,
+            "p99_9": 0.0
+          },
+          "worst_positions": [
+            {
+              "index": [
+                0,
+                0,
+                95,
+                95
+              ],
+              "actual": 21.111085891723633,
+              "expected": 21.111085891723633,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.022111085891723635
+            },
+            {
+              "index": [
+                0,
+                0,
+                31,
+                95
+              ],
+              "actual": 14.404945373535156,
+              "expected": 14.404945373535156,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.015404945373535157
+            },
+            {
+              "index": [
+                0,
+                0,
+                31,
+                94
+              ],
+              "actual": 10.603506088256836,
+              "expected": 10.603506088256836,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.011603506088256835
+            },
+            {
+              "index": [
+                0,
+                0,
+                32,
+                1
+              ],
+              "actual": 10.832056045532227,
+              "expected": 10.832056045532227,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.011832056045532228
+            },
+            {
+              "index": [
+                0,
+                0,
+                32,
+                4
+              ],
+              "actual": 9.79058837890625,
+              "expected": 9.79058837890625,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.01079058837890625
+            }
+          ]
+        },
+        "projected_drift_from_different_raw_inputs": {
+          "shape_actual": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "shape_expected": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "dtype_actual": "float32",
+          "dtype_expected": "float32",
+          "atol": 0.001,
+          "rtol": 0.001,
+          "passed": false,
+          "elements": 9216,
+          "failing_elements": 9,
+          "failing_fraction": 0.0009765625,
+          "max_abs": 0.014268875122070312,
+          "rms": 0.0003073610451614487,
+          "mean_signed_difference": -1.3075162617800137e-05,
+          "expected_mean": 3.230341294895172,
+          "expected_sd": 9.075201859947086,
+          "expected_rms": 9.632984671444882,
+          "rms_relative_to_expected_rms": 3.190714567132667e-05,
+          "absolute_difference_percentiles": {
+            "p50": 5.14984130859375e-05,
+            "p95": 0.0003185272216796875,
+            "p99": 0.000680065155029299,
+            "p99_9": 0.003971452713014901
+          },
+          "worst_positions": [
+            {
+              "index": [
+                0,
+                0,
+                34,
+                65
+              ],
+              "actual": -4.494821548461914,
+              "expected": -4.509090423583984,
+              "absolute_difference": 0.014268875122070312,
+              "allowed_difference": 0.005509090423583984
+            },
+            {
+              "index": [
+                0,
+                0,
+                8,
+                39
+              ],
+              "actual": 3.708804130554199,
+              "expected": 3.7010984420776367,
+              "absolute_difference": 0.0077056884765625,
+              "allowed_difference": 0.004701098442077637
+            },
+            {
+              "index": [
+                0,
+                0,
+                35,
+                65
+              ],
+              "actual": -6.810441970825195,
+              "expected": -6.803091526031494,
+              "absolute_difference": 0.007350444793701172,
+              "allowed_difference": 0.007803091526031494
+            },
+            {
+              "index": [
+                0,
+                0,
+                8,
+                40
+              ],
+              "actual": 3.2872514724731445,
+              "expected": 3.293940305709839,
+              "absolute_difference": 0.006688833236694336,
+              "allowed_difference": 0.004293940305709839
+            },
+            {
+              "index": [
+                0,
+                0,
+                33,
+                65
+              ],
+              "actual": -0.973278284072876,
+              "expected": -0.9670200943946838,
+              "absolute_difference": 0.006258189678192139,
+              "allowed_difference": 0.001967020094394684
+            }
+          ]
+        },
+        "encode_mode_vs_api_raw_same_input": {
+          "shape_actual": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "shape_expected": [
+            1,
+            1,
+            96,
+            96
+          ],
+          "dtype_actual": "float32",
+          "dtype_expected": "float32",
+          "atol": 0.001,
+          "rtol": 0.001,
+          "passed": true,
+          "elements": 9216,
+          "failing_elements": 0,
+          "failing_fraction": 0.0,
+          "max_abs": 0.0,
+          "rms": 0.0,
+          "mean_signed_difference": 0.0,
+          "expected_mean": 4.732350874587104,
+          "expected_sd": 9.757498144748155,
+          "expected_rms": 10.844533869418685,
+          "rms_relative_to_expected_rms": 0.0,
+          "absolute_difference_percentiles": {
+            "p50": 0.0,
+            "p95": 0.0,
+            "p99": 0.0,
+            "p99_9": 0.0
+          },
+          "worst_positions": [
+            {
+              "index": [
+                0,
+                0,
+                95,
+                95
+              ],
+              "actual": 23.06747817993164,
+              "expected": 23.06747817993164,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.024067478179931642
+            },
+            {
+              "index": [
+                0,
+                0,
+                31,
+                95
+              ],
+              "actual": 15.51754093170166,
+              "expected": 15.51754093170166,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.01651754093170166
+            },
+            {
+              "index": [
+                0,
+                0,
+                31,
+                94
+              ],
+              "actual": 13.005108833312988,
+              "expected": 13.005108833312988,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.01400510883331299
+            },
+            {
+              "index": [
+                0,
+                0,
+                32,
+                1
+              ],
+              "actual": 12.918553352355957,
+              "expected": 12.918553352355957,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.013918553352355957
+            },
+            {
+              "index": [
+                0,
+                0,
+                32,
+                4
+              ],
+              "actual": 11.855109214782715,
+              "expected": 11.855109214782715,
+              "absolute_difference": 0.0,
+              "allowed_difference": 0.012855109214782716
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "runtime": {
+    "python": "3.10.21",
+    "packages": {
+      "torch": "2.14.0",
+      "torchvision": "0.29.0",
+      "monai": "1.4.0",
+      "numpy": "1.26.4",
+      "Pillow": "10.4.0",
+      "huggingface-hub": "0.36.2"
+    },
+    "cuda": "13.0",
+    "cudnn": 92400,
+    "gpu": {
+      "name": "NVIDIA A10",
+      "compute_capability": [
+        8,
+        6
+      ],
+      "memory_bytes": 23684841472
+    },
+    "precision": {
+      "api": "fp32_precision",
+      "values": {
+        "global": "none",
+        "cuda_matmul": "none",
+        "cudnn": "none",
+        "cudnn_conv": "tf32",
+        "cudnn_rnn": "tf32"
+      },
+      "cudnn_benchmark": false,
+      "cudnn_deterministic": false
+    },
+    "environment": {
+      "NVIDIA_TF32_OVERRIDE": null,
+      "TORCH_ALLOW_TF32_CUBLAS_OVERRIDE": null,
+      "CUBLAS_WORKSPACE_CONFIG": null
+    }
+  },
+  "tolerances": {
+    "atol": 0.001,
+    "rtol": 0.001
+  },
+  "script_sha256": "75728bba658199f281e86534128e00d189b551f01e01753142715504ef5c7483",
+  "helper_sha256": "d6c34c02daac5734f39b935845b8760c189d92131d0c9291f36bbc5f0878ec1e",
+  "scope": "Numerical diagnosis on selected cases, not a full-cache validation or proof of historical checkpoint identity",
+  "raw_cache": {
+    "path": "/lambda/nfs/MedVAE/MedVAE/latents_aspect/latents_medvae_4_1_2d_train.npz",
+    "sha256": "6d0b29f293b9a310b187cb3878ba6d6e07548c9a5bd1a905309cf128ce8873fe",
+    "shape": [
+      409,
+      1,
+      96,
+      96
+    ],
+    "dtype": "float32",
+    "representation": null
+  },
+  "checkpoint": {
+    "path": "/home/ubuntu/.cache/huggingface/hub/models--stanfordmimi--MedVAE/snapshots/8040c5ccb7a51eff6b4cef513c7f20bd1bda983d/model_weights/vae_4x_1c_2D.ckpt",
+    "sha256": "0e4bd8931238a6c52acb3d826025f5bcfa284aa9f98cc5455505f131d690c1ba",
+    "config_sha256": "b08ea5caeeb8a25699bbd209ac1fb5b451955b859748bba365995f6e81eb27c9",
+    "projection_keys": [
+      "channel_ds.0.weight",
+      "channel_ds.0.bias",
+      "channel_ds.2.weight",
+      "channel_ds.2.bias",
+      "channel_ds.4.weight",
+      "channel_ds.4.bias",
+      "channel_proj.weight",
+      "channel_proj.bias"
+    ],
+    "encoder_tensor_count_checked": 90,
+    "implementation_sha256": "45c1d9ba366e2208a3624b08ca8d69071caf50e70fe844596f62da14ed2a3b3f"
+  },
+  "selected_uuids": [
+    "sunhl-1th-02-Jan-2017-162_A_AP",
+    "sunhl-1th-30-Dec-2016-161_A_AP"
+  ],
+  "precision_changes_same_input": [
+    {
+      "image_uuid": "sunhl-1th-02-Jan-2017-162_A_AP",
+      "mode_a": "current",
+      "mode_b": "ieee",
+      "comparison": {
+        "shape_actual": [
+          1,
+          1,
+          96,
+          96
+        ],
+        "shape_expected": [
+          1,
+          1,
+          96,
+          96
+        ],
+        "dtype_actual": "float32",
+        "dtype_expected": "float32",
+        "atol": 0.001,
+        "rtol": 0.001,
+        "passed": false,
+        "elements": 9216,
+        "failing_elements": 49,
+        "failing_fraction": 0.005316840277777778,
+        "max_abs": 0.08042240142822266,
+        "rms": 0.0022775078056127052,
+        "mean_signed_difference": -0.0003995933479422496,
+        "expected_mean": 9.032652108797468,
+        "expected_sd": 6.980350707831194,
+        "expected_rms": 11.41552014245881,
+        "rms_relative_to_expected_rms": 0.00019950977066228966,
+        "absolute_difference_percentiles": {
+          "p50": 0.0009946823120117188,
+          "p95": 0.002347230911254883,
+          "p99": 0.0041255950927734375,
+          "p99_9": 0.02637786865234394
+        },
+        "worst_positions": [
+          {
+            "index": [
+              0,
+              0,
+              91,
+              49
+            ],
+            "actual": -12.8115873336792,
+            "expected": -12.731164932250977,
+            "absolute_difference": 0.08042240142822266,
+            "allowed_difference": 0.013731164932250978
+          },
+          {
+            "index": [
+              0,
+              0,
+              91,
+              50
+            ],
+            "actual": -12.064504623413086,
+            "expected": -12.13412094116211,
+            "absolute_difference": 0.06961631774902344,
+            "allowed_difference": 0.01313412094116211
+          },
+          {
+            "index": [
+              0,
+              0,
+              9,
+              63
+            ],
+            "actual": 13.220449447631836,
+            "expected": 13.152545928955078,
+            "absolute_difference": 0.06790351867675781,
+            "allowed_difference": 0.014152545928955079
+          },
+          {
+            "index": [
+              0,
+              0,
+              10,
+              63
+            ],
+            "actual": 8.333992958068848,
+            "expected": 8.399580955505371,
+            "absolute_difference": 0.06558799743652344,
+            "allowed_difference": 0.00939958095550537
+          },
+          {
+            "index": [
+              0,
+              0,
+              10,
+              64
+            ],
+            "actual": 7.200501441955566,
+            "expected": 7.1487579345703125,
+            "absolute_difference": 0.051743507385253906,
+            "allowed_difference": 0.008148757934570313
+          }
+        ]
+      }
+    },
+    {
+      "image_uuid": "sunhl-1th-02-Jan-2017-162_A_AP",
+      "mode_a": "current",
+      "mode_b": "tf32",
+      "comparison": {
+        "shape_actual": [
+          1,
+          1,
+          96,
+          96
+        ],
+        "shape_expected": [
+          1,
+          1,
+          96,
+          96
+        ],
+        "dtype_actual": "float32",
+        "dtype_expected": "float32",
+        "atol": 0.001,
+        "rtol": 0.001,
+        "passed": true,
+        "elements": 9216,
+        "failing_elements": 0,
+        "failing_fraction": 0.0,
+        "max_abs": 0.00104522705078125,
+        "rms": 5.25929988124424e-05,
+        "mean_signed_difference": 3.666106042348676e-06,
+        "expected_mean": 9.032652108797468,
+        "expected_sd": 6.980350707831194,
+        "expected_rms": 11.41552014245881,
+        "rms_relative_to_expected_rms": 4.60714870247816e-06,
+        "absolute_difference_percentiles": {
+          "p50": 1.52587890625e-05,
+          "p95": 0.0001010894775390625,
+          "p99": 0.0002192020416259769,
+          "p99_9": 0.0004183596372604496
+        },
+        "worst_positions": [
+          {
+            "index": [
+              0,
+              0,
+              91,
+              49
+            ],
+            "actual": -12.730119705200195,
+            "expected": -12.731164932250977,
+            "absolute_difference": 0.00104522705078125,
+            "allowed_difference": 0.013731164932250978
+          },
+          {
+            "index": [
+              0,
+              0,
+              91,
+              50
+            ],
+            "actual": -12.134941101074219,
+            "expected": -12.13412094116211,
+            "absolute_difference": 0.000820159912109375,
+            "allowed_difference": 0.01313412094116211
+          },
+          {
+            "index": [
+              0,
+              0,
+              0,
+              63
+            ],
+            "actual": 19.723669052124023,
+            "expected": 19.72308349609375,
+            "absolute_difference": 0.0005855560302734375,
+            "allowed_difference": 0.020723083496093753
+          },
+          {
+            "index": [
+              0,
+              0,
+              33,
+              35
+            ],
+            "actual": 7.600539684295654,
+            "expected": 7.601038932800293,
+            "absolute_difference": 0.0004992485046386719,
+            "allowed_difference": 0.008601038932800294
+          },
+          {
+            "index": [
+              0,
+              0,
+              30,
+              37
+            ],
+            "actual": 3.259706497192383,
+            "expected": 3.260183334350586,
+            "absolute_difference": 0.000476837158203125,
+            "allowed_difference": 0.004260183334350586
+          }
+        ]
+      }
+    },
+    {
+      "image_uuid": "sunhl-1th-30-Dec-2016-161_A_AP",
+      "mode_a": "current",
+      "mode_b": "ieee",
+      "comparison": {
+        "shape_actual": [
+          1,
+          1,
+          96,
+          96
+        ],
+        "shape_expected": [
+          1,
+          1,
+          96,
+          96
+        ],
+        "dtype_actual": "float32",
+        "dtype_expected": "float32",
+        "atol": 0.001,
+        "rtol": 0.001,
+        "passed": false,
+        "elements": 9216,
+        "failing_elements": 81,
+        "failing_fraction": 0.0087890625,
+        "max_abs": 0.03587770462036133,
+        "rms": 0.0018945371043665672,
+        "mean_signed_difference": 1.813931804564264e-05,
+        "expected_mean": 4.732351085618979,
+        "expected_sd": 9.757495477256747,
+        "expected_rms": 10.844531561402041,
+        "rms_relative_to_expected_rms": 0.00017469976399069384,
+        "absolute_difference_percentiles": {
+          "p50": 0.0009164810180664062,
+          "p95": 0.002619028091430664,
+          "p99": 0.009608173370361354,
+          "p99_9": 0.01951857566833497
+        },
+        "worst_positions": [
+          {
+            "index": [
+              0,
+              0,
+              29,
+              24
+            ],
+            "actual": -3.992206573486328,
+            "expected": -4.0280842781066895,
+            "absolute_difference": 0.03587770462036133,
+            "allowed_difference": 0.00502808427810669
+          },
+          {
+            "index": [
+              0,
+              0,
+              30,
+              24
+            ],
+            "actual": -1.7150049209594727,
+            "expected": -1.6815816164016724,
+            "absolute_difference": 0.03342330455780029,
+            "allowed_difference": 0.0026815816164016725
+          },
+          {
+            "index": [
+              0,
+              0,
+              84,
+              71
+            ],
+            "actual": -8.111465454101562,
+            "expected": -8.085685729980469,
+            "absolute_difference": 0.02577972412109375,
+            "allowed_difference": 0.009085685729980468
+          },
+          {
+            "index": [
+              0,
+              0,
+              85,
+              71
+            ],
+            "actual": -9.063854217529297,
+            "expected": -9.086437225341797,
+            "absolute_difference": 0.0225830078125,
+            "allowed_difference": 0.010086437225341797
+          },
+          {
+            "index": [
+              0,
+              0,
+              28,
+              24
+            ],
+            "actual": -2.0646486282348633,
+            "expected": -2.0422329902648926,
+            "absolute_difference": 0.022415637969970703,
+            "allowed_difference": 0.003042232990264893
+          }
+        ]
+      }
+    },
+    {
+      "image_uuid": "sunhl-1th-30-Dec-2016-161_A_AP",
+      "mode_a": "current",
+      "mode_b": "tf32",
+      "comparison": {
+        "shape_actual": [
+          1,
+          1,
+          96,
+          96
+        ],
+        "shape_expected": [
+          1,
+          1,
+          96,
+          96
+        ],
+        "dtype_actual": "float32",
+        "dtype_expected": "float32",
+        "atol": 0.001,
+        "rtol": 0.001,
+        "passed": true,
+        "elements": 9216,
+        "failing_elements": 0,
+        "failing_fraction": 0.0,
+        "max_abs": 0.0024080276489257812,
+        "rms": 7.822290526614824e-05,
+        "mean_signed_difference": -2.1103187464177608e-07,
+        "expected_mean": 4.732351085618979,
+        "expected_sd": 9.757495477256747,
+        "expected_rms": 10.844531561402041,
+        "rms_relative_to_expected_rms": 7.213119794363451e-06,
+        "absolute_difference_percentiles": {
+          "p50": 2.288818359375e-05,
+          "p95": 0.00013744831085205078,
+          "p99": 0.0002743721008300788,
+          "p99_9": 0.0005778002738953203
+        },
+        "worst_positions": [
+          {
+            "index": [
+              0,
+              0,
+              34,
+              65
+            ],
+            "actual": -3.951810836791992,
+            "expected": -3.9494028091430664,
+            "absolute_difference": 0.0024080276489257812,
+            "allowed_difference": 0.004949402809143066
+          },
+          {
+            "index": [
+              0,
+              0,
+              33,
+              45
+            ],
+            "actual": 1.1165801286697388,
+            "expected": 1.1152914762496948,
+            "absolute_difference": 0.0012886524200439453,
+            "allowed_difference": 0.002115291476249695
+          },
+          {
+            "index": [
+              0,
+              0,
+              33,
+              65
+            ],
+            "actual": -0.33635661005973816,
+            "expected": -0.33764323592185974,
+            "absolute_difference": 0.001286625862121582,
+            "allowed_difference": 0.0013376432359218596
+          },
+          {
+            "index": [
+              0,
+              0,
+              34,
+              64
+            ],
+            "actual": -4.842507362365723,
+            "expected": -4.843753337860107,
+            "absolute_difference": 0.0012459754943847656,
+            "allowed_difference": 0.005843753337860107
+          },
+          {
+            "index": [
+              0,
+              0,
+              32,
+              45
+            ],
+            "actual": 9.162095069885254,
+            "expected": 9.163260459899902,
+            "absolute_difference": 0.0011653900146484375,
+            "allowed_difference": 0.010163260459899903
+          }
+        ]
+      }
+    }
+  ],
+  "compatible_modes_for_checked_cases": [],
+  "diagnostic_complete": true,
+  "next_step": "No tested mode passed every required check. Return diagnosis.json for review; do not loosen the threshold or start training from the incomplete study."
+}

@@ -1,0 +1,61 @@
+# BoostNet dataloader for patch finetuning. Place in MedVAE/configs/dataloader/.
+#
+# Uses BoostNetPatchDataset (medvae/dataloaders/patch_dataset.py), which returns
+# one random 384 x 384 crop per image at native resolution, without resizing or
+# padding. The split file must contain the bounding-box columns written by
+# prepare_spine_bboxes.py. Validation and test also use random crops, so the
+# validation loss of a fixed model varies slightly between epochs.
+
+defaults:
+  - default.yaml
+
+train:
+  dataset:
+    _target_: medvae.dataloaders.ConcatDataset
+    datasets:
+      - _target_: medvae.dataloaders.BoostNetPatchDataset
+        split_path: ${paths.data_dir}/${dataset_name}.csv
+        data_dir: ${paths.data_dir}/${dataset_name}/
+        dataset_id: 0
+        split_column: split
+        split_name: train
+        img_dir: ${paths.data_dir}/${dataset_name}/
+        img_column: image_uuid
+        img_suffix: .jpg
+        merge_channels: ${merge_channels}
+        patch_size: 384
+        flip_p: 0.5
+
+valid:
+  dataset:
+    _target_: medvae.dataloaders.ConcatDataset
+    datasets:
+      - _target_: medvae.dataloaders.BoostNetPatchDataset
+        split_path: ${paths.data_dir}/${dataset_name}.csv
+        data_dir: ${paths.data_dir}/${dataset_name}/
+        dataset_id: 0
+        split_column: split
+        split_name: val
+        img_dir: ${paths.data_dir}/${dataset_name}/
+        img_column: image_uuid
+        img_suffix: .jpg
+        merge_channels: ${merge_channels}
+        patch_size: 384
+        flip_p: 0.0
+
+test:
+  dataset:
+    _target_: medvae.dataloaders.ConcatDataset
+    datasets:
+      - _target_: medvae.dataloaders.BoostNetPatchDataset
+        split_path: ${paths.data_dir}/${dataset_name}.csv
+        data_dir: ${paths.data_dir}/${dataset_name}/
+        dataset_id: 0
+        split_column: split
+        split_name: test
+        img_dir: ${paths.data_dir}/${dataset_name}/
+        img_column: image_uuid
+        img_suffix: .jpg
+        merge_channels: ${merge_channels}
+        patch_size: 384
+        flip_p: 0.0

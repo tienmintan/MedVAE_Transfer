@@ -1,0 +1,39 @@
+{
+  "python": "3.10.21",
+  "packages": {
+    "torch": "2.14.0",
+    "torchvision": "0.29.0",
+    "monai": "1.4.0",
+    "numpy": "1.26.4",
+    "Pillow": "10.4.0",
+    "huggingface-hub": "0.36.2"
+  },
+  "cuda": "13.0",
+  "cudnn": 92400,
+  "gpu": {
+    "name": "NVIDIA A10",
+    "compute_capability": [
+      8,
+      6
+    ],
+    "memory_bytes": 23684841472
+  },
+  "precision": {
+    "api": "fp32_precision",
+    "values": {
+      "global": "ieee",
+      "cuda_matmul": "ieee",
+      "cudnn": "ieee",
+      "cudnn_conv": "ieee",
+      "cudnn_rnn": "ieee"
+    },
+    "cudnn_benchmark": false,
+    "cudnn_deterministic": false
+  },
+  "environment": {
+    "NVIDIA_TF32_OVERRIDE": null,
+    "TORCH_ALLOW_TF32_CUBLAS_OVERRIDE": null,
+    "CUBLAS_WORKSPACE_CONFIG": null
+  },
+  "loader_sha256": "663de75474de45ccd8e3c3bdce122a5c0c5fd3b57b27cea495cac0cd76c003f2"
+}

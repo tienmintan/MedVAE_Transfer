@@ -1,0 +1,3 @@
+task,unit,anchor_light,anchor_heavy,err_light,err_heavy,rel_pct,ci_overlap
+landmark,norm,4_1,8_1,0.034436050802469254,0.036490973085165024,5.967357565137583,True
+cobb,deg,4_1,8_1,6.58037805557251,6.751572608947754,2.6015914576559958,True

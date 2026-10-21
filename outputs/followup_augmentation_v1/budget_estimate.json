@@ -1,0 +1,13 @@
+{
+  "total_new_fits": 6,
+  "completed_fits": 6,
+  "remaining_fits": 0,
+  "pilot_seconds": [
+    45.71883842000079,
+    58.79244752299928
+  ],
+  "spent_seconds": 354.64531396000075,
+  "conservative_total_seconds": 354.64531396000075,
+  "budget_seconds": 7200.0,
+  "within_budget": true
+}

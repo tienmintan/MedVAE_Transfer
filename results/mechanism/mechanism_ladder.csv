@@ -1,0 +1,7 @@
+rung,unit,err_4x,err_8x,delta,rel_pct,p_paired
+position,norm,0.0394,0.0407,0.0013,3.2,0.0147
+orientation,deg,4.9106,5.2095,0.2989,6.1,0.000273
+apex_orientation,deg,6.9263,7.6309,0.7047,10.2,0.000127
+mt_cobb_vs_geom,deg,7.4899,8.0303,0.5404,7.2,0.165
+mt_cobb_vs_true,deg,7.3921,7.9302,0.5382,7.3,0.166
+direct_cobb,deg,7.7566,8.0587,0.3021,3.9,0.109

@@ -1,0 +1,62 @@
+[
+  {
+    "job": [
+      "augmented",
+      "projected_mean",
+      "cobb",
+      0
+    ],
+    "seconds": 49.46095044999947,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "augmented",
+      "projected_mean",
+      "landmark",
+      0
+    ],
+    "seconds": 62.580992098000024,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "augmented",
+      "projected_mean",
+      "cobb",
+      1
+    ],
+    "seconds": 31.553850201000387,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "augmented",
+      "projected_mean",
+      "landmark",
+      1
+    ],
+    "seconds": 71.65606993500023,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "augmented",
+      "projected_mean",
+      "cobb",
+      2
+    ],
+    "seconds": 45.08698608600025,
+    "status": "ok"
+  },
+  {
+    "job": [
+      "augmented",
+      "projected_mean",
+      "landmark",
+      2
+    ],
+    "seconds": 94.30646519000038,
+    "status": "ok"
+  }
+]

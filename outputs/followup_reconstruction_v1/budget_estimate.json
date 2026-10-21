@@ -1,0 +1,6 @@
+{
+  "conservative_total_seconds": 1004.9189728390002,
+  "spent_seconds": 1004.9189728390002,
+  "budget_seconds": 28800.0,
+  "peak_pilot_cuda_bytes": 12956048384
+}

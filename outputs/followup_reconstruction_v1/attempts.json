@@ -1,0 +1,86 @@
+[
+  {
+    "config": "medvae_4_1_2d",
+    "resolution": 384,
+    "phase": "pilot",
+    "status": "ok",
+    "seconds": 12.807388768000237
+  },
+  {
+    "config": "medvae_4_1_2d",
+    "resolution": 768,
+    "phase": "pilot",
+    "status": "ok",
+    "seconds": 12.756759071999568
+  },
+  {
+    "config": "medvae_8_1_2d",
+    "resolution": 384,
+    "phase": "pilot",
+    "status": "ok",
+    "seconds": 16.713756536000346
+  },
+  {
+    "config": "medvae_8_1_2d",
+    "resolution": 768,
+    "phase": "pilot",
+    "status": "ok",
+    "seconds": 12.402165176999915
+  },
+  {
+    "config": "medvae_8_4_2d",
+    "resolution": 384,
+    "phase": "pilot",
+    "status": "ok",
+    "seconds": 15.458992635999948
+  },
+  {
+    "config": "medvae_8_4_2d",
+    "resolution": 768,
+    "phase": "pilot",
+    "status": "ok",
+    "seconds": 15.30916556000011
+  },
+  {
+    "config": "medvae_4_1_2d",
+    "resolution": 384,
+    "phase": "run",
+    "status": "ok",
+    "seconds": 58.50516251299996
+  },
+  {
+    "config": "medvae_4_1_2d",
+    "resolution": 768,
+    "phase": "run",
+    "status": "ok",
+    "seconds": 256.7409981149999
+  },
+  {
+    "config": "medvae_8_1_2d",
+    "resolution": 384,
+    "phase": "run",
+    "status": "ok",
+    "seconds": 54.692385334999926
+  },
+  {
+    "config": "medvae_8_1_2d",
+    "resolution": 768,
+    "phase": "run",
+    "status": "ok",
+    "seconds": 187.60565553200013
+  },
+  {
+    "config": "medvae_8_4_2d",
+    "resolution": 384,
+    "phase": "run",
+    "status": "ok",
+    "seconds": 75.91335277300004
+  },
+  {
+    "config": "medvae_8_4_2d",
+    "resolution": 768,
+    "phase": "run",
+    "status": "ok",
+    "seconds": 286.01319082200007
+  }
+]
