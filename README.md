@@ -1,7 +1,7 @@
 # MedVAE Transfer for Spinal Geometry
 MSc Computing (Artificial Intelligence and Machine Learning) Individual Project, Imperial College London, 2026, supervised by Dr Elsa Angelini and Dr Loïc Le Folgoc.
 
-Code and saved results for the MSc individual project report *MedVAE Transfer for Spinal Geometry*. The report source is available in this repository and by following this link: [MedVAE Transfer for Spinal Geometry](https://github.com/tienmintan/MedVAE_Transfer/blob/main/MedVAE_Transfer_Report.pdf).
+Code and saved results for the MSc individual project report *MedVAE Transfer for Spinal Geometry*. The report PDF is available in this repository: [MedVAE Transfer for Spinal Geometry](https://github.com/tienmintan/MedVAE_Transfer/blob/main/MedVAE_Transfer_Report.pdf).
 
 The project tests whether the pretrained 2D encoders of [MedVAE](https://github.com/StanfordMIMI/MedVAE) retain enough information to predict spinal geometry: three Cobb angles and 68 vertebral-corner landmarks on the 609 radiographs of the BoostNet/AASCE dataset. The encoders stay frozen except in the finetuning experiments of Chapter 4. The experiments cover:
 
